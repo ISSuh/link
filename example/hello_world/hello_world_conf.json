@@ -1,0 +1,39 @@
+{   
+    "node_name" : "helloworld",
+    "log_level" : "debug",
+    "modules" : 
+    [
+        {
+            "module_name" : "Sample_0",
+            "module_path" : "/home/issuh/workspace/myProject/SimpleModule/build/lib/libhello_world.so",
+            "module" : {
+                "class_name" : "SampleModule",
+                "args" : {
+                    "int_test" : 1,
+                    "float_test" : 1.1,
+                    "bool_test" : true,
+                    "string_test" : "Hello World!"
+                },
+                "configure" : {
+                    "threading" : false
+                }
+            }
+        },
+        {
+            "module_name" : "Sample_1",
+            "module_path" : "/home/issuh/workspace/myProject/SimpleModule/build/lib/libhello_world.so",
+            "module" : {
+                "class_name" : "SampleModule",
+                "args" : {
+                    "int_test" : 1,
+                    "float_test" : 1.1,
+                    "bool_test" : true,
+                    "string_test" : "Hello World!"
+                },
+                "configure" : {
+                    "threading" : false
+                }
+            }
+        }
+    ]
+}

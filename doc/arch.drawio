@@ -5,7 +5,42 @@
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
                 <mxCell id="2" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-                    <mxGeometry x="30" y="240" width="160" height="150" as="geometry"/>
+                    <mxGeometry x="60" y="200" width="160" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="200" width="160" height="150" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="JJT3adKmF4t2psf9ml5j" name="module">
+        <mxGraphModel dx="1186" dy="859" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-0"/>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-1" parent="XbeN9in1GbnzsduU7_B5-0"/>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-2" value="User Module" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="100" y="100" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-3" value="User Module" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="350" y="100" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-4" value="ModuleRegister" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="100" y="210" width="520" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-5" value="Module Loader" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="100" y="310" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-6" value="User Module" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="500" y="100" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-7" value="Module Loader" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="350" y="310" width="270" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="XbeN9in1GbnzsduU7_B5-8" value="Module Manager" style="rounded=0;whiteSpace=wrap;html=1;" parent="XbeN9in1GbnzsduU7_B5-1" vertex="1">
+                    <mxGeometry x="100" y="420" width="520" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="2O1xlTzjCVljMS2MvAQ0-1" value="Module Executor" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="XbeN9in1GbnzsduU7_B5-1">
+                    <mxGeometry x="700" y="310" width="300" height="60" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
