@@ -47,6 +47,7 @@ target_link_libraries(${LINK_LIBRARY_NAME}
 # Build example
 #-------------------------------------------------------------------------------
 add_subdirectory(example)
+add_subdirectory(example/hello_world)
 
 #-------------------------------------------------------------------------------
 # Set gTest

@@ -4,21 +4,21 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_USER_MODULE_MODULE_H_
-#define LINK_LAUNCHER_USER_MODULE_MODULE_H_
+#ifndef LINK_MODULE_USER_MODULE_H_
+#define LINK_MODULE_USER_MODULE_H_
 
 #include <string>
 #include <memory>
 #include <algorithm>
 
-#include "link/launcher/module/module_base.h"
-#include "link/launcher/module/module_register.h"
+#include "link/module/user_module_base.h"
+#include "link/module/loader/module_register_helper.h"
 #include "link/base/json_wrapper.h"
 
 namespace link {
-namespace launcher {
+namespace module {
 
-class UserModule : public ModuleBase {
+class UserModule : public UserModuleBase {
  protected:
   virtual void Init() = 0;
   virtual void Run() = 0;
@@ -61,7 +61,7 @@ class UserModule : public ModuleBase {
 #define REGIST_MODULE(UserModuleClass) \
   MODULE_REGISTER(UserModuleClass, link::launcher::UserModule)
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_USER_MODULE_MODULE_H_
+#endif  // LINK_MODULE_USER_MODULE_H_

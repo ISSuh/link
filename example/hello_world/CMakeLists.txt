@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.2)
 project(hello_world)
 
-message("SimpleModule hello_world Example")
+message("link module hello_world Example")
 
 #-------------------------------------------------------------------------------
 # Compile Option
@@ -22,7 +22,7 @@ SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LIBRARY})
 
 include_directories(
-  ${SRPC_INCLUDES}
+  ${PROJECT_LINK_INCLUDE_DIR}
 )
 
 link_directories(

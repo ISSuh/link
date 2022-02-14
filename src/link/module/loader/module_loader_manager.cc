@@ -4,33 +4,34 @@
  *
  */
 
-#include "link/launcher/loader/module_loader_manager.h"
+#include "link/module/loader/module_loader_manager.h"
 
 #include <iostream>
 #include <utility>
 
-// #include "link/launcher/util/IdGenerator.h"
+// #include "link/module/util/IdGenerator.h"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 ModuleLoadManager::ModuleLoadManager() {}
 
 ModuleLoadManager::~ModuleLoadManager() {}
 
-void ModuleLoadManager::CreateModlueLoader(base::JsonWrapper specifications) {
+void ModuleLoadManager::createModlueLoader(util::JsonWrapper specifications) {
   std::cout << "ModuleLoadManager::createModlueLoader\n";
 
   LoaderId id = util::idGenerator();
   paraseModuleSpecifications(id, specifications);
 
-  module_loades_[id] = std::unique_ptr<ModuleLoader>(
-      new ModuleLoader());
+  m_loaderMap[id] =
+    std::unique_ptr<ModuleLoader<module::Module>>(
+      new ModuleLoader<module::Module>());
 }
 
 void ModuleLoadManager::loadModule(
   LoaderId id, const module::ModuleInfo& info) {
-  module_loades_[id]->loadModule(info);
+  m_loaderMap[id]->loadModule(info);
 }
 
 void ModuleLoadManager::loadAllModule() {
@@ -44,7 +45,7 @@ void ModuleLoadManager::loadAllModule() {
 
 void ModuleLoadManager::unLoadModule(
   LoaderId id, const ModuleName& moduleName) {
-  module_loades_[id]->unLoadModule(moduleName);
+  m_loaderMap[id]->unLoadModule(moduleName);
 }
 
 void ModuleLoadManager::unLoadAllModule() {
@@ -62,11 +63,11 @@ std::shared_ptr<module::Module> ModuleLoadManager::getModule(
   LoaderId id = m_loaderIdByModuleName[moduleName];
   std::cout << "ModuleLoadManager::getModule - "
             << id << " / " << moduleName << std::endl;
-  return std::move(module_loades_[id]->getModule(moduleName));
+  return std::move(m_loaderMap[id]->getModule(moduleName));
 }
 
 bool ModuleLoadManager::hasModuleLoader(LoaderId id) const {
-  if (module_loades_.find(id) != module_loades_.end()) {
+  if (m_loaderMap.find(id) != m_loaderMap.end()) {
     return true;
   }
   return false;
@@ -78,7 +79,7 @@ bool ModuleLoadManager::hasModule(const ModuleName& modulName) const {
   }
 
   LoaderId id = m_loaderIdByModuleName.at(modulName);
-  if (module_loades_.at(id)->hasModule(modulName)) {
+  if (m_loaderMap.at(id)->hasModule(modulName)) {
     return true;
   }
 
@@ -103,5 +104,5 @@ void ModuleLoadManager::paraseModuleSpecifications(
   m_moduleInfomationsByLoader[id] = std::move(infomations);
 }
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link

@@ -4,13 +4,13 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_MODULE_MODULE_REGISTER_HPP_
-#define LINK_LAUNCHER_MODULE_MODULE_REGISTER_HPP_
+#ifndef LINK_MODULE_LOADER_REGISTER_HELPER_HPP_
+#define LINK_MODULE_LOADER_REGISTER_HELPER_HPP_
 
-#include "link/launcher/loader/module_loader_util.h"
+#include "link/module/loader/module_register.h"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 #define MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, UniqueID)                 \
 namespace {                                                                             \
@@ -27,7 +27,7 @@ namespace {                                                                     
 #define MODULE_REGISTER(UserModuleClass, ModuleBase) \
   MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, __COUNTER__)
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_MODULE_MODULE_REGISTER_HPP_
+#endif  // LINK_MODULE_LOADER_REGISTER_HELPER_HPP_

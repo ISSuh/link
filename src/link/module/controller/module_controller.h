@@ -4,17 +4,17 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_CONTROLLER_MODULE_CONTROLLER_H_
-#define LINK_LAUNCHER_CONTROLLER_MODULE_CONTROLLER_H_
+#ifndef LINK_MODULE_CONTROLLER_MODULE_CONTROLLER_H_
+#define LINK_MODULE_CONTROLLER_MODULE_CONTROLLER_H_
 
 #include <vector>
 #include <memory>
 
-#include "link/launcher/module/ModuleBase.hpp"
-#include "link/launcher/loader/ModuleLoaderManager.hpp"
+#include "link/module/ModuleBase.hpp"
+#include "link/module/loader/ModuleLoaderManager.hpp"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 class ModuleController {
  public:
@@ -31,7 +31,7 @@ class ModuleController {
   smt::loader::ModuleLoadManager m_loadManager;
 };
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_CONTROLLER_MODULE_CONTROLLER_H_
+#endif  // LINK_MODULE_CONTROLLER_MODULE_CONTROLLER_H_

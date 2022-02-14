@@ -29,7 +29,7 @@ void JsonWrapper::parse(const char* json_str) {
 }
 
 void JsonWrapper::parse(const std::string& json_str) {
-  parse(json_str.c_str())
+  parse(json_str.c_str());
 }
 
 const std::string JsonWrapper::dump() const {
@@ -48,13 +48,13 @@ bool JsonWrapper::empty() const {
   return json_obj.empty();
 }
 
-bool JsonWrapper::hasKey(const std::string& key) {
+bool JsonWrapper::hasKey(const std::string& key) const {
   return json_obj.find(key) != json_obj.end();
 }
 
-bool JsonWrapper::hasKey(const char* key) {
-  return json_obj.find(key) != json_obj.end();
-}
+// bool JsonWrapper::hasKey(const char* key) {
+//   return json_obj.find(key) != json_obj.end();
+// }
 
 bool JsonWrapper::hasIndex(int index) {
   return json_obj[index].empty();

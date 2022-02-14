@@ -4,20 +4,21 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_MODULE_MODULEBASE_HPP_
-#define LINK_LAUNCHER_MODULE_MODULEBASE_HPP_
+#ifndef LINK_MODULE_USER_MODULE_BASE_H_
+#define LINK_MODULE_USER_MODULE_BASE_H_
 
 #include <iostream>
 #include <memory>
 #include <atomic>
 
 namespace link {
-namespace launcher {
+namespace module {
 
-class ModuleBase : public std::enable_shared_from_this<ModuleBase> {
+class UserModuleBase
+  : public std::enable_shared_from_this<UserModuleBase> {
  public:
-  ModuleBase() = default;
-  virtual ~ModuleBase() = default;
+  UserModuleBase() = default;
+  virtual ~UserModuleBase() = default;
 
   virtual bool Initialize() { return false; }
   virtual bool Process() { return false; }
@@ -28,7 +29,7 @@ class ModuleBase : public std::enable_shared_from_this<ModuleBase> {
   // std::string m_moduleName;
 };
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_MODULE_MODULEBASE_HPP_
+#endif  // LINK_MODULE_USER_MODULE_BASE_H_

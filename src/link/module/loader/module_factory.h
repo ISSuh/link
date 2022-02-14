@@ -4,14 +4,14 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_LOADER_MODULE_FACTORY_H_
-#define LINK_LAUNCHER_LOADER_MODULE_FACTORY_H_
+#ifndef LINK_MODULE_LOADER_MODULE_FACTORY_H_
+#define LINK_MODULE_LOADER_MODULE_FACTORY_H_
 
 #include <string>
 #include <memory>
 
 namespace link {
-namespace launcher {
+namespace module {
 
 class AbstractModuleFactoryBase {
  public:
@@ -61,7 +61,7 @@ class ModuleFactory : public AbstractModlueFactory<UserModuleBase> {
   }
 };
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_LOADER_MODULE_FACTORY_H_
+#endif  // LINK_MODULE_LOADER_MODULE_FACTORY_H_

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_LOADER_MODULEOPENER_HPP_
-#define LINK_LAUNCHER_LOADER_MODULEOPENER_HPP_
+#ifndef LINK_MODULE_LOADER_MODULEOPENER_HPP_
+#define LINK_MODULE_LOADER_MODULEOPENER_HPP_
 
 #include <dlfcn.h>
 
@@ -14,7 +14,7 @@
 #include <memory>
 
 namespace link {
-namespace launcher {
+namespace module {
 
 class ModuleOpener {
  public:
@@ -29,7 +29,7 @@ class ModuleOpener {
     std::unique_ptr<uint8_t, std::function<void(uint8_t*)>>> m_dlHandles;
 };
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_LOADER_MODULEOPENER_HPP_
+#endif  // LINK_MODULE_LOADER_MODULEOPENER_HPP_

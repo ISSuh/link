@@ -8,7 +8,7 @@
 #include <fstream>
 #include <streambuf>
 
-#include "link/launcher/loader/module_loader_manager.h"
+#include "link/module/loader/module_loader_manager.h"
 
 using namespace link;
 

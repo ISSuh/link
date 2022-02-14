@@ -4,14 +4,14 @@
  *
  */
 
-#include "link/launcher/loader/module_opener.h"
+#include "link/module/loader/module_opener.h"
 
 #include <iostream>
 
-#include "link/launcher/module/modul_base.h"
+#include "link/module/modul_base.h"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 std::vector<std::unique_ptr<
   uint8_t, std::function<void(uint8_t*)>>> ModuleOpener::m_dlHandles;
@@ -33,5 +33,5 @@ void ModuleOpener::dlHandleDeletor(uint8_t* hadle) {
   dlclose(static_cast<void*>(hadle));
 }
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link

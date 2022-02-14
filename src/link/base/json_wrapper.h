@@ -28,20 +28,20 @@ class JsonWrapper {
   void parse(const char* json_str);
   void parse(const std::string& json_str);
 
-  template<class T>
-  T get() {
-    return json_obj;
-  }
-
   const std::string dump() const;
 
   void clear();
   uint32_t size() const;
 
   bool empty() const;
-  bool hasKey(const std::string& key);
-  bool hasKey(const char* key)
+  bool hasKey(const std::string& key) const;
+  // bool hasKey(const char* key);
   bool hasIndex(int index);
+
+  template<typename T>
+  T get(const std::string& key) {
+    return json_obj;
+  }
 
   bool getBool(const std::string& key) const;
   int32_t getInt(const std::string& key) const;
@@ -59,15 +59,15 @@ class JsonWrapper {
     return *this;
   }
 
-  JsonWrapper operator[](const char* key) {
+  JsonWrapper operator[](const char* key) const {
     return JsonWrapper(json_obj[key].dump());
   }
 
-  JsonWrapper operator[](const std::string& key) {
+  JsonWrapper operator[](const std::string& key) const {
     return JsonWrapper(json_obj[key].dump());
   }
 
-  JsonWrapper operator[](int index) {
+  JsonWrapper operator[](int index) const {
     return JsonWrapper(json_obj.at(index).dump());
   }
 
@@ -75,6 +75,25 @@ class JsonWrapper {
   json json_obj;
 };
 
+template<>
+bool JsonWrapper::get(const std::string& key) {
+  return getBool(key);
+}
+
+template<>
+int32_t JsonWrapper::get(const std::string& key) {
+  return getInt(key);
+}
+
+template<>
+uint32_t JsonWrapper::get(const std::string& key) {
+  return getUint(key);
+}
+
+template<>
+const std::string JsonWrapper::get(const std::string& key) {
+  return getString(key);
+}
 }  // namespace base
 }  // namespace link
 

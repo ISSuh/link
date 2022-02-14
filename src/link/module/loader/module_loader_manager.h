@@ -4,20 +4,20 @@
  *
  */
 
-#ifndef LINK_LAUNCHER_LOADER_MODULE_LOADER_MANAGER_H_
-#define LINK_LAUNCHER_LOADER_MODULE_LOADER_MANAGER_H_
+#ifndef LINK_MODULE_LOADER_MODULE_LOADER_MANAGER_H_
+#define LINK_MODULE_LOADER_MODULE_LOADER_MANAGER_H_
 
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
 
-#include "link/launcher/module/module.h"
-#include "link/launcher/loader/module_loader.h"
+#include "link/module.h"
+#include "link/module/loader/module_loader.h"
 #include "link/base/json_wrapper.h"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 using LoaderId = uint64_t;
 
@@ -48,7 +48,7 @@ class ModuleLoadManager {
   std::map<LoaderId, std::unique_ptr<ModuleLoader> module_loades_;
 };
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
 
-#endif  // LINK_LAUNCHER_LOADER_MODULE_LOADER_MANAGER_H_
+#endif  // LINK_MODULE_LOADER_MODULE_LOADER_MANAGER_H_

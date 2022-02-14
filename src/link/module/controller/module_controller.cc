@@ -4,7 +4,7 @@
  *
  */
 
-#include "link/launcher/controller/module_controller.h"
+#include "link/module/controller/module_controller.h"
 
 #include <vector>
 #include <memory>
@@ -12,7 +12,7 @@
 // #include "smt/util/JsonWrapper.hpp"
 
 namespace link {
-namespace launcher {
+namespace module {
 
 ModuleController::ModuleController() {}
 
@@ -44,5 +44,5 @@ bool ModuleController::LoadAllModule() {
 //   return true;
 // }
 
-}  // namespace launcher
+}  // namespace module
 }  // namespace link
