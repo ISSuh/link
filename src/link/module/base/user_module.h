@@ -4,14 +4,14 @@
  *
  */
 
-#ifndef LINK_MODULE_USER_MODULE_H_
-#define LINK_MODULE_USER_MODULE_H_
+#ifndef LINK_MODULE_BASE_USER_MODULE_H_
+#define LINK_MODULE_BASE_USER_MODULE_H_
 
 #include <string>
 #include <memory>
 #include <algorithm>
 
-#include "link/module/user_module_base.h"
+#include "link/module/base/user_module_base.h"
 #include "link/module/loader/module_register_helper.h"
 #include "link/base/json_wrapper.h"
 
@@ -59,9 +59,9 @@ class UserModule : public UserModuleBase {
 
 // register class macro
 #define REGIST_MODULE(UserModuleClass) \
-  MODULE_REGISTER(UserModuleClass, link::launcher::UserModule)
+  MODULE_REGISTER(UserModuleClass, link::module::UserModule)
 
 }  // namespace module
 }  // namespace link
 
-#endif  // LINK_MODULE_USER_MODULE_H_
+#endif  // LINK_MODULE_BASE_USER_MODULE_H_

@@ -16,11 +16,11 @@ namespace module {
 namespace {                                                                             \
   struct Proxy##UserModuleClass_##UniqueID {                                            \
     Proxy##UserModuleClass_##UniqueID() {                                               \
-        smt::loader::ModuleLoaderUtil::registUserModule<UserModuleClass, ModuleBase>(   \
+        link::module::ModuleRegister::CreateModuleFactory<UserModuleClass, ModuleBase>( \
           #UserModuleClass, #ModuleBase);                                               \
     }                                                                                   \
   };                                                                                    \
-  static Proxy##UserModuleClass_##UniqueID g_registerModule_##UniqueID;                 \
+  static Proxy##UserModuleClass_##UniqueID g_UserModuleRegister_##UniqueID;             \
 }
 
 // register class macro

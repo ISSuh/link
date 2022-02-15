@@ -10,16 +10,21 @@
 #include <mutex>
 #include <functional>
 
-#include "link/module/module.h"
 #include "link/module/loader/module_register.h"
 #include "link/base/logging.h"
 
 namespace link {
 namespace module {
 
-void ModuleLoader::LoadModule(const std::string& spec_json) {
-  Module::Specification spec;
-  spec.ParseFromStr(spec_json);
+void ModuleLoader::LoadAllModule(
+  const std::vector<Module::Specification>& specs) {
+  for (const Module::Specification& spec : specs) {
+    LoadModule(spec);
+  }
+}
+
+void ModuleLoader::LoadModule(const Module::Specification& spec) {
+  LOG(INFO) << __func__ << " - " << spec.name;
 
   const std::string module_name = spec.name;
   if (modules_.find(module_name) != modules_.end()) {
@@ -27,12 +32,20 @@ void ModuleLoader::LoadModule(const std::string& spec_json) {
     return;
   }
 
-  std::unique_ptr<Module> module = Module::CreateModule(spec);
+  ModulePtr module = Module::CreateModule(spec);
   modules_[module_name] = std::move(module);
 }
 
+void ModuleLoader::UnLoadAllModule() {
+  for (const auto& module : modules_) {
+    const std::string module_name = module.first;
+    UnLoadModule(module_name);
+  }
+}
+
 void ModuleLoader::UnLoadModule(const std::string& module_name) {
-  std::cout << "ModuleLoader::UnLoadModule - " << module_name << std::endl;
+  LOG(INFO) << __func__ << " - " << module_name;
+
   if (HasModule(module_name)) {
     const std::string class_name = modules_[module_name]->class_name();
     modules_[module_name].reset();
@@ -44,6 +57,7 @@ void ModuleLoader::UnLoadModule(const std::string& module_name) {
 
 Module* ModuleLoader::GetModule(const std::string& module_name) const {
   if (!HasModule(module_name)) {
+    LOG(INFO) << __func__ << " - can not find module " << module_name;
     return nullptr;
   }
   return modules_.at(module_name).get();
@@ -54,6 +68,14 @@ bool ModuleLoader::HasModule(const std::string& module_name) const {
     return true;
   }
   return false;
+}
+
+const std::vector<std::string> ModuleLoader::ModuleNames() const {
+  std::vector<std::string> names;
+  for (const auto& module : modules_) {
+    names.emplace_back(module.first);
+  }
+  return names;
 }
 
 }  // namespace module

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_MODULE_MODULE_H_
-#define LINK_MODULE_MODULE_H_
+#ifndef LINK_MODULE_BASE_MODULE_H_
+#define LINK_MODULE_BASE_MODULE_H_
 
 #include <string>
 #include <memory>
@@ -16,10 +16,18 @@
 namespace link {
 namespace module {
 
+class Module;
+
+using ModulePtr =
+  std::unique_ptr<Module, std::function<void(Module*)>>;
+
+void ModuleDeleter(Module* module);
+
 class Module {
  public:
   struct Specification {
     Specification() = default;
+    Specification(const Specification& spec);
     virtual ~Specification() = default;
 
     void ParseFromStr(const std::string& json_str);
@@ -31,11 +39,13 @@ class Module {
     base::JsonWrapper configure;
   };
 
-  static std::unique_ptr<Module> CreateModule(const Specification& spec);
+  static ModulePtr CreateModule(const Specification& spec);
 
   const std::string name() const;
   const std::string class_name() const;
   const std::string path() const;
+
+  virtual void RunModule() = 0;
 
  protected:
   explicit Module(const Specification& spec);
@@ -46,8 +56,7 @@ class Module {
   DISAALOW_COPY_AND_ASSIGN(Module)
 };
 
-
 }  // namespace module
 }  // namespace link
 
-#endif  // LINK_MODULE_MODULE_H_
+#endif  // LINK_MODULE_BASE_MODULE_H_

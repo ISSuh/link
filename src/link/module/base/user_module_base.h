@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_MODULE_USER_MODULE_BASE_H_
-#define LINK_MODULE_USER_MODULE_BASE_H_
+#ifndef LINK_MODULE_BASE_USER_MODULE_BASE_H_
+#define LINK_MODULE_BASE_USER_MODULE_BASE_H_
 
 #include <iostream>
 #include <memory>
@@ -32,4 +32,4 @@ class UserModuleBase
 }  // namespace module
 }  // namespace link
 
-#endif  // LINK_MODULE_USER_MODULE_BASE_H_
+#endif  // LINK_MODULE_BASE_USER_MODULE_BASE_H_

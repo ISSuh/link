@@ -57,7 +57,7 @@ class ModuleFactory : public AbstractModlueFactory<UserModuleBase> {
       : AbstractModlueFactory<UserModuleBase>(class_name, base_class_name) {}
 
   UserModuleBase* CreateModuleObject() const {
-    return new UserModule();
+    return dynamic_cast<UserModuleBase*>(new UserModule());
   }
 };
 

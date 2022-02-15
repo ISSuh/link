@@ -40,7 +40,7 @@ class JsonWrapper {
 
   template<typename T>
   T get(const std::string& key) {
-    return json_obj;
+    return json_obj[key];
   }
 
   bool getBool(const std::string& key) const;
