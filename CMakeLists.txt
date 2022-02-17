@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.5)
 project(link)
 
 #-------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ set(PROJECT_LINK_SRC_DIR ${PROJECT_DIR}/src/link)
 
 set(BUILD_DIR ${PROJECT_DIR}/build)
 set(BUILD_DIR_LINK ${BUILD_DIR}/link)
-set(BUILD_DIR_EXAMPLES ${BUILD_DIR}/example)
+set(BUILD_DIR_EXAMPLES ${BUILD_DIR_LINK}/example)
 set(BUILD_DIR_TESTS ${BUILD_DIR}/tests)
 
 set(LINK_BASE_NAME ${LINK_LIBRARY_NAME}_base)
@@ -33,7 +33,6 @@ set(LINK_MODULE_PATH ${PROJECT_LINK_SRC_DIR}/module)
 set(LINK_NODE_NAME ${LINK_LIBRARY_NAME}_node)
 set(LINK_NODE_PATH ${PROJECT_LINK_SRC_DIR}/node)
 
-
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
@@ -43,10 +42,11 @@ include_directories(
 
 add_subdirectory(${LINK_BASE_PATH})
 add_subdirectory(${LINK_MODULE_PATH})
+add_subdirectory(${LINK_NODE_PATH})
 
 add_library(${LINK_LIBRARY_NAME}
- STATIC
-  $<TARGET_OBJECTS:link_base>
+ SHARED
+  $<TARGET_OBJECTS:link_base> 
   $<TARGET_OBJECTS:link_module>
 )
 
@@ -59,13 +59,13 @@ target_link_libraries(${LINK_LIBRARY_NAME}
 set_target_properties(${LINK_LIBRARY_NAME}
  PROPERTIES
   LINK_FLAGS "-Wl,-all_load"
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
 )
 
 #-------------------------------------------------------------------------------
 # Build example
 #-------------------------------------------------------------------------------
 add_subdirectory(example)
-add_subdirectory(example/hello_world)
 
 #-------------------------------------------------------------------------------
 # Set gTest

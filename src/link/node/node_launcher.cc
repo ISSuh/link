@@ -10,10 +10,9 @@
 
 #include "link/module/loader/module_loader.h"
 #include "link/base/logging.h"
-#include "third_party/json/json.hpp"
+#include "link/base/json_wrapper.h"
 
 using namespace link;
-using json = nlohmann::json;
 
 int32_t main(int32_t argc, char *argv[]) {
   std::cout << "Link Example" << std::endl;

@@ -1,5 +1,5 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 3.2)
-project(hello_world)
+cmake_minimum_required(VERSION 3.5)
+project(example_hello_world)
 
 message("link module hello_world Example")
 
@@ -9,6 +9,7 @@ message("link module hello_world Example")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-g -Wall -fPIC -rdynamic -ldl -E)
+
 #-------------------------------------------------------------------------------
 # Linking option about debug, release
 #-------------------------------------------------------------------------------
@@ -26,7 +27,10 @@ link_directories(
   ${BUILD_DIR}
 )
 
-add_library(hello_world MODULE hello_world_module.cc)
+add_library(hello_world
+ MODULE
+  hello_world_module.cc
+)
 
 target_include_directories(hello_world
  PRIVATE
@@ -38,4 +42,9 @@ target_link_libraries(hello_world
   ${LINK_LIBRARY_NAME}
 )
 
-set_target_properties(hello_world PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(hello_world
+ PROPERTIES
+  LINKER_LANGUAGE CXX 
+  LINK_FLAGS "-Wl,-all_load"
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}
+)

@@ -75,25 +75,6 @@ class JsonWrapper {
   json json_obj;
 };
 
-template<>
-bool JsonWrapper::get(const std::string& key) {
-  return getBool(key);
-}
-
-template<>
-int32_t JsonWrapper::get(const std::string& key) {
-  return getInt(key);
-}
-
-template<>
-uint32_t JsonWrapper::get(const std::string& key) {
-  return getUint(key);
-}
-
-template<>
-const std::string JsonWrapper::get(const std::string& key) {
-  return getString(key);
-}
 }  // namespace base
 }  // namespace link
 
