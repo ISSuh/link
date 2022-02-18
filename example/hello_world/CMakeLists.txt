@@ -8,7 +8,7 @@ message("link module hello_world Example")
 #-------------------------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options(-g -Wall -fPIC -rdynamic -ldl -E)
+set(CMAKE_CXX_FLAGS "-g -Wall -fPIC -rdynamic -ldl")
 
 #-------------------------------------------------------------------------------
 # Linking option about debug, release

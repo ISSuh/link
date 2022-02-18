@@ -10,7 +10,7 @@
 
 namespace link {
 
-static bool active_logging = false;
+static bool active_logging = true;
 static LogLevel system_log_level = LogLevel::INFO;
 
 void ActiveLogging() {

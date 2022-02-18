@@ -21,32 +21,22 @@ namespace module {
 
 const char* kModuleNameKey = "module_name";
 const char* kModulePathKey = "module_path";
+const char* kModuleKey = "module";
 const char* kClassNameKey = "class_name";
 const char* kArgumentsKey = "args";
 const char* kConfigureKey = "configure";
 
+bool CheckKeyExist(
+  const base::JsonWrapper& json, const std::string& key) {
+  if (!json.hasKey(key)) {
+    LOG(WARN) << __func__ << " - invalid key : " << key;
+    return false;
+  }
+  return true;
+}
+
 void ModuleDeleter(Module* module) {
   LOG(INFO) << __func__;
-}
-
-std::string SetSpecStrValue(
-  const base::JsonWrapper& json, const std::string& key) {
-  if (!json.hasKey(key)) {
-    LOG(WARN) << __func__ << " - invalid key : " << key
-                          << ", return empty";
-    return std::string();
-  }
-  return json.getString(key);
-}
-
-base::JsonWrapper SetSpecSubJsonValue(
-  const base::JsonWrapper& json, const std::string& key) {
-  if (!json.hasKey(key)) {
-    LOG(WARN) << __func__ << " - invalid key : " << key
-                          << ", return empty";
-    return base::JsonWrapper();
-  }
-  return json[key];
 }
 
 class ModuleHandle {
@@ -72,7 +62,7 @@ class ModuleImpl : public Module {
 
   virtual ~ModuleImpl() = default;
 
-  void RunModule() override;
+  virtual void RunModule();
 
  private:
   std::unique_ptr<ModuleHandle> module_handle_;
@@ -91,7 +81,7 @@ ModuleHandle::~ModuleHandle() {
 bool ModuleHandle::Open(const std::string& path, int32_t flags) {
   handle_ = static_cast<uint8_t*>(dlopen(path.c_str(), flags));
   if (!handle_) {
-    std::cerr << dlerror() << std::endl;
+    LOG(ERROR) << __func__ << " - " << dlerror();
     return false;
   }
   return true;
@@ -121,11 +111,24 @@ Module::Specification::Specification(const Specification& spec)
 void Module::Specification::ParseFromStr(const std::string& json_str) {
   base::JsonWrapper spec_json(json_str);
 
-  name = SetSpecStrValue(spec_json, kModuleNameKey);
-  path = SetSpecStrValue(spec_json, kModulePathKey);
-  class_name = SetSpecStrValue(spec_json, kClassNameKey);
-  args = SetSpecSubJsonValue(spec_json, kArgumentsKey);
-  configure = SetSpecSubJsonValue(spec_json, kConfigureKey);
+  if (!CheckKeyExist(spec_json, kModuleNameKey) ||
+      !CheckKeyExist(spec_json, kModulePathKey) ||
+      !CheckKeyExist(spec_json, kModuleKey)) {
+    return;
+  }
+
+  base::JsonWrapper spec_module_json(spec_json[kModuleKey].dump());
+  if (!CheckKeyExist(spec_module_json, kClassNameKey) ||
+      !CheckKeyExist(spec_module_json, kArgumentsKey) ||
+      !CheckKeyExist(spec_module_json, kConfigureKey)) {
+    return;
+  }
+
+  name = spec_json.getString(kModuleNameKey);
+  path = spec_json.getString(kModulePathKey);
+  class_name = spec_module_json.getString(kClassNameKey);
+  args = spec_module_json[kArgumentsKey];
+  configure = spec_module_json[kConfigureKey];
 }
 
 ModulePtr Module::CreateModule(const Specification& spec) {
