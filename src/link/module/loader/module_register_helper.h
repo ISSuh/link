@@ -16,8 +16,8 @@ namespace module {
 namespace {                                                                             \
   struct Proxy##UserModuleClass_##UniqueID {                                            \
     Proxy##UserModuleClass_##UniqueID() {                                               \
-        link::module::ModuleRegister::CreateModuleFactory<UserModuleClass, ModuleBase>( \
-          #UserModuleClass, #ModuleBase);                                               \
+        link::module::ModuleRegister::GetInstance()->CreateModuleFactory<               \
+          UserModuleClass, ModuleBase>(#UserModuleClass, #ModuleBase);                  \
     }                                                                                   \
   };                                                                                    \
   static Proxy##UserModuleClass_##UniqueID g_UserModuleRegister_##UniqueID;             \

@@ -18,7 +18,8 @@ add_library(${LINK_MODULE_NAME}
 
 target_link_libraries(${LINK_MODULE_NAME}
  PRIVATE
-  ${LINK_BASE_NAME}
+  # ${LINK_BASE_NAME}
+  dl
 )
 
 add_dependencies(${LINK_MODULE_NAME}

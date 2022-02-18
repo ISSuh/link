@@ -18,7 +18,7 @@ int32_t main(int32_t argc, char *argv[]) {
   std::cout << "Link Example" << std::endl;
 
   const std::string TEST_MODULE_JSON_PATH =
-    "/Users/inseocksuh/workspace/my_project/link/example/hello_world/hello_world_conf.json";
+    "/home/issuh/workspace/my_project/link/example/hello_world/hello_world_conf.json";
 
   std::ifstream json_file(TEST_MODULE_JSON_PATH);
   std::string json_str((std::istream_iterator<char>(json_file)),

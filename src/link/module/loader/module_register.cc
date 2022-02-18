@@ -9,8 +9,21 @@
 namespace link {
 namespace module {
 
-ModuleRegister::ModuleFactoryMap ModuleRegister::factories_
-  = ModuleFactoryMap();
+std::atomic<ModuleRegister*> ModuleRegister::instance_;
+std::mutex ModuleRegister::lock_;
+
+ModuleRegister* ModuleRegister::GetInstance() {
+  ModuleRegister* instance = instance_.load(std::memory_order_acquire);
+  if (!instance) {
+      std::lock_guard<std::mutex> myLock(lock_);
+      instance = instance_.load(std::memory_order_relaxed);
+      if (!instance) {
+        instance = new ModuleRegister();
+        instance_.store(instance, std::memory_order_release);
+      }
+  }
+  return instance;
+}
 
 void ModuleRegister::ReleaseModuleFactory(const std::string& class_name) {
   if (factories_.find(class_name) == factories_.end()) {

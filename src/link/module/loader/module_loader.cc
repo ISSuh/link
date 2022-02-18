@@ -37,10 +37,10 @@ void ModuleLoader::LoadModule(const Module::Specification& spec) {
 }
 
 void ModuleLoader::UnLoadAllModule() {
-  for (const auto& module : modules_) {
-    const std::string module_name = module.first;
-    UnLoadModule(module_name);
+  for (auto& module : modules_) {
+    module.second.reset();
   }
+  modules_.clear();
 }
 
 void ModuleLoader::UnLoadModule(const std::string& module_name) {
@@ -51,7 +51,7 @@ void ModuleLoader::UnLoadModule(const std::string& module_name) {
     modules_[module_name].reset();
     modules_.erase(module_name);
 
-    ModuleRegister::ReleaseModuleFactory(class_name);
+    ModuleRegister::GetInstance()->ReleaseModuleFactory(class_name);
   }
 }
 

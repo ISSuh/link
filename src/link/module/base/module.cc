@@ -140,7 +140,9 @@ ModulePtr Module::CreateModule(const Specification& spec) {
   }
 
   const AbstractModlueFactory<UserModuleBase>* factory =
-    ModuleRegister::GetModuleFactory<UserModuleBase>(spec.class_name);
+    ModuleRegister::GetInstance()->GetModuleFactory<UserModuleBase>(
+      spec.class_name);
+
   if (!factory) {
     LOG(ERROR) << __func__ << " - "
                << spec.class_name << " can not find factory";

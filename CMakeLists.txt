@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MAKE_PROGRAM="make -j 4")
 # set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
-add_compile_options(-g -Wall -Wextra -c)
+set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -ldl")
 
 #-------------------------------------------------------------------------------
 # Set Configure
@@ -58,7 +58,7 @@ target_link_libraries(${LINK_LIBRARY_NAME}
 
 set_target_properties(${LINK_LIBRARY_NAME}
  PROPERTIES
-  LINK_FLAGS "-Wl,-all_load"
+  # LINK_FLAGS "-Wl,-all_load"
   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
 )
 

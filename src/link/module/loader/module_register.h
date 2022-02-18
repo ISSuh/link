@@ -11,8 +11,11 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <atomic>
+#include <mutex>
 
 #include "link/module/loader/module_factory.h"
+#include "link/base/logging.h"
 
 namespace link {
 namespace module {
@@ -24,19 +27,24 @@ class ModuleRegister {
     std::unique_ptr<AbstractModuleFactoryBase> factory = nullptr;
   };
 
+  static ModuleRegister* GetInstance();
+
   template<typename UserModuleType, typename UserModuleBaseType>
-  static void CreateModuleFactory(
+  void CreateModuleFactory(
     const std::string& class_name, const std::string& base_class_name);
 
-  static void ReleaseModuleFactory(const std::string& class_name);
+  void ReleaseModuleFactory(const std::string& class_name);
 
   template <typename UserModuleBaseType>
-  static AbstractModlueFactory<UserModuleBaseType>* GetModuleFactory(
+  AbstractModlueFactory<UserModuleBaseType>* GetModuleFactory(
     const std::string& class_name);
 
  private:
+  static std::atomic<ModuleRegister*> instance_;
+  static std::mutex lock_;
+
   using ModuleFactoryMap = std::map<std::string, FactoryWrapper>;
-  static ModuleFactoryMap factories_;
+  ModuleFactoryMap factories_;
 };
 
 template<typename UserModuleType, typename UserModuleBaseType>
@@ -63,7 +71,17 @@ AbstractModlueFactory<UserModuleBaseType>*
   if (factories_.find(class_name) == factories_.end()) {
     return nullptr;
   }
-  return dynamic_cast<AbstractModlueFactory<UserModuleBaseType>*>(
+
+  // TODO(issuh) : why do not use dynamic_cast????
+  LOG(ERROR) << __func__ << " - addr : "<< factories_[class_name].factory.get()
+              << " / "
+              << dynamic_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get())
+              << " / "
+              << static_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get())
+              << " / "
+              << reinterpret_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get());
+
+  return static_cast<AbstractModlueFactory<UserModuleBaseType>*>(
     factories_[class_name].factory.get());
 }
 
