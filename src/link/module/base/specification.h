@@ -14,48 +14,42 @@
 namespace link {
 namespace module {
 
-// class Specification {
-//  public:
-//   Specification(const Specification& spec);
-//   Specification(Specification&& spec);
+class Specification {
+ public:
+  Specification() = default;
+  Specification(const Specification& spec);
+  Specification(Specification&& spec);
 
-//   void ParseFromeStr(const std::string& json_str);
+  ~Specification() = default;
 
-//   const std::string name() const;
-//   const std::string path() const;
-//   const std::string class_name() const;
+  void ParseFromStr(const std::string& spec_json_str);
 
-//   template<typename T>
-//   const T args(const std::string& key) const {
-//     return args_.get<T>(key);
-//   }
+  const std::string name() const;
+  const std::string path() const;
+  const std::string class_name() const;
 
-//   template<typename T>
-//   const T configure(const std::string& key) const {
-//     return configure_.get<T>(key);
-//   }
+  template<typename T>
+  const T args(const std::string& key) const {
+    return args_.get<T>(key);
+  }
 
+  template<typename T>
+  const T configure(const std::string& key) const {
+    return configure_.get<T>(key);
+  }
 
-//   Specification&& operator=(Specification&& spec) {
-//     if (&key == this) {
-//       return *this;
-//     }
+  Specification& operator=(const Specification& spec);
+  Specification& operator=(Specification&& spec);
 
-//     name_ = spec.name_;
-//     path_ = spec.path_;
-//     claas_name_ = spec.claas_name_;
-//     args_ = spec.args_;
-//     configure_ = spec.configure_;
-//     return *this;
-//   }
+ private:
+  bool CheckKeyExist(const base::JsonWrapper& json, const std::string& key);
 
-//  private:
-//   std::string name_;
-//   std::string path_;
-//   std::string claas_name_;
-//   base::JsonWrapper args_;
-//   base::JsonWrapper configure_;
-// };
+  std::string name_;
+  std::string path_;
+  std::string class_name_;
+  base::JsonWrapper args_;
+  base::JsonWrapper configure_;
+};
 
 }  // namespace module
 }  // namespace link

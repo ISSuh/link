@@ -8,6 +8,7 @@
 #include <fstream>
 #include <streambuf>
 
+#include "link/base/arguments.h"
 #include "link/module/loader/module_loader.h"
 #include "link/base/logging.h"
 #include "link/base/json_wrapper.h"
@@ -15,10 +16,16 @@
 using namespace link;
 
 int32_t main(int32_t argc, char *argv[]) {
-  std::cout << "Link Example" << std::endl;
+  LOG(INFO) << "Node Launcher";
 
-  const std::string TEST_MODULE_JSON_PATH =
-    "/home/issuh/workspace/my_project/link/example/hello_world/hello_world_conf.json";
+  base::Arguments args(argc, argv);
+  
+  if (args.IsEmpty()) {
+    LOG(ERROR) << "need argument";
+    exit(0);
+  }
+
+  const std::string TEST_MODULE_JSON_PATH  = args.module_config_path();
 
   std::ifstream json_file(TEST_MODULE_JSON_PATH);
   std::string json_str((std::istream_iterator<char>(json_file)),
@@ -26,14 +33,14 @@ int32_t main(int32_t argc, char *argv[]) {
 
   base::JsonWrapper spec_json(json_str);
 
-  module::Module::Specification spec;
+  module::Specification spec;
   spec.ParseFromStr(spec_json["modules"][0].dump());
 
   module::ModuleLoader loader;
   loader.LoadModule(spec);
 
   module::Module* user_module = loader.GetModule("Sample_0");
-  user_module->RunModule();
+  // user_module->RunModule();
 
   loader.UnLoadAllModule();
 }

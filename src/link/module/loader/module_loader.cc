@@ -17,16 +17,16 @@ namespace link {
 namespace module {
 
 void ModuleLoader::LoadAllModule(
-  const std::vector<Module::Specification>& specs) {
-  for (const Module::Specification& spec : specs) {
+  const std::vector<Specification>& specs) {
+  for (const Specification& spec : specs) {
     LoadModule(spec);
   }
 }
 
-void ModuleLoader::LoadModule(const Module::Specification& spec) {
-  LOG(INFO) << __func__ << " - " << spec.name;
+void ModuleLoader::LoadModule(const Specification& spec) {
+  LOG(INFO) << __func__ << " - " << spec.name();
 
-  const std::string module_name = spec.name;
+  const std::string module_name = spec.name();
   if (modules_.find(module_name) != modules_.end()) {
     LOG(WARN) << __func__ << " - already loaded " << module_name;
     return;

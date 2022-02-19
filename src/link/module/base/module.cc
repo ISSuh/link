@@ -19,24 +19,8 @@
 namespace link {
 namespace module {
 
-const char* kModuleNameKey = "module_name";
-const char* kModulePathKey = "module_path";
-const char* kModuleKey = "module";
-const char* kClassNameKey = "class_name";
-const char* kArgumentsKey = "args";
-const char* kConfigureKey = "configure";
-
-bool CheckKeyExist(
-  const base::JsonWrapper& json, const std::string& key) {
-  if (!json.hasKey(key)) {
-    LOG(WARN) << __func__ << " - invalid key : " << key;
-    return false;
-  }
-  return true;
-}
-
 void ModuleDeleter(Module* module) {
-  LOG(INFO) << __func__;
+  delete module;
 }
 
 class ModuleHandle {
@@ -62,7 +46,9 @@ class ModuleImpl : public Module {
 
   virtual ~ModuleImpl() = default;
 
-  virtual void RunModule();
+  void Initialize() override;
+  void Process() override;
+  void Shutdown() override;
 
  private:
   std::unique_ptr<ModuleHandle> module_handle_;
@@ -92,60 +78,32 @@ Module::Module(const Specification& spec)
 }
 
 const std::string Module::name() const {
-  return spec_.name;
+  return spec_.name();
 }
 
 const std::string Module::path() const {
-  return spec_.path;
+  return spec_.path();
 }
 
 const std::string Module::class_name() const {
-  return spec_.class_name;
-}
-
-Module::Specification::Specification(const Specification& spec)
-  : name(spec.name), path(spec.path), class_name(spec.class_name),
-    args(spec.args.dump()), configure(spec.configure.dump()) {
-}
-
-void Module::Specification::ParseFromStr(const std::string& json_str) {
-  base::JsonWrapper spec_json(json_str);
-
-  if (!CheckKeyExist(spec_json, kModuleNameKey) ||
-      !CheckKeyExist(spec_json, kModulePathKey) ||
-      !CheckKeyExist(spec_json, kModuleKey)) {
-    return;
-  }
-
-  base::JsonWrapper spec_module_json(spec_json[kModuleKey].dump());
-  if (!CheckKeyExist(spec_module_json, kClassNameKey) ||
-      !CheckKeyExist(spec_module_json, kArgumentsKey) ||
-      !CheckKeyExist(spec_module_json, kConfigureKey)) {
-    return;
-  }
-
-  name = spec_json.getString(kModuleNameKey);
-  path = spec_json.getString(kModulePathKey);
-  class_name = spec_module_json.getString(kClassNameKey);
-  args = spec_module_json[kArgumentsKey];
-  configure = spec_module_json[kConfigureKey];
+  return spec_.class_name();
 }
 
 ModulePtr Module::CreateModule(const Specification& spec) {
   ModuleHandle* module_handle = new ModuleHandle();
-  if (!module_handle->Open(spec.path, RTLD_LAZY | RTLD_GLOBAL)) {
+  if (!module_handle->Open(spec.path(), RTLD_LAZY | RTLD_GLOBAL)) {
     LOG(ERROR) << __func__ << " - "
-               << spec.class_name << " load fail";
+               << spec.class_name() << " load fail";
     return nullptr;
   }
 
   const AbstractModlueFactory<UserModuleBase>* factory =
     ModuleRegister::GetInstance()->GetModuleFactory<UserModuleBase>(
-      spec.class_name);
+      spec.class_name());
 
   if (!factory) {
     LOG(ERROR) << __func__ << " - "
-               << spec.class_name << " can not find factory";
+               << spec.class_name() << " can not find factory";
     return nullptr;
   }
 
@@ -157,11 +115,40 @@ ModulePtr Module::CreateModule(const Specification& spec) {
 }
 
 template <typename UserModuleBaseType>
-void ModuleImpl<UserModuleBaseType>::RunModule() {
+void ModuleImpl<UserModuleBaseType>::Initialize() {
   module_->Initialize();
+}
+
+template <typename UserModuleBaseType>
+void ModuleImpl<UserModuleBaseType>::Process() {
   module_->Process();
+}
+template <typename UserModuleBaseType>
+void ModuleImpl<UserModuleBaseType>::Shutdown() {
   module_->Shutdown();
 }
+
+// ModulePtr::ModulePtr(Module* module)
+//  : deleter_(std::bind(&ModulePtr::ModuleDeleter, this, std::placeholders::_1)),
+//    module_(module, deleter_) {
+// }
+
+// ModulePtr::ModulePtr(const ModulePtr& module_ptr) {
+//   deleter_ = std::bind(&ModulePtr::ModuleDeleter, this, std::placeholders::_1);
+//   module_ptr.deleter_.
+//   module_ptr.module_ = std::move(module_ptr.module_);
+// }
+
+// ModulePtr::ModulePtr(ModulePtr&& module_ptr) {
+
+// }
+
+// ModulePtr& ModulePtr::operator=(const ModulePtr& module_ptr);
+// ModulePtr& ModulePtr::operator=(ModulePtr&& module_ptr);
+
+// ModulePtr::ModuleDeleter() {
+//   module_.reset();
+// }
 
 }  // namespace module
 }  // namespace link

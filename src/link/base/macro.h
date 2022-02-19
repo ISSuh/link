@@ -4,8 +4,10 @@
  *
  */
 
+#ifndef LINK_BASE_MACRO_H_
+#define LINK_BASE_MACRO_H_
+
 namespace link {
-namespace module {
 
 #define DISAALOW_COPY(Typename)       \
   Typename(const Typename&) = delete; \
@@ -18,5 +20,6 @@ namespace module {
   DISAALOW_COPY(Typename)                   \
   DISAALOW_ASSIGN(Typename)
 
-}  // namespace module
 }  // namespace link
+
+#endif  // LINK_BASE_MACRO_H_

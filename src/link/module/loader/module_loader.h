@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "link/module/base/module.h"
+#include "link/module/base/specification.h"
 #include "link/base/macro.h"
 
 namespace link {
@@ -24,8 +25,8 @@ class ModuleLoader {
   ModuleLoader() = default;
   ~ModuleLoader() = default;
 
-  void LoadAllModule(const std::vector<Module::Specification>& specs);
-  void LoadModule(const Module::Specification& spec);
+  void LoadAllModule(const std::vector<Specification>& specs);
+  void LoadModule(const Specification& spec);
 
   void UnLoadAllModule();
   void UnLoadModule(const std::string& module_name);

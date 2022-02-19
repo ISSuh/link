@@ -72,15 +72,6 @@ AbstractModlueFactory<UserModuleBaseType>*
     return nullptr;
   }
 
-  // TODO(issuh) : why do not use dynamic_cast????
-  LOG(ERROR) << __func__ << " - addr : "<< factories_[class_name].factory.get()
-              << " / "
-              << dynamic_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get())
-              << " / "
-              << static_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get())
-              << " / "
-              << reinterpret_cast<AbstractModlueFactory<UserModuleBaseType>*>(factories_[class_name].factory.get());
-
   return static_cast<AbstractModlueFactory<UserModuleBaseType>*>(
     factories_[class_name].factory.get());
 }

@@ -14,6 +14,7 @@
 
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_dispatcher.h"
+#include "link/base/macro.h"
 
 namespace link {
 namespace base {
@@ -38,9 +39,6 @@ class TaskManager {
   uint32_t NumberOfTaskRunner() const;
   std::vector<std::string> TaskRunnerLabels() const;
 
-  TaskManager(TaskManager&) = delete;
-  TaskManager& operator=(const TaskManager&) = delete;
-
  private:
   friend TaskDispatcher;
 
@@ -50,6 +48,8 @@ class TaskManager {
 
   std::map<std::string, std::unique_ptr<TaskRunnerProxy>> runner_map_;
   std::unique_ptr<TaskDispatcher> dispatcher_;
+
+  DISAALOW_COPY_AND_ASSIGN(TaskManager)
 };
 
 }  // namespace base
