@@ -19,7 +19,7 @@ int32_t main(int32_t argc, char *argv[]) {
   LOG(INFO) << "Node Launcher";
 
   base::Arguments args(argc, argv);
-  
+
   if (args.IsEmpty()) {
     LOG(ERROR) << "need argument";
     exit(0);

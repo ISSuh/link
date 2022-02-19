@@ -25,10 +25,7 @@ class ModuleLoader {
   ModuleLoader() = default;
   ~ModuleLoader() = default;
 
-  void LoadAllModule(const std::vector<Specification>& specs);
-  void LoadModule(const Specification& spec);
-
-  void UnLoadAllModule();
+  bool LoadModule(const Specification& spec);
   void UnLoadModule(const std::string& module_name);
 
   Module* GetModule(const std::string& module_name) const;

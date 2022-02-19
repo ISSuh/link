@@ -7,28 +7,24 @@
 #ifndef LINK_MODULE_CONTROLLER_EXECUTOR_H_
 #define LINK_MODULE_CONTROLLER_EXECUTOR_H_
 
-#include <string>
-#include <map>
-#include <memory>
-
-
-#include "link/module/loader/module_loader.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/macro.h"
 
 namespace link {
 namespace module {
 
+#include "link/module/base/module.h"
+
 class ModuleExecutor {
  public:
-  ModuleExecutor();
+  explicit ModuleExecutor(base::TaskRunner* task_runner);
   ~ModuleExecutor();
 
-  
+  void RunningModule(Module* module);
 
  private:
-  ModuleLoader loader_;
   base::TaskRunner* task_runner_;
+  bool is_running_;
 
   DISAALOW_COPY_AND_ASSIGN(ModuleExecutor)
 };

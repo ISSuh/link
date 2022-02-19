@@ -10,6 +10,9 @@ set(LINK_MODULE_SRC
 
   ${LINK_MODULE_PATH}/loader/module_loader.cc
   ${LINK_MODULE_PATH}/loader/module_register.cc
+
+  ${LINK_MODULE_PATH}/controller/controller.cc
+  ${LINK_MODULE_PATH}/controller/controller.cc
 )
 
 add_library(${LINK_MODULE_NAME}

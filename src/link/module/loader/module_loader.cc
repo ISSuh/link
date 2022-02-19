@@ -16,31 +16,22 @@
 namespace link {
 namespace module {
 
-void ModuleLoader::LoadAllModule(
-  const std::vector<Specification>& specs) {
-  for (const Specification& spec : specs) {
-    LoadModule(spec);
-  }
-}
-
-void ModuleLoader::LoadModule(const Specification& spec) {
+bool ModuleLoader::LoadModule(const Specification& spec) {
   LOG(INFO) << __func__ << " - " << spec.name();
 
   const std::string module_name = spec.name();
   if (modules_.find(module_name) != modules_.end()) {
     LOG(WARN) << __func__ << " - already loaded " << module_name;
-    return;
+    return false;
   }
 
   ModulePtr module = Module::CreateModule(spec);
-  modules_[module_name] = std::move(module);
-}
-
-void ModuleLoader::UnLoadAllModule() {
-  for (auto& module : modules_) {
-    module.second.reset();
+  if (!module) {
+    return false;
   }
-  modules_.clear();
+
+  modules_[module_name] = std::move(module);
+  return true;
 }
 
 void ModuleLoader::UnLoadModule(const std::string& module_name) {

@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 
+#include "link/module/loader/module_loader.h"
 #include "link/module/controller/executor.h"
 #include "link/module/base/specification.h"
 #include "link/base/task_manager.h"
@@ -22,16 +23,23 @@ namespace module {
 
 class ModuleController {
  public:
-  ModuleController();
+  explicit ModuleController(base::TaskRunner* task_runner);
   ~ModuleController();
 
-  void WaitForAllModuleTerminate() const;
+  void CreateRunner();
+  bool LoadingModule(const std::vector<Specification>& specs);
+  void RunningModule();
+  void Destroy();
+
 
  private:
-  void CreateModuleExecutor(const std::string& node_name);
+  struct Runner {
+    std::unique_ptr<ModuleLoader> loader;
+    std::unique_ptr<ModuleExecutor> executor;
+  };
 
-  std::unique_ptr<base::TaskManager> task_manager_;
-  std::map<std::string, std::unique_ptr<ModuleExecutor>> executors_;
+  base::TaskRunner* task_runner_;
+  Runner runner_;
 
   DISAALOW_COPY_AND_ASSIGN(ModuleController)
 };
