@@ -26,20 +26,14 @@ class ModuleController {
   explicit ModuleController(base::TaskRunner* task_runner);
   ~ModuleController();
 
-  void CreateRunner();
   bool LoadingModule(const std::vector<Specification>& specs);
   void RunningModule();
   void Destroy();
 
-
  private:
-  struct Runner {
-    std::unique_ptr<ModuleLoader> loader;
-    std::unique_ptr<ModuleExecutor> executor;
-  };
-
   base::TaskRunner* task_runner_;
-  Runner runner_;
+  ModuleLoader loader_;
+  ModuleExecutor executor_;
 
   DISAALOW_COPY_AND_ASSIGN(ModuleController)
 };

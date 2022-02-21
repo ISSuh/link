@@ -5,9 +5,6 @@ message("Build Link base")
 set(LINK_BASE_SRC
   ${LINK_BASE_PATH}/logging.cc
   ${LINK_BASE_PATH}/time.cc
-  ${LINK_BASE_PATH}/arguments.cc
-
-  ${LINK_BASE_PATH}/json_wrapper.h
   ${LINK_BASE_PATH}/json_wrapper.cc
 
   ${LINK_BASE_PATH}/task/task_runner.cc

@@ -17,17 +17,10 @@ const char* kModuleTaskRunnerName = "ModuleTaskRunner";
 
 ModuleController::ModuleController(base::TaskRunner* task_runner)
   : task_runner_(task_runner),
-    runner_({nullptr, nullptr}) {
+    executor_(task_runner_) {
 }
 
 ModuleController::~ModuleController() {
-}
-
-void ModuleController::CreateRunner() {
-  std::unique_ptr<ModuleLoader> loader(new ModuleLoader());
-  std::unique_ptr<ModuleExecutor> executor(new ModuleExecutor(task_runner_));
-  runner_.loader = std::move(loader);
-  runner_.executor = std::move(executor);
 }
 
 bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
@@ -37,17 +30,25 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
   }
 
   for (const Specification& spec : specs) {
-    if (runner_.loader->LoadModule(spec)) {
+    if (loader_.LoadModule(spec)) {
       return false;
     }
   }
   return true;
 }
 
-void ModuleController::Destroy() {
-  std::vector<std::string > module_names = runner_.loader->ModuleNames();
+void ModuleController::RunningModule() {
+  std::vector<std::string > module_names = loader_.ModuleNames();
   for (const std::string& name : module_names) {
-    runner_.loader->UnLoadModule(name);
+    Module* module = loader_.GetModule(name);
+    executor_.RunningModule(module);
+  }
+}
+
+void ModuleController::Destroy() {
+  std::vector<std::string > module_names = loader_.ModuleNames();
+  for (const std::string& name : module_names) {
+    loader_.UnLoadModule(name);
   }
 }
 

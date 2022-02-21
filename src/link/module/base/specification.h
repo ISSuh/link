@@ -23,6 +23,7 @@ class Specification {
   ~Specification() = default;
 
   void ParseFromStr(const std::string& spec_json_str);
+  void ParseFromJson(const base::JsonWrapper& spec_json);
 
   const std::string name() const;
   const std::string path() const;
@@ -42,8 +43,6 @@ class Specification {
   Specification& operator=(Specification&& spec);
 
  private:
-  bool CheckKeyExist(const base::JsonWrapper& json, const std::string& key);
-
   std::string name_;
   std::string path_;
   std::string class_name_;

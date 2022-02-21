@@ -42,17 +42,20 @@ Specification::Specification(Specification&& spec)
 
 void Specification::ParseFromStr(const std::string& spec_json_str) {
   base::JsonWrapper spec_json(spec_json_str);
+  ParseFromJson(spec_json);
+}
 
-  if (!CheckKeyExist(spec_json, kModuleNameKey) ||
-      !CheckKeyExist(spec_json, kModulePathKey) ||
-      !CheckKeyExist(spec_json, kModuleKey)) {
+void Specification::ParseFromJson(const base::JsonWrapper& spec_json) {
+  if (!spec_json.hasKey(kModuleNameKey) ||
+      !spec_json.hasKey(kModulePathKey) ||
+      !spec_json.hasKey(kModuleKey)) {
     return;
   }
 
   base::JsonWrapper spec_module_json(spec_json[kModuleKey].dump());
-  if (!CheckKeyExist(spec_module_json, kClassNameKey) ||
-      !CheckKeyExist(spec_module_json, kArgumentsKey) ||
-      !CheckKeyExist(spec_module_json, kConfigureKey)) {
+  if (!spec_module_json.hasKey(kClassNameKey) ||
+      !spec_module_json.hasKey(kArgumentsKey) ||
+      !spec_module_json.hasKey(kConfigureKey)) {
     return;
   }
 
@@ -97,15 +100,6 @@ Specification& Specification::operator=(Specification&& spec) {
   args_ = spec.args_;
   configure_ = spec.configure_;
   return *this;
-}
-
-bool Specification::CheckKeyExist(
-  const base::JsonWrapper& json, const std::string& key) {
-  if (!json.hasKey(key)) {
-    LOG(WARN) << __func__ << " - invalid key : " << key;
-    return false;
-  }
-  return true;
 }
 
 }  // namespace module
