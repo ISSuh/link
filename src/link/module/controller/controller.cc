@@ -30,7 +30,7 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
   }
 
   for (const Specification& spec : specs) {
-    if (loader_.LoadModule(spec)) {
+    if (!loader_.LoadModule(spec)) {
       return false;
     }
   }
@@ -39,8 +39,13 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
 
 void ModuleController::RunningModule() {
   std::vector<std::string > module_names = loader_.ModuleNames();
+  if (module_names.empty()) {
+    LOG(WARN) << " Empty module on loader";
+    return;
+  }
+
   for (const std::string& name : module_names) {
-    Module* module = loader_.GetModule(name);
+    LinkModule* module = loader_.GetModule(name);
     executor_.RunningModule(module);
   }
 }

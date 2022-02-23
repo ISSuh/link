@@ -28,13 +28,13 @@ class ModuleLoader {
   bool LoadModule(const Specification& spec);
   void UnLoadModule(const std::string& module_name);
 
-  Module* GetModule(const std::string& module_name) const;
+  LinkModule* GetModule(const std::string& module_name) const;
   bool HasModule(const std::string& module_name) const;
 
   const std::vector<std::string> ModuleNames() const;
 
  private:
-  std::map<std::string, ModulePtr> modules_;
+  std::map<std::string, LinkModulePtr> modules_;
 
   DISAALOW_COPY_AND_ASSIGN(ModuleLoader)
 };

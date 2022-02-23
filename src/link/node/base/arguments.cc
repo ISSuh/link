@@ -70,27 +70,37 @@ bool Arguments::ParseFromeConfigureFile(const std::string& config_file_path) {
 
   std::string config_str((std::istream_iterator<char>(config_file)),
                       std::istream_iterator<char>());
+  base::Json config_json = base::Json::parse(config_str);
 
-  base::JsonWrapper config_json(config_str);
+  if (config_json.empty()) {
+    LOG(ERROR) << " Config file is empty. " << config_file_path;
+    return false;
+  }
 
-  if (!config_json.hasKey(kNodeNameKey) ||
-      config_json.getString(kNodeNameKey).empty()) {
+  if (!base::CheckKeyExist(config_json, kNodeNameKey) ||
+      !base::CheckKeyExist(config_json, kModulesKey)) {
+    LOG(ERROR) << " Invalid key name";
+    return false;
+  }
+
+  node_name_ = config_json[kNodeNameKey].get<std::string>();
+  if (node_name_.empty()) {
     LOG(ERROR) << " Invalid node name";
     return false;
   }
 
-  node_name_ = config_json.getString(kNodeNameKey);
+  base::Json modules_json = config_json[kModulesKey];
 
-  if (!config_json.hasKey(kModulesKey) ||
-      config_json.getString(kModulesKey).empty()) {
-    LOG(ERROR) << " Invalid node name";
-    return false;
+  for (const auto& module_json : modules_json) {
+    module::Specification module_spec;
+    if (!module_spec.ParseFromJson(module_json)) {
+      LOG(ERROR) << " Invalid module spec";
+      return false;
+    }
+    module_specs_.emplace_back(module_spec);
   }
 
-  base::JsonWrapper modules_json(config_json[kModulesKey].dump());
-  
-  node_name_ = config_json.getString(kModulesKey);
-
+  return true;
 }
 
 }  // namespace node

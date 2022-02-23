@@ -14,11 +14,12 @@ ModuleExecutor::ModuleExecutor(base::TaskRunner* task_runner)
     is_running_(false) {
 }
 
-void ModuleExecutor::RunningModule(Module* module) {
+void ModuleExecutor::RunningModule(LinkModule* module) {
   is_running_ = true;
 
-  task_runner_->PostTask(base::Bind(Module::Initialize, module));
-  task_runner_->PostTask(base::Bind(Module::Process, module));
+  task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
+  task_runner_->PostTask(base::Bind(&LinkModule::Process, module));
+  task_runner_->PostTask(base::Bind(&LinkModule::Shutdown, module));
 }
 
 ModuleExecutor::~ModuleExecutor() {

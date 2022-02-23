@@ -25,7 +25,7 @@ bool ModuleLoader::LoadModule(const Specification& spec) {
     return false;
   }
 
-  ModulePtr module = Module::CreateModule(spec);
+  LinkModulePtr module = LinkModule::CreateModule(spec);
   if (!module) {
     return false;
   }
@@ -46,7 +46,7 @@ void ModuleLoader::UnLoadModule(const std::string& module_name) {
   }
 }
 
-Module* ModuleLoader::GetModule(const std::string& module_name) const {
+LinkModule* ModuleLoader::GetModule(const std::string& module_name) const {
   if (!HasModule(module_name)) {
     LOG(INFO) << __func__ << " - can not find module " << module_name;
     return nullptr;
@@ -63,7 +63,7 @@ bool ModuleLoader::HasModule(const std::string& module_name) const {
 
 const std::vector<std::string> ModuleLoader::ModuleNames() const {
   std::vector<std::string> names;
-  for (const auto& module : modules_) {
+  for (auto&& module : modules_) {
     names.emplace_back(module.first);
   }
   return names;

@@ -11,7 +11,7 @@
 using namespace link;
 
 void SampleModule::Init() {
-//   std::cout << "SampleModule::init()" << '\n';
+  LOG(INFO) << "SampleModule::init";
 
 //   getArgument<int>("int_test", m_int_test);
 //   getArgument<float>("float_test", m_float_test);
@@ -20,7 +20,7 @@ void SampleModule::Init() {
 }
 
 void SampleModule::Run() {
-  LOG(INFO) << "SampleModule::init";
+  LOG(INFO) << "SampleModule::Run";
 
   // std::cout << m_int_test << std::endl;
   // std::cout << m_float_test << std::endl;

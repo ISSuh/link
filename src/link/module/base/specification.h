@@ -22,8 +22,8 @@ class Specification {
 
   ~Specification() = default;
 
-  void ParseFromStr(const std::string& spec_json_str);
-  void ParseFromJson(const base::JsonWrapper& spec_json);
+  bool ParseFromStr(const std::string& spec_json_str);
+  bool ParseFromJson(const base::Json& spec_json);
 
   const std::string name() const;
   const std::string path() const;
@@ -46,8 +46,8 @@ class Specification {
   std::string name_;
   std::string path_;
   std::string class_name_;
-  base::JsonWrapper args_;
-  base::JsonWrapper configure_;
+  base::Json args_;
+  base::Json configure_;
 };
 
 }  // namespace module

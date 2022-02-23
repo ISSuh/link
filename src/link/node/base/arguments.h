@@ -17,6 +17,9 @@ namespace node {
 
 class Arguments {
  public:
+  Arguments();
+  ~Arguments();
+
   bool ParseFromeProcessArguments(int32_t argc, char* argv[]);
 
   const std::string config_path() const;

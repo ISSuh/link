@@ -17,16 +17,16 @@
 namespace link {
 namespace module {
 
-class Module;
+class LinkModule;
 
-using ModulePtr =
-  std::unique_ptr<Module, std::function<void(Module*)>>;
+using LinkModulePtr =
+  std::unique_ptr<LinkModule, std::function<void(LinkModule*)>>;
 
-class Module {
+class LinkModule {
  public:
-  virtual ~Module() = default;
+  virtual ~LinkModule() = default;
 
-  static ModulePtr CreateModule(const Specification& spec);
+  static LinkModulePtr CreateModule(const Specification& spec);
 
   const std::string name() const;
   const std::string class_name() const;
@@ -37,11 +37,11 @@ class Module {
   virtual void Shutdown() = 0;
 
  protected:
-  explicit Module(const Specification& spec);
+  explicit LinkModule(const Specification& spec);
 
   const Specification spec_;
 
-  DISAALOW_COPY_AND_ASSIGN(Module)
+  DISAALOW_COPY_AND_ASSIGN(LinkModule)
 };
 
 // class ModulePtr {

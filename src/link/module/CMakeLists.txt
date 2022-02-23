@@ -12,7 +12,8 @@ set(LINK_MODULE_SRC
   ${LINK_MODULE_PATH}/loader/module_register.cc
 
   ${LINK_MODULE_PATH}/controller/controller.cc
-  ${LINK_MODULE_PATH}/controller/controller.cc
+  ${LINK_MODULE_PATH}/controller/executor.cc
+
 )
 
 add_library(${LINK_MODULE_NAME}
@@ -22,7 +23,7 @@ add_library(${LINK_MODULE_NAME}
 
 target_link_libraries(${LINK_MODULE_NAME}
  PRIVATE
-  # ${LINK_BASE_NAME}
+  ${LINK_BASE_NAME}
   dl
 )
 

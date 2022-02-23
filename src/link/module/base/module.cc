@@ -19,14 +19,14 @@
 namespace link {
 namespace module {
 
-void ModuleDeleter(Module* module) {
+void ModuleDeleter(LinkModule* module) {
   delete module;
 }
 
-class ModuleHandle {
+class LinkModuleHandle {
  public:
-  ModuleHandle();
-  ~ModuleHandle();
+  LinkModuleHandle();
+  ~LinkModuleHandle();
 
   bool Open(const std::string& path, int32_t flags);
 
@@ -34,37 +34,16 @@ class ModuleHandle {
   uint8_t* handle_;
 };
 
-template<typename UserModuleBaseType>
-class ModuleImpl : public Module {
- public:
-  ModuleImpl(ModuleHandle* module_handle,
-         UserModuleBaseType* user_module,
-         const Specification& spec)
-    : Module(spec),
-      module_handle_(module_handle),
-      module_(user_module) {}
-
-  virtual ~ModuleImpl() = default;
-
-  void Initialize() override;
-  void Process() override;
-  void Shutdown() override;
-
- private:
-  std::unique_ptr<ModuleHandle> module_handle_;
-  std::unique_ptr<UserModuleBaseType> module_;
-};
-
-ModuleHandle::ModuleHandle()
+LinkModuleHandle::LinkModuleHandle()
   : handle_(nullptr) {}
 
-ModuleHandle::~ModuleHandle() {
+LinkModuleHandle::~LinkModuleHandle() {
   if (handle_) {
     dlclose(static_cast<void*>(handle_));
   }
 }
 
-bool ModuleHandle::Open(const std::string& path, int32_t flags) {
+bool LinkModuleHandle::Open(const std::string& path, int32_t flags) {
   handle_ = static_cast<uint8_t*>(dlopen(path.c_str(), flags));
   if (!handle_) {
     LOG(ERROR) << __func__ << " - " << dlerror();
@@ -73,24 +52,59 @@ bool ModuleHandle::Open(const std::string& path, int32_t flags) {
   return true;
 }
 
-Module::Module(const Specification& spec)
+template<typename UserModuleBaseType>
+class LinkModuleImpl : public LinkModule {
+ public:
+  LinkModuleImpl(LinkModuleHandle* module_handle,
+         UserModuleBaseType* user_module,
+         const Specification& spec)
+    : LinkModule(spec),
+      module_handle_(module_handle),
+      module_(user_module) {}
+
+  virtual ~LinkModuleImpl() = default;
+
+  void Initialize() override;
+  void Process() override;
+  void Shutdown() override;
+
+ private:
+  std::unique_ptr<LinkModuleHandle> module_handle_;
+  std::unique_ptr<UserModuleBaseType> module_;
+};
+
+template <typename UserModuleBaseType>
+void LinkModuleImpl<UserModuleBaseType>::Initialize() {
+  module_->Initialize();
+}
+
+template <typename UserModuleBaseType>
+void LinkModuleImpl<UserModuleBaseType>::Process() {
+  module_->Process();
+}
+template <typename UserModuleBaseType>
+void LinkModuleImpl<UserModuleBaseType>::Shutdown() {
+  module_->Shutdown();
+}
+
+LinkModule::LinkModule(const Specification& spec)
   : spec_(spec) {
 }
 
-const std::string Module::name() const {
+const std::string LinkModule::name() const {
   return spec_.name();
 }
 
-const std::string Module::path() const {
+const std::string LinkModule::path() const {
   return spec_.path();
 }
 
-const std::string Module::class_name() const {
+const std::string LinkModule::class_name() const {
   return spec_.class_name();
 }
 
-ModulePtr Module::CreateModule(const Specification& spec) {
-  ModuleHandle* module_handle = new ModuleHandle();
+LinkModulePtr LinkModule::CreateModule(const Specification& spec) {
+  LinkModuleHandle* module_handle = new LinkModuleHandle();
   if (!module_handle->Open(spec.path(), RTLD_LAZY | RTLD_GLOBAL)) {
     LOG(ERROR) << __func__ << " - "
                << spec.class_name() << " load fail";
@@ -107,25 +121,11 @@ ModulePtr Module::CreateModule(const Specification& spec) {
     return nullptr;
   }
 
-  ModulePtr module_impl(
-    new ModuleImpl<UserModuleBase>(
+  LinkModulePtr module_impl(
+    new LinkModuleImpl<UserModuleBase>(
       module_handle, factory->CreateModuleObject(), spec),
       &ModuleDeleter);
   return module_impl;
-}
-
-template <typename UserModuleBaseType>
-void ModuleImpl<UserModuleBaseType>::Initialize() {
-  module_->Initialize();
-}
-
-template <typename UserModuleBaseType>
-void ModuleImpl<UserModuleBaseType>::Process() {
-  module_->Process();
-}
-template <typename UserModuleBaseType>
-void ModuleImpl<UserModuleBaseType>::Shutdown() {
-  module_->Shutdown();
 }
 
 // ModulePtr::ModulePtr(Module* module)

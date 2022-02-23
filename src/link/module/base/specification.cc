@@ -17,8 +17,10 @@ const char* kModuleNameKey = "module_name";
 const char* kModulePathKey = "module_path";
 const char* kModuleKey = "module";
 const char* kClassNameKey = "class_name";
-const char* kArgumentsKey = "args";
+const char* kArgumentsKey = "arguments";
 const char* kConfigureKey = "configure";
+
+
 
 Specification::Specification(const Specification& spec)
   : name_(), path_(), class_name_(),
@@ -40,30 +42,32 @@ Specification::Specification(Specification&& spec)
   configure_ = spec.configure_;
 }
 
-void Specification::ParseFromStr(const std::string& spec_json_str) {
-  base::JsonWrapper spec_json(spec_json_str);
-  ParseFromJson(spec_json);
+bool Specification::ParseFromStr(const std::string& spec_json_str) {
+  base::Json spec_json(spec_json_str);
+  return ParseFromJson(spec_json);
 }
 
-void Specification::ParseFromJson(const base::JsonWrapper& spec_json) {
-  if (!spec_json.hasKey(kModuleNameKey) ||
-      !spec_json.hasKey(kModulePathKey) ||
-      !spec_json.hasKey(kModuleKey)) {
-    return;
+bool Specification::ParseFromJson(const base::Json& spec_json) {
+  if (!base::CheckKeyExist(spec_json, kModuleNameKey) ||
+      !base::CheckKeyExist(spec_json, kModulePathKey) ||
+      !base::CheckKeyExist(spec_json, kModuleKey)) {
+    return false;
   }
 
-  base::JsonWrapper spec_module_json(spec_json[kModuleKey].dump());
-  if (!spec_module_json.hasKey(kClassNameKey) ||
-      !spec_module_json.hasKey(kArgumentsKey) ||
-      !spec_module_json.hasKey(kConfigureKey)) {
-    return;
+  base::Json module_json = spec_json[kModuleKey];
+  if (!base::CheckKeyExist(module_json, kClassNameKey) ||
+      !base::CheckKeyExist(module_json, kArgumentsKey) ||
+      !base::CheckKeyExist(module_json, kConfigureKey)) {
+    return false;
   }
 
-  name_ = spec_json.getString(kModuleNameKey);
-  path_ = spec_json.getString(kModulePathKey);
-  class_name_ = spec_module_json.getString(kClassNameKey);
-  args_ = spec_module_json[kArgumentsKey];
-  configure_ = spec_module_json[kConfigureKey];
+  name_ = spec_json[kModuleNameKey].get<std::string>();
+  path_ = spec_json[kModulePathKey].get<std::string>();
+  class_name_ = module_json[kClassNameKey].get<std::string>();
+  args_ = module_json[kArgumentsKey];
+  configure_ = module_json[kConfigureKey];
+
+  return true;
 }
 
 const std::string Specification::name() const {

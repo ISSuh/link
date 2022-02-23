@@ -26,9 +26,11 @@ class LinkNode {
   void Run();
 
  private:
+  bool CreateModuleControllerAndLoadModules();
+
   base::TaskManager task_manager_;
   std::unique_ptr<module::ModuleController> controller_;
-  std::unique_ptr<Arguments> args_;
+  Arguments args_;
 
   DISAALOW_COPY_AND_ASSIGN(LinkNode)
 };

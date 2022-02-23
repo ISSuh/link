@@ -20,7 +20,7 @@ class ModuleExecutor {
   explicit ModuleExecutor(base::TaskRunner* task_runner);
   ~ModuleExecutor();
 
-  void RunningModule(Module* module);
+  void RunningModule(LinkModule* module);
 
  private:
   base::TaskRunner* task_runner_;

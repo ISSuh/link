@@ -6,94 +6,17 @@
 
 #include "link/base/json_wrapper.h"
 
+#include "link/base/logging.h"
+
 namespace link {
 namespace base {
 
-using json = nlohmann::json;
-
-JsonWrapper::JsonWrapper(const char* json_str) {
-  json_obj = json::parse(json_str);
-}
-
-JsonWrapper::JsonWrapper(const std::string& json_str)
-  : JsonWrapper(json_str.c_str()) {}
-
-JsonWrapper::JsonWrapper(const JsonWrapper& json) {
-  clear();
-  json_obj = json.json_obj;
-}
-
-void JsonWrapper::parse(const char* json_str) {
-  clear();
-  json_obj = json::parse(json_str);
-}
-
-void JsonWrapper::parse(const std::string& json_str) {
-  parse(json_str.c_str());
-}
-
-const std::string JsonWrapper::dump() const {
-  return json_obj.dump();
-}
-
-void JsonWrapper::clear() {
-  json_obj.clear();
-}
-
-uint32_t JsonWrapper::size() const {
-  return json_obj.size();
-}
-
-bool JsonWrapper::empty() const {
-  return json_obj.empty();
-}
-
-bool JsonWrapper::hasKey(const std::string& key) const {
-  return json_obj.find(key) != json_obj.end();
-}
-
-// bool JsonWrapper::hasKey(const char* key) {
-//   return json_obj.find(key) != json_obj.end();
-// }
-
-bool JsonWrapper::hasIndex(int index) {
-  return json_obj[index].empty();
-}
-
-bool JsonWrapper::getBool(const std::string& key) const {
-  return json_obj[key];
-}
-
-int32_t JsonWrapper::getInt(const std::string& key) const {
-  return json_obj[key];
-}
-
-uint32_t JsonWrapper::getUint(const std::string& key) const  {
-  return json_obj[key];
-}
-
-const std::string JsonWrapper::getString(const std::string& key) const {
-  return json_obj[key];
-}
-
-template<>
-bool JsonWrapper::get(const std::string& key) {
-  return getBool(key);
-}
-
-template<>
-int32_t JsonWrapper::get(const std::string& key) {
-  return getInt(key);
-}
-
-template<>
-uint32_t JsonWrapper::get(const std::string& key) {
-  return getUint(key);
-}
-
-template<>
-const std::string JsonWrapper::get(const std::string& key) {
-  return getString(key);
+bool CheckKeyExist(const base::Json& json, const std::string& key) {
+  if (json.find(key) == json.end()) {
+    LOG(INFO) << " Not fount key : " << key;
+    return false;
+  }
+  return true;
 }
 
 }  // namespace base
