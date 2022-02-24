@@ -12,19 +12,19 @@
 namespace link {
 namespace module {
 
-#define MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, UniqueID)                 \
-namespace {                                                                             \
-  struct Proxy##UserModuleClass_##UniqueID {                                            \
-    Proxy##UserModuleClass_##UniqueID() {                                               \
-        link::module::ModuleRegister::GetInstance()->CreateModuleFactory<               \
-          UserModuleClass, ModuleBase>(#UserModuleClass, #ModuleBase);                  \
-    }                                                                                   \
-  };                                                                                    \
-  static Proxy##UserModuleClass_##UniqueID g_UserModuleRegister_##UniqueID;             \
+#define MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, UniqueID)       \
+namespace {                                                                   \
+  struct Proxy##UserModuleClass_##UniqueID {                                  \
+    Proxy##UserModuleClass_##UniqueID() {                                     \
+        link::module::ModuleRegister::GetInstance()->CreateModuleFactory<     \
+          UserModuleClass, ModuleBase>(#UserModuleClass, #ModuleBase);        \
+    }                                                                         \
+  };                                                                          \
+  static Proxy##UserModuleClass_##UniqueID g_UserModuleRegister_##UniqueID;   \
 }
 
 // register class macro
-#define MODULE_REGISTER(UserModuleClass, ModuleBase) \
+#define MODULE_REGISTER(UserModuleClass, ModuleBase)    \
   MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, __COUNTER__)
 
 }  // namespace module

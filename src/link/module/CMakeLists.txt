@@ -6,6 +6,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR_LINK})
 
 set(LINK_MODULE_SRC
   ${LINK_MODULE_PATH}/base/module.cc
+  ${LINK_MODULE_PATH}/base/user_module.cc
+  ${LINK_MODULE_PATH}/base/user_module_base.cc
   ${LINK_MODULE_PATH}/base/specification.cc
 
   ${LINK_MODULE_PATH}/loader/module_loader.cc
@@ -13,7 +15,6 @@ set(LINK_MODULE_SRC
 
   ${LINK_MODULE_PATH}/controller/controller.cc
   ${LINK_MODULE_PATH}/controller/executor.cc
-
 )
 
 add_library(${LINK_MODULE_NAME}

@@ -13,15 +13,17 @@
 
 class SampleModule final : public link::module::UserModule {
  public:
+  MODULE_CONSTRUCTOR(SampleModule)
+
   void Init() override;
   void Run() override;
-  void Terminate() override;
+  void Shutdown() override;
 
  private:
-  int m_int_test;
-  float m_float_test;
-  bool m_bool_test;
-  std::string m_string_test;
+  int32_t int_test_;
+  float float_test_;
+  bool bool_test_;
+  std::string string_test_;
 };
 
 REGIST_MODULE(SampleModule);

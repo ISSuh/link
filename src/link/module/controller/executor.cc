@@ -14,15 +14,23 @@ ModuleExecutor::ModuleExecutor(base::TaskRunner* task_runner)
     is_running_(false) {
 }
 
+ModuleExecutor::~ModuleExecutor() {
+}
+
 void ModuleExecutor::RunningModule(LinkModule* module) {
   is_running_ = true;
 
-  task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
-  task_runner_->PostTask(base::Bind(&LinkModule::Process, module));
-  task_runner_->PostTask(base::Bind(&LinkModule::Shutdown, module));
+  // task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
+  // task_runner_->PostTask(base::Bind(&LinkModule::Process, module));
+  // task_runner_->PostTask(base::Bind(&LinkModule::Terminate, module));
+
+  module->Initialize();
+  module->Process();
+  module->Terminate();
 }
 
-ModuleExecutor::~ModuleExecutor() {
+void ModuleExecutor::OnTerminate() {
+  
 }
 
 }  // namespace module

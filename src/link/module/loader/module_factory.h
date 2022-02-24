@@ -10,6 +10,8 @@
 #include <string>
 #include <memory>
 
+#include "link/module/base/user_module_base.h"
+
 namespace link {
 namespace module {
 
@@ -34,14 +36,16 @@ class AbstractModuleFactoryBase {
   const std::string base_class_name_;
 };
 
-template <typename UserModuleBase>
+template <typename UserModule>
 class AbstractModlueFactory : public AbstractModuleFactoryBase {
  public:
   AbstractModlueFactory(
     const std::string& class_name, const std::string& base_class_name)
       : AbstractModuleFactoryBase(class_name, base_class_name) {}
 
-  virtual UserModuleBase* CreateModuleObject() const = 0;
+  virtual UserModule* CreateModuleObject(
+    const std::string& module_name,
+    UserModuleBase::ModuleClient* client) const = 0;
 
  private:
   AbstractModlueFactory();
@@ -49,15 +53,17 @@ class AbstractModlueFactory : public AbstractModuleFactoryBase {
   AbstractModlueFactory &operator=(const AbstractModlueFactory &);
 };
 
-template <typename UserModule, typename UserModuleBase>
-class ModuleFactory : public AbstractModlueFactory<UserModuleBase> {
+template <typename UserModuleImpl, typename UserModule>
+class ModuleFactory : public AbstractModlueFactory<UserModule> {
  public:
   ModuleFactory(
     const std::string& class_name, const std::string& base_class_name)
-      : AbstractModlueFactory<UserModuleBase>(class_name, base_class_name) {}
+      : AbstractModlueFactory<UserModule>(class_name, base_class_name) {}
 
-  UserModuleBase* CreateModuleObject() const {
-    return dynamic_cast<UserModuleBase*>(new UserModule());
+  UserModule* CreateModuleObject(
+    const std::string& module_name,
+    UserModuleBase::ModuleClient* client) const {
+      return dynamic_cast<UserModule*>(new UserModuleImpl(module_name, client));
   }
 };
 

@@ -52,11 +52,19 @@ bool LinkModuleHandle::Open(const std::string& path, int32_t flags) {
   return true;
 }
 
-template<typename UserModuleBaseType>
+LinkModule::LinkModule(const Specification& spec)
+  : spec_(spec) {
+}
+
+const Specification LinkModule::ModuleSpecification() const {
+  return spec_;
+}
+
+template<typename UserModule>
 class LinkModuleImpl : public LinkModule {
  public:
   LinkModuleImpl(LinkModuleHandle* module_handle,
-         UserModuleBaseType* user_module,
+         UserModule* user_module,
          const Specification& spec)
     : LinkModule(spec),
       module_handle_(module_handle),
@@ -66,41 +74,25 @@ class LinkModuleImpl : public LinkModule {
 
   void Initialize() override;
   void Process() override;
-  void Shutdown() override;
+  void Terminate() override;
 
  private:
   std::unique_ptr<LinkModuleHandle> module_handle_;
-  std::unique_ptr<UserModuleBaseType> module_;
+  std::unique_ptr<UserModule> module_;
 };
 
-template <typename UserModuleBaseType>
-void LinkModuleImpl<UserModuleBaseType>::Initialize() {
-  module_->Initialize();
+template <typename UserModule>
+void LinkModuleImpl<UserModule>::Initialize() {
+  module_->Initialize(spec_.arguments());
 }
 
-template <typename UserModuleBaseType>
-void LinkModuleImpl<UserModuleBaseType>::Process() {
+template <typename UserModule>
+void LinkModuleImpl<UserModule>::Process() {
   module_->Process();
 }
-template <typename UserModuleBaseType>
-void LinkModuleImpl<UserModuleBaseType>::Shutdown() {
-  module_->Shutdown();
-}
-
-LinkModule::LinkModule(const Specification& spec)
-  : spec_(spec) {
-}
-
-const std::string LinkModule::name() const {
-  return spec_.name();
-}
-
-const std::string LinkModule::path() const {
-  return spec_.path();
-}
-
-const std::string LinkModule::class_name() const {
-  return spec_.class_name();
+template <typename UserModule>
+void LinkModuleImpl<UserModule>::Terminate() {
+  module_->Terminate();
 }
 
 LinkModulePtr LinkModule::CreateModule(const Specification& spec) {
@@ -123,7 +115,9 @@ LinkModulePtr LinkModule::CreateModule(const Specification& spec) {
 
   LinkModulePtr module_impl(
     new LinkModuleImpl<UserModuleBase>(
-      module_handle, factory->CreateModuleObject(), spec),
+      module_handle,
+      factory->CreateModuleObject(spec.module_name(), nullptr),
+      spec),
       &ModuleDeleter);
   return module_impl;
 }

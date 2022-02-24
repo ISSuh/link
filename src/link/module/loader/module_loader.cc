@@ -17,9 +17,9 @@ namespace link {
 namespace module {
 
 bool ModuleLoader::LoadModule(const Specification& spec) {
-  LOG(INFO) << __func__ << " - " << spec.name();
+  LOG(INFO) << __func__ << " - " << spec.module_name();
 
-  const std::string module_name = spec.name();
+  const std::string module_name = spec.module_name();
   if (modules_.find(module_name) != modules_.end()) {
     LOG(WARN) << __func__ << " - already loaded " << module_name;
     return false;
@@ -38,7 +38,9 @@ void ModuleLoader::UnLoadModule(const std::string& module_name) {
   LOG(INFO) << __func__ << " - " << module_name;
 
   if (HasModule(module_name)) {
-    const std::string class_name = modules_[module_name]->class_name();
+    const Specification spec = modules_[module_name]->ModuleSpecification();
+    const std::string class_name = spec.class_name();
+
     modules_[module_name].reset();
     modules_.erase(module_name);
 

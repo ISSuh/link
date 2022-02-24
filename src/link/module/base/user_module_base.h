@@ -7,26 +7,33 @@
 #ifndef LINK_MODULE_BASE_USER_MODULE_BASE_H_
 #define LINK_MODULE_BASE_USER_MODULE_BASE_H_
 
-#include <iostream>
-#include <memory>
-#include <atomic>
+#include <string>
+
+#include "link/base/json_wrapper.h"
 
 namespace link {
 namespace module {
 
-class UserModuleBase
-  : public std::enable_shared_from_this<UserModuleBase> {
+class UserModuleBase {
  public:
-  UserModuleBase() = default;
-  virtual ~UserModuleBase() = default;
+  class ModuleClient {
+    virtual void OnTerminate() = 0;
+  };
 
-  virtual bool Initialize() { return false; }
-  virtual bool Process() { return false; }
-  virtual bool Shutdown() { return false; }
+  UserModuleBase(
+    const std::string& module_name, UserModuleBase::ModuleClient* client);
+  virtual ~UserModuleBase();
 
- private:
-  // std::atomic<bool> m_isShutdown = { false };
-  // std::string m_moduleName;
+  virtual void Initialize(const base::Json& arguments) = 0;
+  virtual void Process() = 0;
+  virtual void Terminate() = 0;
+
+  bool IsRunning() const;
+
+ protected:
+  const std::string module_name_;
+  bool running_state_;
+  ModuleClient* client_;
 };
 
 }  // namespace module

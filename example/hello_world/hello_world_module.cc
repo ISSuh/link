@@ -13,21 +13,21 @@ using namespace link;
 void SampleModule::Init() {
   LOG(INFO) << "SampleModule::init";
 
-//   getArgument<int>("int_test", m_int_test);
-//   getArgument<float>("float_test", m_float_test);
-//   getArgument<bool>("bool_test", m_bool_test);
-//   getArgument<std::string>("string_test", m_string_test);
+  GetArgument("int_test", &int_test_);
+  GetArgument("float_test", &float_test_);
+  GetArgument("bool_test", &bool_test_);
+  GetArgument("string_test", &string_test_);
 }
 
 void SampleModule::Run() {
   LOG(INFO) << "SampleModule::Run";
 
-  // std::cout << m_int_test << std::endl;
-  // std::cout << m_float_test << std::endl;
-  // std::cout << m_bool_test << std::endl;
-  // std::cout << m_string_test << std::endl;
+  LOG(INFO) << "int_test_ : " << int_test_;
+  LOG(INFO) << "float_test_ : " << float_test_;
+  LOG(INFO) << "bool_test_ : " << bool_test_;
+  LOG(INFO) << "string_test_ : " << string_test_;
 }
 
-void SampleModule::Terminate() {
+void SampleModule::Shutdown() {
   LOG(INFO) << "SampleModule::Terminate";
 }

@@ -17,8 +17,6 @@ TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
     id_(std::hash<std::thread::id>{}(worker_.get_id())),
     running_(true),
     delegate_(task_runner_proxy) {
-
-  LOG(INFO) << __func__ << " - " << delegate_;
 }
 
 TaskExecutor::~TaskExecutor() = default;

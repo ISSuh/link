@@ -29,14 +29,14 @@ class ModuleRegister {
 
   static ModuleRegister* GetInstance();
 
-  template<typename UserModuleType, typename UserModuleBaseType>
+  template<typename UserModuleImpl, typename UserModule>
   void CreateModuleFactory(
     const std::string& class_name, const std::string& base_class_name);
 
   void ReleaseModuleFactory(const std::string& class_name);
 
-  template <typename UserModuleBaseType>
-  AbstractModlueFactory<UserModuleBaseType>* GetModuleFactory(
+  template <typename UserModule>
+  AbstractModlueFactory<UserModule>* GetModuleFactory(
     const std::string& class_name);
 
  private:
@@ -47,7 +47,7 @@ class ModuleRegister {
   ModuleFactoryMap factories_;
 };
 
-template<typename UserModuleType, typename UserModuleBaseType>
+template<typename UserModuleImpl, typename UserModule>
 void ModuleRegister::CreateModuleFactory(const std::string& class_name,
                                         const std::string& base_class_name) {
   if (factories_.find(class_name) != factories_.end()) {
@@ -56,7 +56,7 @@ void ModuleRegister::CreateModuleFactory(const std::string& class_name,
   }
 
   std::unique_ptr<AbstractModuleFactoryBase> factory(
-    new ModuleFactory<UserModuleType, UserModuleBaseType>(
+    new ModuleFactory<UserModuleImpl, UserModule>(
         class_name, base_class_name));
 
   FactoryWrapper factory_wrapper;
@@ -65,14 +65,14 @@ void ModuleRegister::CreateModuleFactory(const std::string& class_name,
   factories_.insert({class_name, std::move(factory_wrapper)});
 }
 
-template <typename UserModuleBaseType>
-AbstractModlueFactory<UserModuleBaseType>*
+template <typename UserModule>
+AbstractModlueFactory<UserModule>*
   ModuleRegister::GetModuleFactory(const std::string& class_name) {
   if (factories_.find(class_name) == factories_.end()) {
     return nullptr;
   }
 
-  return static_cast<AbstractModlueFactory<UserModuleBaseType>*>(
+  return static_cast<AbstractModlueFactory<UserModule>*>(
     factories_[class_name].factory.get());
 }
 

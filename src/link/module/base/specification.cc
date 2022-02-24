@@ -20,25 +20,23 @@ const char* kClassNameKey = "class_name";
 const char* kArgumentsKey = "arguments";
 const char* kConfigureKey = "configure";
 
-
-
 Specification::Specification(const Specification& spec)
-  : name_(), path_(), class_name_(),
-    args_(), configure_() {
-  name_ = spec.name_;
+  : module_name_(), path_(), class_name_(),
+    arguments_(), configure_() {
+  module_name_ = spec.module_name_;
   path_ = spec.path_;
   class_name_ = spec.class_name_;
-  args_ = spec.args_;
+  arguments_ = spec.arguments_;
   configure_ = spec.configure_;
 }
 
 Specification::Specification(Specification&& spec)
-  : name_(), path_(), class_name_(),
-    args_(), configure_() {
-  name_ = spec.name_;
+  : module_name_(), path_(), class_name_(),
+    arguments_(), configure_() {
+  module_name_ = spec.module_name_;
   path_ = spec.path_;
   class_name_ = spec.class_name_;
-  args_ = spec.args_;
+  arguments_ = spec.arguments_;
   configure_ = spec.configure_;
 }
 
@@ -61,23 +59,33 @@ bool Specification::ParseFromJson(const base::Json& spec_json) {
     return false;
   }
 
-  name_ = spec_json[kModuleNameKey].get<std::string>();
+  module_name_ = spec_json[kModuleNameKey].get<std::string>();
   path_ = spec_json[kModulePathKey].get<std::string>();
   class_name_ = module_json[kClassNameKey].get<std::string>();
-  args_ = module_json[kArgumentsKey];
+  arguments_ = module_json[kArgumentsKey];
   configure_ = module_json[kConfigureKey];
 
   return true;
 }
 
-const std::string Specification::name() const {
-  return name_;
+const std::string Specification::module_name() const {
+  return module_name_;
 }
+
 const std::string Specification::path() const {
   return path_;
 }
+
 const std::string Specification::class_name() const {
   return class_name_;
+}
+
+const base::Json Specification::arguments() const {
+  return arguments_;
+}
+
+const base::Json Specification::configure() const {
+  return configure_;
 }
 
 Specification& Specification::operator=(const Specification& spec) {
@@ -85,10 +93,10 @@ Specification& Specification::operator=(const Specification& spec) {
     return *this;
   }
 
-  name_ = spec.name_;
+  module_name_ = spec.module_name_;
   path_ = spec.path_;
   class_name_ = spec.class_name_;
-  args_ = spec.args_;
+  arguments_ = spec.arguments_;
   configure_ = spec.configure_;
   return *this;
 }
@@ -98,10 +106,10 @@ Specification& Specification::operator=(Specification&& spec) {
     return *this;
   }
 
-  name_ = spec.name_;
+  module_name_ = spec.module_name_;
   path_ = spec.path_;
   class_name_ = spec.class_name_;
-  args_ = spec.args_;
+  arguments_ = spec.arguments_;
   configure_ = spec.configure_;
   return *this;
 }

@@ -27,14 +27,11 @@ class LinkModule {
   virtual ~LinkModule() = default;
 
   static LinkModulePtr CreateModule(const Specification& spec);
-
-  const std::string name() const;
-  const std::string class_name() const;
-  const std::string path() const;
+  const Specification ModuleSpecification() const;
 
   virtual void Initialize() = 0;
   virtual void Process() = 0;
-  virtual void Shutdown() = 0;
+  virtual void Terminate() = 0;
 
  protected:
   explicit LinkModule(const Specification& spec);

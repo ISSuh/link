@@ -8,57 +8,48 @@
 #define LINK_MODULE_BASE_USER_MODULE_H_
 
 #include <string>
-#include <memory>
-#include <algorithm>
 
 #include "link/module/base/user_module_base.h"
 #include "link/module/loader/module_register_helper.h"
-#include "link/base/json_wrapper.h"
 
 namespace link {
 namespace module {
 
 class UserModule : public UserModuleBase {
+ public:
+  explicit UserModule(
+    const std::string& module_name, UserModuleBase::ModuleClient* client);
+  virtual ~UserModule();
+
+  void Initialize(const base::Json& arguments) override;
+  void Process() override;
+  void Terminate() override;
+
+  template<typename T>
+  void GetArgument(const std::string& key, T* dest);
+
  protected:
   virtual void Init() = 0;
   virtual void Run() = 0;
-  virtual void Terminate() = 0;
+  virtual void Shutdown() = 0;
 
- public:
-  UserModule() = default;
-  virtual ~UserModule() = default;
-
-  bool Initialize() override {
-    Init();
-    return true;
-  }
-
-  bool Process() override {
-    Run();
-    return true;
-  }
-
-  bool Shutdown() override {
-    Terminate();
-    return true;
-  }
-
-  // void setArguments(util::JsonWrapper args) {
-  //   m_arguments = args;
-  // }
-
-  // template<typename T>
-  // void GetArgument(const std::string& args, T& var) {
-  //   const T temp = m_arguments[args].get<T>();
-  //   std::copy(&temp, &temp + sizeof(temp), &var);
-  // }
-
- private:
-  // util::JsonWrapper m_arguments;
+  base::Json arguments_;
 };
 
+template<typename T>
+void UserModule::GetArgument(const std::string& key, T* dest) {
+  *dest = arguments_[key].get<T>();
+}
+
+// Implement construct
+#define MODULE_CONSTRUCTOR(UserModuleClass)                \
+  UserModuleClass(                                        \
+    const std::string& module_name,                       \
+    link::module::UserModuleBase::ModuleClient* client)   \
+    : link::module::UserModule(module_name, client) {}
+
 // register class macro
-#define REGIST_MODULE(UserModuleClass) \
+#define REGIST_MODULE(UserModuleClass)    \
   MODULE_REGISTER(UserModuleClass, link::module::UserModule)
 
 }  // namespace module
