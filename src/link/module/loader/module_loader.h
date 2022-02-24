@@ -25,7 +25,7 @@ class ModuleLoader {
   ModuleLoader() = default;
   ~ModuleLoader() = default;
 
-  bool LoadModule(const Specification& spec);
+  bool LoadModule(ModuleClient* client, const Specification& spec);
   void UnLoadModule(const std::string& module_name);
 
   LinkModule* GetModule(const std::string& module_name) const;

@@ -16,7 +16,8 @@
 namespace link {
 namespace module {
 
-bool ModuleLoader::LoadModule(const Specification& spec) {
+bool ModuleLoader::LoadModule(
+  ModuleClient* client, const Specification& spec) {
   LOG(INFO) << __func__ << " - " << spec.module_name();
 
   const std::string module_name = spec.module_name();
@@ -25,7 +26,7 @@ bool ModuleLoader::LoadModule(const Specification& spec) {
     return false;
   }
 
-  LinkModulePtr module = LinkModule::CreateModule(spec);
+  LinkModulePtr module = LinkModule::CreateModule(client, spec);
   if (!module) {
     return false;
   }

@@ -34,11 +34,10 @@ class TaskExecutor {
   void Work();
   void TerminateWorker();
 
+  TaskExecutorDelegate* delegate_;
   std::thread worker_;
   uint64_t id_;
   bool running_;
-
-  TaskExecutorDelegate* delegate_;
 };
 
 }  // namespace base

@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "link/module/base/module_client.h"
 #include "link/base/json_wrapper.h"
 
 namespace link {
@@ -16,12 +17,8 @@ namespace module {
 
 class UserModuleBase {
  public:
-  class ModuleClient {
-    virtual void OnTerminate() = 0;
-  };
-
   UserModuleBase(
-    const std::string& module_name, UserModuleBase::ModuleClient* client);
+    const std::string& module_name, ModuleClient* client);
   virtual ~UserModuleBase();
 
   virtual void Initialize(const base::Json& arguments) = 0;

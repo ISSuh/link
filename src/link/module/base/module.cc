@@ -63,9 +63,10 @@ const Specification LinkModule::ModuleSpecification() const {
 template<typename UserModule>
 class LinkModuleImpl : public LinkModule {
  public:
-  LinkModuleImpl(LinkModuleHandle* module_handle,
-         UserModule* user_module,
-         const Specification& spec)
+  LinkModuleImpl(
+    LinkModuleHandle* module_handle,
+    UserModule* user_module,
+    const Specification& spec)
     : LinkModule(spec),
       module_handle_(module_handle),
       module_(user_module) {}
@@ -75,6 +76,7 @@ class LinkModuleImpl : public LinkModule {
   void Initialize() override;
   void Process() override;
   void Terminate() override;
+  bool IsRunning() const override;
 
  private:
   std::unique_ptr<LinkModuleHandle> module_handle_;
@@ -90,12 +92,19 @@ template <typename UserModule>
 void LinkModuleImpl<UserModule>::Process() {
   module_->Process();
 }
+
 template <typename UserModule>
 void LinkModuleImpl<UserModule>::Terminate() {
   module_->Terminate();
 }
 
-LinkModulePtr LinkModule::CreateModule(const Specification& spec) {
+template <typename UserModule>
+bool LinkModuleImpl<UserModule>::IsRunning() const {
+  return module_->IsRunning();
+}
+
+LinkModulePtr LinkModule::CreateModule(
+  ModuleClient* client, const Specification& spec) {
   LinkModuleHandle* module_handle = new LinkModuleHandle();
   if (!module_handle->Open(spec.path(), RTLD_LAZY | RTLD_GLOBAL)) {
     LOG(ERROR) << __func__ << " - "
@@ -116,7 +125,7 @@ LinkModulePtr LinkModule::CreateModule(const Specification& spec) {
   LinkModulePtr module_impl(
     new LinkModuleImpl<UserModuleBase>(
       module_handle,
-      factory->CreateModuleObject(spec.module_name(), nullptr),
+      factory->CreateModuleObject(spec.module_name(), client),
       spec),
       &ModuleDeleter);
   return module_impl;

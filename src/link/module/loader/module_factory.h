@@ -45,7 +45,7 @@ class AbstractModlueFactory : public AbstractModuleFactoryBase {
 
   virtual UserModule* CreateModuleObject(
     const std::string& module_name,
-    UserModuleBase::ModuleClient* client) const = 0;
+    ModuleClient* client) const = 0;
 
  private:
   AbstractModlueFactory();
@@ -62,7 +62,7 @@ class ModuleFactory : public AbstractModlueFactory<UserModule> {
 
   UserModule* CreateModuleObject(
     const std::string& module_name,
-    UserModuleBase::ModuleClient* client) const {
+    ModuleClient* client) const {
       return dynamic_cast<UserModule*>(new UserModuleImpl(module_name, client));
   }
 };

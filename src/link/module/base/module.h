@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 
+#include "link/module/base/module_client.h"
 #include "link/module/base/specification.h"
 #include "link/base/macro.h"
 #include "link/base/json_wrapper.h"
@@ -26,12 +27,14 @@ class LinkModule {
  public:
   virtual ~LinkModule() = default;
 
-  static LinkModulePtr CreateModule(const Specification& spec);
+  static LinkModulePtr CreateModule(
+    ModuleClient* client, const Specification& spec);
   const Specification ModuleSpecification() const;
 
   virtual void Initialize() = 0;
   virtual void Process() = 0;
   virtual void Terminate() = 0;
+  virtual bool IsRunning() const = 0;
 
  protected:
   explicit LinkModule(const Specification& spec);

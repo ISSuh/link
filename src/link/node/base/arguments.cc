@@ -33,7 +33,7 @@ Arguments::~Arguments() {
 }
 
 bool Arguments::ParseFromeProcessArguments(int32_t argc, char* argv[]) {
-  if (argc < kMinArgsNums) {
+  if (argc <= kMinArgsNums) {
     LOG(ERROR) << " Empty arguments";
     return false;
   }

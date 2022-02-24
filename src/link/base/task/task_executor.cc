@@ -13,10 +13,10 @@ namespace link {
 namespace base {
 
 TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
-  : worker_(std::thread(&TaskExecutor::ExcuteWork, this)),
+  : delegate_(task_runner_proxy),
+    worker_(std::thread(&TaskExecutor::ExcuteWork, this)),
     id_(std::hash<std::thread::id>{}(worker_.get_id())),
-    running_(true),
-    delegate_(task_runner_proxy) {
+    running_(true) {
 }
 
 TaskExecutor::~TaskExecutor() = default;

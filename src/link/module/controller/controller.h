@@ -21,7 +21,8 @@
 namespace link {
 namespace module {
 
-class ModuleController {
+class ModuleController
+  : public ModuleExecutor::ModuleExecutorClient {
  public:
   explicit ModuleController(base::TaskRunner* task_runner);
   ~ModuleController();
@@ -29,6 +30,9 @@ class ModuleController {
   bool LoadingModule(const std::vector<Specification>& specs);
   void RunningModule();
   void Destroy();
+
+  // ModuleExecutor::ModuleExecutorClient
+  void TerminateModule(const std::string& module_name);
 
  private:
   base::TaskRunner* task_runner_;

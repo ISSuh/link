@@ -18,7 +18,7 @@ namespace module {
 class UserModule : public UserModuleBase {
  public:
   explicit UserModule(
-    const std::string& module_name, UserModuleBase::ModuleClient* client);
+    const std::string& module_name, ModuleClient* client);
   virtual ~UserModule();
 
   void Initialize(const base::Json& arguments) override;
@@ -45,7 +45,7 @@ void UserModule::GetArgument(const std::string& key, T* dest) {
 #define MODULE_CONSTRUCTOR(UserModuleClass)                \
   UserModuleClass(                                        \
     const std::string& module_name,                       \
-    link::module::UserModuleBase::ModuleClient* client)   \
+    link::module::ModuleClient* client)   \
     : link::module::UserModule(module_name, client) {}
 
 // register class macro

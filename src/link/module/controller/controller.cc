@@ -17,7 +17,7 @@ const char* kModuleTaskRunnerName = "ModuleTaskRunner";
 
 ModuleController::ModuleController(base::TaskRunner* task_runner)
   : task_runner_(task_runner),
-    executor_(task_runner_) {
+    executor_(task_runner_, this) {
 }
 
 ModuleController::~ModuleController() {
@@ -30,7 +30,9 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
   }
 
   for (const Specification& spec : specs) {
-    if (!loader_.LoadModule(spec)) {
+    ModuleClient* module_client =
+      dynamic_cast<ModuleClient*>(&executor_);
+    if (!loader_.LoadModule(module_client, spec)) {
       return false;
     }
   }
@@ -55,6 +57,11 @@ void ModuleController::Destroy() {
   for (const std::string& name : module_names) {
     loader_.UnLoadModule(name);
   }
+}
+
+void ModuleController::TerminateModule(const std::string& module_name) {
+  LOG(INFO) << __func__;
+  loader_.UnLoadModule(module_name);
 }
 
 }  // namespace module

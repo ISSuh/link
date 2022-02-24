@@ -9,28 +9,31 @@
 namespace link {
 namespace module {
 
-ModuleExecutor::ModuleExecutor(base::TaskRunner* task_runner)
+ModuleExecutor::ModuleExecutor(
+  base::TaskRunner* task_runner, ModuleExecutorClient* client)
   : task_runner_(task_runner),
-    is_running_(false) {
+    client_(client),
+    module_(nullptr) {
 }
 
 ModuleExecutor::~ModuleExecutor() {
 }
 
 void ModuleExecutor::RunningModule(LinkModule* module) {
-  is_running_ = true;
-
-  // task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
-  // task_runner_->PostTask(base::Bind(&LinkModule::Process, module));
-  // task_runner_->PostTask(base::Bind(&LinkModule::Terminate, module));
-
-  module->Initialize();
-  module->Process();
-  module->Terminate();
+  module_ = module;
+  task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
 }
 
-void ModuleExecutor::OnTerminate() {
-  
+void ModuleExecutor::AfterInitialize(const std::string& module_name) {
+  task_runner_->PostTask(base::Bind(&LinkModule::Process, module_));
+}
+
+void ModuleExecutor::AfterProcess(const std::string& module_name) {
+  task_runner_->PostTask(base::Bind(&LinkModule::Terminate, module_));
+}
+
+void ModuleExecutor::AfterTerminate(const std::string& module_name) {
+  client_->TerminateModule(module_name);
 }
 
 }  // namespace module

@@ -21,20 +21,20 @@ SequencedTaskRunner::~SequencedTaskRunner() = default;
 
 void SequencedTaskRunner::PostDelayTask(
   const TaskCallback& task_callback, TimeTick delay) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   std::lock_guard<std::mutex> lock(mutex_);
   queue_.push(Task(task_callback, delay));
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::StopRunner() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   running_ = false;
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::WiatForTerminateWorkers() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return;
   }
@@ -42,7 +42,7 @@ void SequencedTaskRunner::WiatForTerminateWorkers() {
 }
 
 std::vector<uint64_t> SequencedTaskRunner::WorkersIdLists() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return std::vector<uint64_t>();
   }
@@ -54,25 +54,25 @@ bool SequencedTaskRunner::IsRunning() {
 }
 
 void SequencedTaskRunner::OnStartWorker(uint64_t id) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] "
+  LOG(TRACE) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnTerminateWorker(uint64_t id) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] "
+  LOG(TRACE) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnStartTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 }
 
 void SequencedTaskRunner::OnDidFinishTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 }
 
 Task SequencedTaskRunner::NextTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {

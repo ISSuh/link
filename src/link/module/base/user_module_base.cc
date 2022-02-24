@@ -10,7 +10,7 @@ namespace link {
 namespace module {
 
 UserModuleBase::UserModuleBase(
-  const std::string& module_name, UserModuleBase::ModuleClient* client)
+  const std::string& module_name, ModuleClient* client)
   : module_name_(module_name),
     running_state_(false),
     client_(client) {
