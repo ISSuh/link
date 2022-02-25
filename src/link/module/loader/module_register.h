@@ -22,9 +22,11 @@ namespace module {
 
 class ModuleRegister {
  public:
+
+  // TODO(issuh) : should modify referece coutner for AbstractModuleFactoryBase
   struct FactoryWrapper {
     uint32_t ref_count = 0;
-    std::unique_ptr<AbstractModuleFactoryBase> factory = nullptr;
+    AbstractModuleFactoryBase* factory = nullptr;
   };
 
   static ModuleRegister* GetInstance();
@@ -55,14 +57,14 @@ void ModuleRegister::CreateModuleFactory(const std::string& class_name,
     return;
   }
 
-  std::unique_ptr<AbstractModuleFactoryBase> factory(
+  AbstractModuleFactoryBase* factory(
     new ModuleFactory<UserModuleImpl, UserModule>(
         class_name, base_class_name));
 
   FactoryWrapper factory_wrapper;
   factory_wrapper.ref_count = 1;
-  factory_wrapper.factory = std::move(factory);
-  factories_.insert({class_name, std::move(factory_wrapper)});
+  factory_wrapper.factory = factory;
+  factories_.insert({class_name, factory_wrapper});
 }
 
 template <typename UserModule>
@@ -73,7 +75,7 @@ AbstractModlueFactory<UserModule>*
   }
 
   return static_cast<AbstractModlueFactory<UserModule>*>(
-    factories_[class_name].factory.get());
+    factories_[class_name].factory);
 }
 
 }  // namespace module

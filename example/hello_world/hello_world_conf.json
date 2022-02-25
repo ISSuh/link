@@ -18,6 +18,22 @@
                     "threading" : false
                 }
             }
+        },
+        {
+            "module_name" : "Sample_1",
+            "module_path" : "/home/issuh/workspace/my_project/link/build/link/example/libhello_world.so",
+            "module" : {
+                "class_name" : "SampleModule",
+                "arguments" : {
+                    "int_test" : 1,
+                    "float_test" : 1.1,
+                    "bool_test" : true,
+                    "string_test" : "Hello World!"
+                },
+                "configure" : {
+                    "threading" : false
+                }
+            }
         }
     ]
 }

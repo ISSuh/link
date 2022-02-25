@@ -7,6 +7,7 @@
 #ifndef LINK_MODULE_LOADER_MODULE_FACTORY_H_
 #define LINK_MODULE_LOADER_MODULE_FACTORY_H_
 
+#include <iostream>
 #include <string>
 #include <memory>
 

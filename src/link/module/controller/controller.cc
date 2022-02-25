@@ -15,9 +15,8 @@ namespace module {
 
 const char* kModuleTaskRunnerName = "ModuleTaskRunner";
 
-ModuleController::ModuleController(base::TaskRunner* task_runner)
-  : task_runner_(task_runner),
-    executor_(task_runner_, this) {
+ModuleController::ModuleController(base::TaskManager* task_manager)
+  : task_manager_(task_manager) {
 }
 
 ModuleController::~ModuleController() {
@@ -30,8 +29,21 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
   }
 
   for (const Specification& spec : specs) {
+    const std::string module_name = spec.module_name();
+    base::TaskRunner* task_runner =
+      CreateTaskRunnerForModule(module_name);
+    if (!task_runner) {
+      LOG(WARN) << " Can not create task runner for module. "
+                << module_name;
+      continue;
+    }
+
+    if (!CreateModuleExecutor(module_name, task_runner)) {
+      continue;
+    }
+
     ModuleClient* module_client =
-      dynamic_cast<ModuleClient*>(&executor_);
+      dynamic_cast<ModuleClient*>(executors_.at(module_name).get());
     if (!loader_.LoadModule(module_client, spec)) {
       return false;
     }
@@ -48,7 +60,7 @@ void ModuleController::RunningModule() {
 
   for (const std::string& name : module_names) {
     LinkModule* module = loader_.GetModule(name);
-    executor_.RunningModule(module);
+    executors_[name]->RunningModule(module);
   }
 }
 
@@ -60,8 +72,33 @@ void ModuleController::Destroy() {
 }
 
 void ModuleController::TerminateModule(const std::string& module_name) {
-  LOG(INFO) << __func__;
-  loader_.UnLoadModule(module_name);
+  LOG(TRACE) << __func__;
+  base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
+
+  task_dispatcher->PostTask(module_name,
+    base::Bind(&ModuleLoader::UnLoadModule, &loader_, module_name));
+
+  task_dispatcher->PostTask(module_name,
+    base::Bind(&base::TaskManager::StopRunner, task_manager_, module_name));
+}
+
+base::TaskRunner* ModuleController::CreateTaskRunnerForModule(
+  const std::string& module_name) {
+  return task_manager_->CreateTaskRunner(
+    module_name, base::TaskRunner::Type::SEQUENCE);
+}
+
+bool ModuleController::CreateModuleExecutor(
+  const std::string& module_name, base::TaskRunner* task_runner) {
+  if (executors_.find(module_name) != executors_.end()) {
+    LOG(WARN) << " ModuleExecutor already exist. " << module_name;
+    return false;
+  }
+
+  std::unique_ptr<ModuleExecutor> executor(
+    new ModuleExecutor(task_runner, this));
+  executors_.insert({module_name, std::move(executor)});
+  return true;
 }
 
 }  // namespace module

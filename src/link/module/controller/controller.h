@@ -24,20 +24,24 @@ namespace module {
 class ModuleController
   : public ModuleExecutor::ModuleExecutorClient {
  public:
-  explicit ModuleController(base::TaskRunner* task_runner);
+  explicit ModuleController(base::TaskManager* task_manager);
   ~ModuleController();
 
   bool LoadingModule(const std::vector<Specification>& specs);
   void RunningModule();
   void Destroy();
 
-  // ModuleExecutor::ModuleExecutorClient
+  // ModuleExecutorClient
   void TerminateModule(const std::string& module_name);
 
  private:
-  base::TaskRunner* task_runner_;
+  base::TaskRunner* CreateTaskRunnerForModule(const std::string& module_name);
+  bool CreateModuleExecutor(
+    const std::string& module_name, base::TaskRunner* task_runner);
+
+  base::TaskManager* task_manager_;
   ModuleLoader loader_;
-  ModuleExecutor executor_;
+  std::map<std::string, std::unique_ptr<ModuleExecutor>> executors_;
 
   DISAALOW_COPY_AND_ASSIGN(ModuleController)
 };

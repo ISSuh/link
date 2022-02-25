@@ -13,11 +13,14 @@ namespace base {
 
 SequencedTaskRunner::SequencedTaskRunner(const std::string& label)
   : TaskRunnerProxy(label),
-    executor_(new TaskExecutor(dynamic_cast<TaskRunnerProxy*>(this))),
     running_(true) {
+  executor_ = std::unique_ptr<TaskExecutor>(
+      new TaskExecutor(dynamic_cast<TaskRunnerProxy*>(this)));
 }
 
-SequencedTaskRunner::~SequencedTaskRunner() = default;
+SequencedTaskRunner::~SequencedTaskRunner() {
+  LOG(TRACE) << "[" << label() << "] " << __func__;
+}
 
 void SequencedTaskRunner::PostDelayTask(
   const TaskCallback& task_callback, TimeTick delay) {

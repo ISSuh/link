@@ -30,9 +30,11 @@ void ModuleRegister::ReleaseModuleFactory(const std::string& class_name) {
     return;
   }
 
+
+  // TODO(issuh) : should change release factory logic
   --factories_[class_name].ref_count;
   if (factories_[class_name].ref_count <= 0) {
-    factories_[class_name].factory.reset();
+    // delete factories_[class_name].factory;
     factories_.erase(class_name);
   }
 }

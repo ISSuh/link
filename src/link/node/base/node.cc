@@ -33,13 +33,7 @@ void LinkNode::Run() {
 }
 
 bool LinkNode::CreateModuleControllerAndLoadModules() {
-  base::TaskRunner* task_runner = task_manager_.CreateTaskRunner(
-    args_.node_name(), base::TaskRunner::Type::SEQUENCE);
-  if (!task_runner) {
-    return false;
-  }
-
-  controller_.reset(new module::ModuleController(task_runner));
+  controller_.reset(new module::ModuleController(&task_manager_));
 
   if (!controller_->LoadingModule(args_.module_specs())) {
     return false;

@@ -54,7 +54,7 @@ void TaskManager::WaitForTerminateTaskRunner(const std::string& label) {
   }
 
   TaskRunnerProxy* runner = runner_map_.at(label).get();
-  if (!runner || !runner->IsRunning()) {
+  if (!runner) {
     return;
   }
 
@@ -62,13 +62,12 @@ void TaskManager::WaitForTerminateTaskRunner(const std::string& label) {
 }
 
 void TaskManager::WaitForTerminateAllTaskRunner() {
-  for (auto iter = runner_map_.begin() ; iter != runner_map_.end();) {
-    const std::string label = iter->first;
+  for (auto&& runner : runner_map_) {
+    const std::string label = runner.first;
     WaitForTerminateTaskRunner(label);
-
-    iter->second.reset(nullptr);
-    runner_map_.erase(iter++);
   }
+
+  runner_map_.clear();
 }
 
 void TaskManager::StopRunner(const std::string& label) {

@@ -33,6 +33,9 @@ set(LINK_MODULE_PATH ${PROJECT_LINK_SRC_DIR}/module)
 set(LINK_NODE_NAME ${LINK_LIBRARY_NAME}_node)
 set(LINK_NODE_PATH ${PROJECT_LINK_SRC_DIR}/node)
 
+set(LINK_NET_NAME ${LINK_LIBRARY_NAME}_net)
+set(LINK_NET_PATH ${PROJECT_LINK_SRC_DIR}/net)
+
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
