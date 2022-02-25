@@ -18,15 +18,18 @@ class BindStateBase;
 
 class CallbackBase {
  public:
-  bool is_null() const { return !bind_state_; }
-  explicit operator bool() const { return !is_null(); }
-
-  CallbackBase(const CallbackBase& c) {
-    bind_state_ = c.bind_state_;
-  }
+  CallbackBase(const CallbackBase& c)
+    : bind_state_(c.bind_state_) {}
 
   CallbackBase(CallbackBase&& c) noexcept
     : bind_state_(c.bind_state_) {}
+
+  bool is_null() const { return !bind_state_; }
+  explicit operator bool() const { return !is_null(); }
+
+  void Reset() {
+    bind_state_ = nullptr;
+  }
 
   CallbackBase& operator=(const CallbackBase& c) {
     bind_state_ = c.bind_state_;
@@ -86,6 +89,7 @@ class Callback<R(Args...)> : public CallbackBase {
 };
 
 using TaskCallback = Callback<void()>;
+using CompletionCallback = Callback<void(int32_t)>;
 
 }  // namespace base
 }  // namespace link

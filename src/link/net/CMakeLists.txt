@@ -3,6 +3,12 @@ project(link_net)
 message("Build Link net")
 
 set(LINK_NET_SRC
+  ${LINK_NET_PATH}/base/net_error.cc
+  ${LINK_NET_PATH}/base/sockaddr_storage.cc
+  ${LINK_NET_PATH}/base/ip_address.cc
+  ${LINK_NET_PATH}/base/ip_endpoint.cc
+  
+  ${LINK_NET_PATH}/socket/posix/posix_socket.cc
 )
 
 add_library(${LINK_NET_NAME}

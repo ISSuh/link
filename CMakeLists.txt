@@ -46,6 +46,7 @@ include_directories(
 add_subdirectory(${LINK_BASE_PATH})
 add_subdirectory(${LINK_MODULE_PATH})
 add_subdirectory(${LINK_NODE_PATH})
+add_subdirectory(${LINK_NET_PATH})
 
 add_library(${LINK_LIBRARY_NAME}
  SHARED
