@@ -60,6 +60,8 @@ class PosixSocket {
   void SetPeerAddress(const SockaddrStorage& address);
   bool HasPeerAddress() const;
 
+  SocketDescriptor socket_fd() const { return socket_fd_; }
+
  private:
   int32_t DoAccept(std::unique_ptr<PosixSocket>* socket);
   void AcceptCompleted();

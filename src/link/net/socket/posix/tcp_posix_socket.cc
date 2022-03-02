@@ -173,6 +173,13 @@ int32_t TcpPosixSocket::GetPeerAddress(IpEndPoint* address) const {
   return OK;
 }
 
+int TcpPosixSocket::AllowAddressReuse() {
+  int32_t reuse = true;
+  int32_t res = setsockopt(socket_->socket_fd(), SOL_SOCKET, SO_REUSEADDR,
+    reinterpret_cast<const char*>(&reuse), sizeof(reuse));
+  return res == -1 ? SystemErrorToNetError(errno) : OK;
+}
+
 void TcpPosixSocket::AcceptCompleted(
   std::unique_ptr<TcpPosixSocket>* tcp_socket,
   IpEndPoint* address,

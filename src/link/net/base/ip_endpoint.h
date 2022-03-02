@@ -19,6 +19,7 @@ namespace net {
 
 class IpEndPoint {
  public:
+  IpEndPoint() = default;
   IpEndPoint(const std::string& address, uint16_t port);
   IpEndPoint(const IpAddress& address, uint16_t port);
   IpEndPoint(const IpEndPoint& endpoint);

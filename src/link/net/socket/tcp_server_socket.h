@@ -11,32 +11,47 @@
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
-#include "link/net/socket/tcp_socket.h"
-#include "link/net/socket/client_socket.h"
 #include "link/net/base/ip_endpoint.h"
+#include "link/net/socket/server_socket.h"
+#include "link/net/socket/tcp_socket.h"
 
 namespace link {
 namespace net {
 
-class TcpServerSocket {
+class TcpServerSocket : public ServerSocket {
  public:
   TcpServerSocket();
-  ~TcpServerSocket();
+  explicit TcpServerSocket(std::unique_ptr<TcpSocket> socket);
+  virtual ~TcpServerSocket();
 
-  int AdoptSocket(SocketDescriptor socket);
+  int32_t AdoptSocket(SocketDescriptor socket);
 
-  // net::ServerSocket implementation.
-  int Listen(const IpEndPoint& address, int backlog);
+  int32_t Listen(const IpEndPoint& address, int32_t backlog) override;
+  int32_t GetLocalAddress(IpEndPoint* address) const override;
 
-  int Accept(std::unique_ptr<ClientSocket>* socket,
-             base::CompletionCallback callback,
-             IpEndPoint* peer_address);
-
+  int32_t Accept(
+    std::unique_ptr<TcpSocket>* socket,
+    base::CompletionCallback callback) override;
+  int32_t Accept(
+    std::unique_ptr<TcpSocket>* socket,
+    base::CompletionCallback callback,
+    IpEndPoint* peer_address) override;
 
  private:
-  std::unique_ptr<TcpSocket> socket_;
+  int ConvertAcceptedSocket(
+    int result,
+    std::unique_ptr<TcpSocket>* output_accepted_socket,
+    IpEndPoint* output_accepted_address);
 
-  std::unique_ptr<TcpSocket> accept_socket_;
+  void OnAcceptCompleted(
+    std::unique_ptr<TcpSocket>* output_accepted_socket,
+    IpEndPoint* output_accepted_address,
+    base::CompletionCallback forward_callback,
+    int result);
+
+  std::unique_ptr<TcpSocket> socket_;
+  std::unique_ptr<TcpSocket> accepted_socket_;
+
   IpEndPoint accepted_address_;
   bool pending_accept_;
 

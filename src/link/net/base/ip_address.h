@@ -19,6 +19,7 @@ class IpAddress {
     kIPv6AddressSize = 16
   };
 
+  IpAddress() = default;
   explicit IpAddress(const std::string& address_str);
   IpAddress(const IpAddress& lhs);
   IpAddress(IpAddress&& lhs);

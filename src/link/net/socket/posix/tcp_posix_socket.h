@@ -55,6 +55,8 @@ class TcpPosixSocket {
   bool IsConnected() const;
   int32_t GetPeerAddress(IpEndPoint* address) const;
 
+  int32_t AllowAddressReuse();
+
  private:
   void AcceptCompleted(std::unique_ptr<TcpPosixSocket>* tcp_socket,
                        IpEndPoint* address,
