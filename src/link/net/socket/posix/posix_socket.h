@@ -32,7 +32,7 @@ class PosixSocket {
   int32_t Bind(const SockaddrStorage& address);
   int32_t Listen(int32_t connection);
   int32_t Accept(
-    std::shared_ptr<PosixSocket> socket,
+    std::unique_ptr<PosixSocket>* socket,
     base::CompletionCallback callback);
   int32_t Connect(
     const SockaddrStorage& address,
@@ -56,10 +56,12 @@ class PosixSocket {
 
   bool IsConnected() const;
 
- private:
-  void SetPeerAddress(const SockaddrStorage& peer_address);
+  int32_t GetPeerAddress(SockaddrStorage* address) const;
+  void SetPeerAddress(const SockaddrStorage& address);
+  bool HasPeerAddress() const;
 
-  int32_t DoAccept(std::shared_ptr<PosixSocket> socket);
+ private:
+  int32_t DoAccept(std::unique_ptr<PosixSocket>* socket);
   void AcceptCompleted();
 
   int32_t DoConnect();
@@ -73,7 +75,7 @@ class PosixSocket {
   void WriteCompleted();
 
   SocketDescriptor socket_fd_;
-  std::shared_ptr<PosixSocket> accept_socket_;
+  std::unique_ptr<PosixSocket>* accept_socket_;
   std::unique_ptr<SockaddrStorage> peer_address_;
 
   bool waiting_connect_ = false;

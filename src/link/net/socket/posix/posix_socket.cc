@@ -4,6 +4,8 @@
  *
  */
 
+#include "link/net/socket/posix/posix_socket.h"
+
 #include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -16,7 +18,6 @@ namespace {
 
 #include <utility>
 
-#include "link/net/socket/posix/posix_socket.h"
 #include "link/net/base/net_error.h"
 #include "link/base/logging.h"
 
@@ -32,6 +33,24 @@ bool SetNonBlocking(int fd) {
   if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1)
     return false;
   return true;
+}
+
+int32_t MapConnectError(int32_t os_error) {
+  switch (os_error) {
+    case EINPROGRESS:
+      return ERR_IO_PENDING;
+    case EACCES:
+      return ERR_NETWORK_ACCESS_DENIED;
+    case ETIMEDOUT:
+      return ERR_CONNECTION_TIMED_OUT;
+    default: {
+      int32_t net_error = SystemErrorToNetError(os_error);
+      if (net_error == ERR_FAILED) {
+        return ERR_CONNECTION_FAILED;
+      }
+      return net_error;
+    }
+  }
 }
 
 PosixSocket::PosixSocket()
@@ -73,9 +92,9 @@ int32_t PosixSocket::AdoptUnconnectedSocket(SocketDescriptor socket) {
   socket_fd_ = socket;
 
   if (!SetNonBlocking(socket_fd_)) {
-    int rv = errno;
+    int res = errno;
     Close();
-    return rv;
+    return res;
   }
   return OK;
 }
@@ -99,7 +118,7 @@ int32_t PosixSocket::Listen(int32_t connection) {
 }
 
 int32_t PosixSocket::Accept(
-  std::shared_ptr<PosixSocket> socket,
+  std::unique_ptr<PosixSocket>* socket,
   base::CompletionCallback callback) {
   int32_t res = DoAccept(socket);
   if (res != ERR_IO_PENDING) {
@@ -111,7 +130,7 @@ int32_t PosixSocket::Accept(
   return OK;
 }
 
-int32_t PosixSocket::DoAccept(std::shared_ptr<PosixSocket> socket) {
+int32_t PosixSocket::DoAccept(std::unique_ptr<PosixSocket>* socket) {
   SockaddrStorage new_peer_address;
   int32_t new_socket = accept(
     socket_fd_, new_peer_address.addr, &new_peer_address.addr_len);
@@ -120,14 +139,24 @@ int32_t PosixSocket::DoAccept(std::shared_ptr<PosixSocket> socket) {
     return errno;
   }
 
-  std::shared_ptr<PosixSocket> accepted_socket(new PosixSocket());
+  std::unique_ptr<PosixSocket> accepted_socket(new PosixSocket());
   int res = accepted_socket->AdoptConnectedSocket(new_socket, new_peer_address);
   if (res != OK) {
     return res;
   }
 
-  socket = std::move(accepted_socket);
+  *socket = std::move(accepted_socket);
   return OK;
+}
+
+void PosixSocket::AcceptCompleted() {
+  int32_t res = DoAccept(accept_socket_);
+  if (res == ERR_IO_PENDING) {
+    return;
+  }
+
+  accept_socket_ = nullptr;
+  std::move(accept_callback_).Run(res);
 }
 
 int32_t PosixSocket::Connect(
@@ -147,8 +176,9 @@ int32_t PosixSocket::Connect(
     errno = os_error;
   }
 
-  if (errno != OK && errno != ERR_IO_PENDING) {
-    return errno;
+  res = MapConnectError(errno);
+  if (res != OK && res != ERR_IO_PENDING) {
+    return res;
   }
 
   write_callback_ = std::move(callback);
@@ -160,6 +190,22 @@ int32_t PosixSocket::DoConnect() {
   int32_t res = connect(
     socket_fd_, peer_address_->addr, peer_address_->addr_len);
   return res;
+}
+
+void PosixSocket::ConnectCompleted() {
+  int32_t os_error = 0;
+  socklen_t len = sizeof(os_error);
+  if (getsockopt(socket_fd_, SOL_SOCKET, SO_ERROR, &os_error, &len) == 0) {
+    errno = os_error;
+  }
+
+  int32_t res = MapConnectError(errno);
+  if (res == ERR_IO_PENDING) {
+    return;
+  }
+
+  waiting_connect_ = false;
+  std::move(write_callback_).Run(res);
 }
 
 int32_t PosixSocket::Close() {
@@ -201,6 +247,11 @@ int32_t PosixSocket::ReadIfReady(
   return ERR_IO_PENDING;
 }
 
+int32_t PosixSocket::CancelReadIfReady() {
+  read_if_ready_callback_.Reset();
+  return net::OK;
+}
+
 int32_t PosixSocket::DoRead(Buffer* buf, int32_t len) {
   int32_t res = ::read(socket_fd_, buf->data(), len);
   return res;
@@ -218,6 +269,10 @@ void PosixSocket::RetryRead(int32_t res) {
   read_buf_ = nullptr;
   read_buf_len_ = 0;
   read_callback_.Run(res);
+}
+
+void PosixSocket::ReadCompleted() {
+  std::move(read_if_ready_callback_).Run(OK);
 }
 
 int32_t PosixSocket::Write(
@@ -244,8 +299,15 @@ int32_t PosixSocket::WaitForWrite(
   return ERR_IO_PENDING;
 }
 
-void PosixSocket::SetPeerAddress(const SockaddrStorage& peer_address) {
-  peer_address_.reset(new SockaddrStorage(peer_address));
+void PosixSocket::WriteCompleted() {
+  int32_t res = DoWrite(write_buf_.get(), write_buf_len_);
+  if (res == ERR_IO_PENDING) {
+    return;
+  }
+
+  write_buf_.reset();
+  write_buf_len_ = 0;
+  std::move(write_callback_).Run(OK);
 }
 
 bool PosixSocket::IsConnected() const {
@@ -265,6 +327,23 @@ bool PosixSocket::IsConnected() const {
     return false;
   }
   return true;
+}
+
+int32_t PosixSocket::GetPeerAddress(SockaddrStorage* address) const {
+  if (!HasPeerAddress()) {
+    return ERR_SOCKET_NOT_CONNECTED;
+  }
+
+  *address = *peer_address_;
+  return OK;
+}
+
+void PosixSocket::SetPeerAddress(const SockaddrStorage& address) {
+  peer_address_.reset(new SockaddrStorage(address));
+}
+
+bool PosixSocket::HasPeerAddress() const {
+  return peer_address_ != nullptr;
 }
 
 }  // namespace net

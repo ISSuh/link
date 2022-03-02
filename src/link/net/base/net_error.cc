@@ -14,10 +14,10 @@
 namespace link {
 namespace net {
 
-NetError SystemErrorToNetError(int32_t errno) {
+NetError SystemErrorToNetError(int32_t os_error) {
   // There are numerous posix error codes, but these are the ones we thus far
   // find interesting.
-  switch (errno) {
+  switch (os_error) {
     case EAGAIN:
       return ERR_IO_PENDING;
     case EACCES:

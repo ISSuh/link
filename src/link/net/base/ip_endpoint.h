@@ -36,6 +36,7 @@ class IpEndPoint {
   bool FromSockAddr(
     sockaddr* address, socklen_t address_length);
 
+  bool empty() const;
   const std::string ToString() const;
 
   IpEndPoint& operator=(const IpEndPoint& lhs);

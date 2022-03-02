@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "link/net/socket/posix/posix_socket.h"
+#include "link/net/base/ip_endpoint.h"
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
 
@@ -25,16 +26,17 @@ class TcpPosixSocket {
 
   int32_t Open(AddressFamily address_family);
   int32_t AdoptConnectedSocket(
-    SocketDescriptor socket, const SockaddrStorage& peer_address);
+    SocketDescriptor socket, const IpEndPoint& peer_address);
   int32_t AdoptUnconnectedSocket(SocketDescriptor socket);
 
-  int32_t Bind(const SockaddrStorage& address);
+  int32_t Bind(const IpEndPoint& address);
   int32_t Listen(int32_t connection);
   int32_t Accept(
-    std::shared_ptr<TcpPosixSocket> socket,
+    std::unique_ptr<TcpPosixSocket>* tcp_socket,
+    IpEndPoint* address,
     base::CompletionCallback callback);
   int32_t Connect(
-    const SockaddrStorage& address,
+    const IpEndPoint& address,
     base::CompletionCallback callback);
   int32_t Close();
 
@@ -49,22 +51,20 @@ class TcpPosixSocket {
   int32_t Write(
     Buffer* buf, int32_t len,
     base::CompletionCallback callback);
-  int32_t WaitForWrite(
-    Buffer* buf, int32_t len,
-    base::CompletionCallback callback);
 
   bool IsConnected() const;
+  int32_t GetPeerAddress(IpEndPoint* address) const;
 
  private:
-  // void AcceptCompleted(std::unique_ptr<TCPSocketPosix>* tcp_socket,
-  //                      IPEndPoint* address,
-  //                      base::CompletionCallback callback,
-  //                      int32_t res);
-  // int32_t HandleAcceptCompleted(std::unique_ptr<TCPSocketPosix>* tcp_socket,
-  //                           IPEndPoint* address,
-  //                           int32_t res);
-  // int32_t BuildTcpSocketPosix(std::unique_ptr<TCPSocketPosix>* tcp_socket,
-  //                         IPEndPoint* address);
+  void AcceptCompleted(std::unique_ptr<TcpPosixSocket>* tcp_socket,
+                       IpEndPoint* address,
+                       base::CompletionCallback callback,
+                       int32_t res);
+  int32_t HandleAcceptCompleted(std::unique_ptr<TcpPosixSocket>* tcp_socket,
+                            IpEndPoint* address,
+                            int32_t res);
+  int32_t BuildTcpSocketPosix(std::unique_ptr<TcpPosixSocket>* tcp_socket,
+                          IpEndPoint* address);
 
   void ConnectCompleted(base::CompletionCallback callback, int32_t res);
   int32_t HandleConnectCompleted(int32_t res);

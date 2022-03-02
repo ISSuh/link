@@ -7,16 +7,18 @@
 #ifndef LINK_NET_BASE_ADDRESS_FAMILY_H_
 #define LINK_NET_BASE_ADDRESS_FAMILY_H_
 
-#include <vector>
+#include <stdint.h>
 
 namespace link {
 namespace net {
 
-enum AddressFamily {
+enum AddressFamily : int32_t {
   ADDRESS_FAMILY_UNSPECIFIED = 0,   // AF_UNSPEC
   ADDRESS_FAMILY_IPV4 = 2,          // AF_INET
   ADDRESS_FAMILY_IPV6 = 10,         // AF_INET6
 };
+
+int32_t ConvertAddressFamilyToPlatfrom(AddressFamily address_family);
 
 }  // namespace net
 }  // namespace link

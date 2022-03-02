@@ -12,7 +12,7 @@
 namespace link {
 namespace net {
 
-enum NetError {
+enum NetError : int32_t {
   OK = 0,
   ERR_IO_PENDING = -1,
 
@@ -554,7 +554,7 @@ enum NetError {
   ERR_CERT_END = -219
 };
 
-NetError SystemErrorToNetError(int32_t errno);
+NetError SystemErrorToNetError(int32_t os_error);
 
 }  // namespace net
 }  // namespace link

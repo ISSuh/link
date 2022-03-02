@@ -149,6 +149,10 @@ bool IpEndPoint::FromSockAddr(
   return false;  // Unrecognized |sa_family|.
 }
 
+bool IpEndPoint::empty() const {
+  return address_.empty();
+}
+
 const std::string IpEndPoint::ToString() const {
   return address_.ToString() + ":" + std::to_string(port_);
 }
