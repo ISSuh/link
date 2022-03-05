@@ -26,6 +26,15 @@ void SampleModule::Run() {
   LOG(INFO) << "float_test_ : " << float_test_;
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
+
+  regist(http_component)
+  regist(rpc_component)
+
+  while () { 
+    publish()
+    SpinOnce()
+
+  }
 }
 
 void SampleModule::Shutdown() {
