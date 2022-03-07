@@ -23,7 +23,6 @@ namespace link {
 namespace base {
 
 class TaskExecutor;
-class TaskQueue;
 
 class SequencedTaskRunner final : public TaskRunnerProxy {
  public:
@@ -52,12 +51,9 @@ class SequencedTaskRunner final : public TaskRunnerProxy {
 
  private:
   std::unique_ptr<TaskExecutor> executor_;
-
-  using TaskQueue = std::priority_queue<Task>;
   TaskQueue queue_;
 
   bool running_;
-
   std::condition_variable cv_;
   std::mutex mutex_;
 };

@@ -10,6 +10,8 @@
 #include <stddef.h>
 #include <functional>
 
+#include <queue>
+
 #include "link/base/time.h"
 #include "link/base/callback/callback.h"
 
@@ -29,6 +31,8 @@ struct Task {
         return delay < s.delay;
   }
 };
+
+using TaskQueue = std::priority_queue<Task>;
 
 }  // namespace base
 }  // namespace link

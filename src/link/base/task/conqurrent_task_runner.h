@@ -24,7 +24,6 @@ namespace link {
 namespace base {
 
 class TaskExecutor;
-class TaskQueue;
 
 class ConcurrentTaskRunner final : public TaskRunnerProxy {
  public:
@@ -54,12 +53,9 @@ class ConcurrentTaskRunner final : public TaskRunnerProxy {
  private:
   size_t number_of_executor_;
   std::map<uint64_t, std::unique_ptr<TaskExecutor>> executors_;
-
-  using TaskQueue = std::priority_queue<Task>;
   TaskQueue queue_;
 
   bool running_;
-
   std::condition_variable cv_;
   std::mutex mutex_;
 };

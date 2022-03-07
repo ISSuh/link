@@ -34,7 +34,7 @@ int32_t TcpPosixSocket::Open(AddressFamily address_family) {
 }
 
 int32_t TcpPosixSocket::AdoptConnectedSocket(
-  SocketDescriptor socket, const IpEndPoint& peer_address) {
+  base::Discriptor socket, const IpEndPoint& peer_address) {
   SockaddrStorage storage;
   if (!peer_address.ToSockAddr(storage.addr, &storage.addr_len) ||
       peer_address.empty()) {
@@ -49,7 +49,7 @@ int32_t TcpPosixSocket::AdoptConnectedSocket(
   return res;
 }
 
-int32_t TcpPosixSocket::AdoptUnconnectedSocket(SocketDescriptor socket) {
+int32_t TcpPosixSocket::AdoptUnconnectedSocket(base::Discriptor socket) {
   socket_.reset(new PosixSocket());
   int32_t res = socket_->AdoptUnconnectedSocket(socket);
   if (res != OK) {

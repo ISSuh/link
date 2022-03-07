@@ -9,13 +9,14 @@
 
 #include <cstdint>
 
+#include "link/base/platform/discriptor.h"
+
 namespace link {
 namespace net {
 
-using SocketDescriptor = int32_t;
-const SocketDescriptor kInvalidSocket = -1;
+const base::Discriptor kInvalidSocket = -1;
 
-SocketDescriptor CreatePlatformSocket(
+base::Discriptor CreatePlatformSocket(
   int32_t family, int32_t type, int32_t protocol);
 
 }  // namespace net

@@ -13,6 +13,10 @@ set(LINK_BASE_SRC
   ${LINK_BASE_PATH}/task/task_executor.cc
   ${LINK_BASE_PATH}/task/task_dispatcher.cc
   ${LINK_BASE_PATH}/task_manager.cc
+
+  ${LINK_BASE_PATH}/event/event.cc
+  ${LINK_BASE_PATH}/event/event_channel.cc
+  ${LINK_BASE_PATH}/event/platform/event_dispatcher_epoll.cc
 )
 
 add_library(${LINK_BASE_NAME}

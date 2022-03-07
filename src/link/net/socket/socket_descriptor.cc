@@ -12,9 +12,9 @@
 namespace link {
 namespace net {
 
-SocketDescriptor CreatePlatformSocket(
+base::Discriptor CreatePlatformSocket(
   int32_t family, int32_t type, int32_t protocol) {
-  SocketDescriptor socket_fd = socket(family, type, protocol);
+  base::Discriptor socket_fd = socket(family, type, protocol);
   return socket_fd;
 }
 

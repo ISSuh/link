@@ -4,15 +4,17 @@
  *
  */
 
-#ifndef LINK_BASE_EVNET_EVENT_CHANNEL_CONTROLLER_H_
-#define LINK_BASE_EVNET_EVENT_CHANNEL_CONTROLLER_H_
+#ifndef LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_
+#define LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_
 
 #include <unordered_map>
 
-#include "link/base/evnet/event_channel.h"
+#include "link/base/event/event_channel.h"
 
 namespace link {
 namespace base {
+
+class EventChannel;
 
 class EventChannelController {
  protected:
@@ -26,8 +28,7 @@ class EventChannelController {
   std::unordered_map<Discriptor, EventChannel*> channel_map_;
 };
 
-
 }  // namespace base
 }  // namespace link
 
-#endif  // LINK_BASE_EVNET_EVENT_CHANNEL_CONTROLLER_H_
+#endif  // LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_

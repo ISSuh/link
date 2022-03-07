@@ -26,8 +26,8 @@ class TcpPosixSocket {
 
   int32_t Open(AddressFamily address_family);
   int32_t AdoptConnectedSocket(
-    SocketDescriptor socket, const IpEndPoint& peer_address);
-  int32_t AdoptUnconnectedSocket(SocketDescriptor socket);
+    base::Discriptor socket, const IpEndPoint& peer_address);
+  int32_t AdoptUnconnectedSocket(base::Discriptor socket);
 
   int32_t Bind(const IpEndPoint& address);
   int32_t Listen(int32_t connection);
@@ -56,6 +56,8 @@ class TcpPosixSocket {
   int32_t GetPeerAddress(IpEndPoint* address) const;
 
   int32_t AllowAddressReuse();
+
+  base::Discriptor socket_fd() const { return socket_->socket_fd(); }
 
  private:
   void AcceptCompleted(std::unique_ptr<TcpPosixSocket>* tcp_socket,

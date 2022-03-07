@@ -26,8 +26,8 @@ class PosixSocket {
 
   int32_t Open(AddressFamily address_family);
   int32_t AdoptConnectedSocket(
-    SocketDescriptor socket, const SockaddrStorage& peer_address);
-  int32_t AdoptUnconnectedSocket(SocketDescriptor socket);
+    base::Discriptor socket, const SockaddrStorage& peer_address);
+  int32_t AdoptUnconnectedSocket(base::Discriptor socket);
 
   int32_t Bind(const SockaddrStorage& address);
   int32_t Listen(int32_t connection);
@@ -60,7 +60,7 @@ class PosixSocket {
   void SetPeerAddress(const SockaddrStorage& address);
   bool HasPeerAddress() const;
 
-  SocketDescriptor socket_fd() const { return socket_fd_; }
+  base::Discriptor socket_fd() const { return socket_fd_; }
 
  private:
   int32_t DoAccept(std::unique_ptr<PosixSocket>* socket);
@@ -76,7 +76,7 @@ class PosixSocket {
   int32_t DoWrite(Buffer* buf, int32_t len);
   void WriteCompleted();
 
-  SocketDescriptor socket_fd_;
+  base::Discriptor socket_fd_;
   std::unique_ptr<PosixSocket>* accept_socket_;
   std::unique_ptr<SockaddrStorage> peer_address_;
 

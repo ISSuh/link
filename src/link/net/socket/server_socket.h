@@ -12,13 +12,14 @@
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
+#include "link/base/event/event_observer.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/tcp_socket.h"
 
 namespace link {
 namespace net {
 
-class ServerSocket {
+class ServerSocket : public base::EventObserver {
  public:
   ServerSocket() = default;
   virtual ~ServerSocket() = default;

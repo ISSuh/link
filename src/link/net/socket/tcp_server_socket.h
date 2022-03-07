@@ -11,6 +11,8 @@
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
+#include "link/base/platform/discriptor.h"
+#include "link/base/event/event.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/server_socket.h"
 #include "link/net/socket/tcp_socket.h"
@@ -24,7 +26,7 @@ class TcpServerSocket : public ServerSocket {
   explicit TcpServerSocket(std::unique_ptr<TcpSocket> socket);
   virtual ~TcpServerSocket();
 
-  int32_t AdoptSocket(SocketDescriptor socket);
+  int32_t AdoptSocket(base::Discriptor socket);
 
   int32_t Listen(const IpEndPoint& address, int32_t backlog) override;
   int32_t GetLocalAddress(IpEndPoint* address) const override;
@@ -36,6 +38,9 @@ class TcpServerSocket : public ServerSocket {
     std::unique_ptr<TcpSocket>* socket,
     base::CompletionCallback callback,
     IpEndPoint* peer_address) override;
+
+  base::Discriptor discriptor() override;
+  void HandleEvent(const base::Event& event) override;
 
  private:
   int ConvertAcceptedSocket(

@@ -23,7 +23,7 @@ TcpServerSocket::TcpServerSocket(std::unique_ptr<TcpSocket> socket)
 
 TcpServerSocket::~TcpServerSocket() = default;
 
-int32_t TcpServerSocket::AdoptSocket(SocketDescriptor socket) {
+int32_t TcpServerSocket::AdoptSocket(base::Discriptor socket) {
   return socket_->AdoptUnconnectedSocket(socket);
 }
 

@@ -79,7 +79,7 @@ int32_t PosixSocket::Open(AddressFamily address_family) {
 }
 
 int32_t PosixSocket::AdoptConnectedSocket(
-  SocketDescriptor socket, const SockaddrStorage& address) {
+  base::Discriptor socket, const SockaddrStorage& address) {
   int32_t res = AdoptUnconnectedSocket(socket);
   if (res != OK)
     return res;
@@ -88,7 +88,7 @@ int32_t PosixSocket::AdoptConnectedSocket(
   return OK;
 }
 
-int32_t PosixSocket::AdoptUnconnectedSocket(SocketDescriptor socket) {
+int32_t PosixSocket::AdoptUnconnectedSocket(base::Discriptor socket) {
   socket_fd_ = socket;
 
   if (!SetNonBlocking(socket_fd_)) {
