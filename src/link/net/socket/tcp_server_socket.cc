@@ -8,6 +8,8 @@
 
 #include <utility>
 
+#include "link/base/logging.h"
+#include "link/base/event/event_util.h"
 #include "link/net/base/net_error.h"
 
 namespace link {
@@ -83,6 +85,14 @@ int32_t TcpServerSocket::Accept(
   }
 
   return result;
+}
+
+base::Discriptor TcpServerSocket::discriptor() {
+  return socket_->socket_fd();
+}
+
+void TcpServerSocket::HandleEvent(const base::Event& event) {
+  LOG(INFO) << __func__ << " - " << base::EventTypeToString(event);
 }
 
 int TcpServerSocket::ConvertAcceptedSocket(

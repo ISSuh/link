@@ -80,10 +80,9 @@ bool IpEndPoint::ToSockAddr(
       memset(addr, 0, sizeof(sockaddr_in));
 
       addr->sin_family = AF_INET;
-      addr->sin_port = base::HostToNet16(port_);
-
-      memcpy(&addr->sin_addr, address_.ToString().data(),
-             IpAddress::kIPv4AddressSize);
+      addr->sin_port = htons(port_);
+      // addr->sin_addr.s_addr = inet_addr(address_.ToString().data());
+      addr->sin_addr.s_addr = inet_addr("127.0.0.1");
       break;
     }
     case IpAddress::kIPv6AddressSize: {
@@ -99,7 +98,6 @@ bool IpEndPoint::ToSockAddr(
 
       addr6->sin6_family = AF_INET6;
       addr6->sin6_port = base::HostToNet16(port_);
-
       memcpy(&addr6->sin6_addr, address_.ToString().data(),
              IpAddress::kIPv6AddressSize);
       break;

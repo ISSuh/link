@@ -17,7 +17,7 @@ namespace base {
 class EventChannel;
 
 class EventChannelController {
- protected:
+ public:
   friend EventChannel;
 
   virtual bool AttachChannel(EventChannel* channel) = 0;

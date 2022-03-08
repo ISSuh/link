@@ -28,7 +28,7 @@ EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher(
     ::close(epoll_fd);
     return nullptr;
   }
-  return new EventDispatcherEpoll(epoll_fd, evnet_size, 5);
+  return new EventDispatcherEpoll(epoll_fd, evnet_size, timeout);
 }
 
 EventDispatcherEpoll::EventDispatcherEpoll(
@@ -52,6 +52,8 @@ void EventDispatcherEpoll::Dispatch() {
     LOG(INFO) << __func__ << " - timeout";
     return;
   }
+
+  LOG(INFO) << __func__ << " - " << count;
 
   epoll_events.resize(count);
   for (const auto& epoll_event : epoll_events) {

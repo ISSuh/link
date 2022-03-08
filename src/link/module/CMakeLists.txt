@@ -2,8 +2,6 @@ project(link_module)
 
 message("Build Link module")
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR_LINK})
-
 set(LINK_MODULE_SRC
   ${LINK_MODULE_PATH}/base/module.cc
   ${LINK_MODULE_PATH}/base/user_module.cc

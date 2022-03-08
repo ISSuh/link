@@ -1,11 +1,17 @@
 /**
- * Copyright 2020 The ISSuh Authors. All Rights Reserved.
- * Distributed under the MIT License (http://opensource.org/licenses/MIT)
+ *
+ *  Copyright:  Copyright (c) 2022, ISSuh
+ *
  */
+
 #include "hello_world_module.h"
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 
+#include <link/net/socket/tcp_server_socket.h>
+#include <link/handle/link_handle.h>
 #include <link/base/logging.h>
 
 using namespace link;
@@ -26,6 +32,18 @@ void SampleModule::Run() {
   LOG(INFO) << "float_test_ : " << float_test_;
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
+
+  handle::LinkHandle handle;
+  handle.Initialize();
+
+  net::TcpServerSocket server;
+  net::IpEndPoint end_point("0.0.0.0", 33660);
+  server.Listen(end_point, 10);
+
+  while (true) {
+    handle.RunOnce();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 }
 
 void SampleModule::Shutdown() {

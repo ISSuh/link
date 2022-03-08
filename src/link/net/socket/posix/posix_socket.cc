@@ -11,7 +11,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
-
+#include <cstring>
 namespace {
 #include <sys/unistd.h>
 }
@@ -102,7 +102,7 @@ int32_t PosixSocket::AdoptUnconnectedSocket(base::Discriptor socket) {
 int32_t PosixSocket::Bind(const SockaddrStorage& address) {
   int res = bind(socket_fd_, address.addr, address.addr_len);
   if (res < 0) {
-    LOG(ERROR) << __func__ << " - failed";
+    LOG(ERROR) << __func__ << " - failed. " << std::strerror(errno);
     return errno;
   }
   return OK;

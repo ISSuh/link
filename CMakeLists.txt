@@ -36,6 +36,12 @@ set(LINK_NODE_PATH ${PROJECT_LINK_SRC_DIR}/node)
 set(LINK_NET_NAME ${LINK_LIBRARY_NAME}_net)
 set(LINK_NET_PATH ${PROJECT_LINK_SRC_DIR}/net)
 
+set(LINK_HANDLE_NAME ${LINK_LIBRARY_NAME}_handle)
+set(LINK_HANDLE_PATH ${PROJECT_LINK_SRC_DIR}/handle)
+
+set(LINK_COMPONENT_NAME ${LINK_LIBRARY_NAME}_component)
+set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
+
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
@@ -47,17 +53,24 @@ add_subdirectory(${LINK_BASE_PATH})
 add_subdirectory(${LINK_MODULE_PATH})
 add_subdirectory(${LINK_NODE_PATH})
 add_subdirectory(${LINK_NET_PATH})
+add_subdirectory(${LINK_HANDLE_PATH})
 
 add_library(${LINK_LIBRARY_NAME}
  SHARED
   $<TARGET_OBJECTS:link_base> 
   $<TARGET_OBJECTS:link_module>
+  $<TARGET_OBJECTS:link_node>
+  $<TARGET_OBJECTS:link_net>
+  $<TARGET_OBJECTS:link_handle>
 )
 
 target_link_libraries(${LINK_LIBRARY_NAME}
  PUBLIC
   ${LINK_BASE_NAME}
   ${LINK_MODULE_NAME}
+  ${LINK_NODE_NAME}
+  ${LINK_NET_NAME}
+  ${LINK_HANDLE_NAME}
 )
 
 set_target_properties(${LINK_LIBRARY_NAME}
