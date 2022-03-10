@@ -40,6 +40,8 @@ void SampleModule::Run() {
   net::IpEndPoint end_point("0.0.0.0", 33660);
   server.Listen(end_point, 10);
 
+  handle.RegistEventObserver(&server);
+
   while (true) {
     handle.RunOnce();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

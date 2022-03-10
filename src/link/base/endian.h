@@ -36,7 +36,7 @@ inline uintptr_t ByteSwapUintPtrT(uintptr_t x) {
 }
 
 inline uint16_t ByteSwapToLE16(uint16_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return x;
 #else
   return ByteSwap(x);
@@ -44,7 +44,7 @@ inline uint16_t ByteSwapToLE16(uint16_t x) {
 }
 
 inline uint32_t ByteSwapToLE32(uint32_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return x;
 #else
   return ByteSwap(x);
@@ -52,7 +52,7 @@ inline uint32_t ByteSwapToLE32(uint32_t x) {
 }
 
 inline uint64_t ByteSwapToLE64(uint64_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return x;
 #else
   return ByteSwap(x);
@@ -60,7 +60,7 @@ inline uint64_t ByteSwapToLE64(uint64_t x) {
 }
 
 inline uint16_t NetToHost16(uint16_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;
@@ -68,7 +68,7 @@ inline uint16_t NetToHost16(uint16_t x) {
 }
 
 inline uint32_t NetToHost32(uint32_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;
@@ -76,7 +76,7 @@ inline uint32_t NetToHost32(uint32_t x) {
 }
 
 inline uint64_t NetToHost64(uint64_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;
@@ -84,7 +84,7 @@ inline uint64_t NetToHost64(uint64_t x) {
 }
 
 inline uint16_t HostToNet16(uint16_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;
@@ -92,7 +92,7 @@ inline uint16_t HostToNet16(uint16_t x) {
 }
 
 inline uint32_t HostToNet32(uint32_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;
@@ -100,7 +100,7 @@ inline uint32_t HostToNet32(uint32_t x) {
 }
 
 inline uint64_t HostToNet64(uint64_t x) {
-#if defined(ARCH_CPU_LITTLE_ENDIAN)
+#if defined(__LITTLE_ENDIAN__)
   return ByteSwap(x);
 #else
   return x;

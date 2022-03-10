@@ -42,10 +42,10 @@ void UserModule::GetArgument(const std::string& key, T* dest) {
 }
 
 // Implement construct
-#define MODULE_CONSTRUCTOR(UserModuleClass)                \
-  UserModuleClass(                                        \
-    const std::string& module_name,                       \
-    link::module::ModuleClient* client)   \
+#define MODULE_CONSTRUCTOR(UserModuleClass)             \
+  UserModuleClass(                                      \
+    const std::string& module_name,                     \
+    link::module::ModuleClient* client)                 \
     : link::module::UserModule(module_name, client) {}
 
 // register class macro

@@ -8,6 +8,7 @@
 #define LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_
 
 #include <vector>
+#include <unordered_map>
 
 #include "link/base/macro.h"
 #include "link/base/platform/discriptor.h"
@@ -30,6 +31,8 @@ class EventDispatcherEpoll : public EventDispatcher {
   bool AttachChannel(EventChannel* channel) override;
   void DetatchCahnnel(Discriptor fd) override;
   void DispatchEvent(const Event& event) override;
+
+  std::unordered_map<Discriptor, EventChannel*> channel_map_;
 
   Discriptor epoll_fd_;
   uint32_t event_size_;

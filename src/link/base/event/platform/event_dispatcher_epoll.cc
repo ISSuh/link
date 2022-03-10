@@ -16,6 +16,8 @@ namespace {
 
 #include "link/base/logging.h"
 
+#include <bitset>
+
 namespace link {
 namespace base {
 
@@ -81,6 +83,11 @@ void EventDispatcherEpoll::Dispatch() {
 
 bool EventDispatcherEpoll::AttachChannel(EventChannel* channel) {
   Discriptor fd = channel->ChannelDiscriptor();
+  if (channel_map_.find(fd) != channel_map_.end()) {
+    LOG(ERROR) <<  __func__ << " - decriptor already exist.  " << fd;
+    return false;
+  }
+
   EpollEvent event;
   event.events = EPOLLIN | EPOLLOUT | 1;
   event.data.fd = fd;
@@ -90,9 +97,9 @@ bool EventDispatcherEpoll::AttachChannel(EventChannel* channel) {
                 << " - fail : " << std::strerror(errno);
     return false;
   }
-  return true;
 
-  channel_map_[fd] = channel;
+  channel_map_.insert({fd, channel});
+  return true;
 }
 
 void EventDispatcherEpoll::DetatchCahnnel(Discriptor fd) {
