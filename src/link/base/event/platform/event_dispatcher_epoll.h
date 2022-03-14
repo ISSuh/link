@@ -12,6 +12,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/platform/discriptor.h"
+#include "link/base/event/event_channel.h"
 #include "link/base/event/event_dispatcher.h"
 
 namespace link {

@@ -15,7 +15,13 @@ namespace base {
 
 class EventObserver {
  public:
+  enum class Type : uint8_t{
+    SERVER,
+    CLIENT
+  };
+
   virtual Discriptor discriptor() = 0;
+  virtual Type type() = 0;
   virtual void HandleEvent(const Event& event) = 0;
 };
 

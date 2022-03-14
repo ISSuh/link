@@ -55,8 +55,6 @@ void EventDispatcherEpoll::Dispatch() {
     return;
   }
 
-  LOG(INFO) << __func__ << " - " << count;
-
   epoll_events.resize(count);
   for (const auto& epoll_event : epoll_events) {
     Discriptor fd = epoll_event.data.fd;
@@ -64,17 +62,34 @@ void EventDispatcherEpoll::Dispatch() {
 
     // TODO(issuh) : need test read & send on epoll
     Event::Type type;
-    if (event_flag | EPOLLIN) {
-      type = Event::Type::READ;
-    } else if (event_flag | EPOLLOUT) {
-      type = Event::Type::WRITE;
-    } else if (event_flag | EPOLLERR) {
-      type = Event::Type::ERROR;
-    } else if (event_flag | EPOLLRDHUP) {
-      type = Event::Type::CLOSE;
+    if (channel_map_[fd]->ObserverType() == EventObserver::Type::SERVER) {
+      LOG(INFO) << __func__ << " - Event::Type::ACCEPT;";
+      type = Event::Type::ACCEPT;
     } else {
-      type = Event::Type::NONE;
+      if (event_flag & EPOLLIN) {
+        LOG(INFO) << __func__ << " - Event::Type::READ;";
+        type = Event::Type::READ;
+      }
+
+      if (event_flag & EPOLLOUT) {
+        LOG(INFO) << __func__ << " - Event::Type::WRITE";
+        type = Event::Type::WRITE;
+      }
+
+      if (event_flag & EPOLLERR) {
+        LOG(INFO) << __func__ << " - Event::Type::ERROR";
+        type = Event::Type::ERROR;
+      }
+
+      if (event_flag & EPOLLRDHUP) {
+        LOG(INFO) << __func__ << " - Event::Type::CLOSE";
+        type = Event::Type::CLOSE;
+      }
     }
+
+    // else {
+    //   type = Event::Type::NONE;
+    // }
 
     Event event(fd, type);
     DispatchEvent(event);
@@ -89,7 +104,7 @@ bool EventDispatcherEpoll::AttachChannel(EventChannel* channel) {
   }
 
   EpollEvent event;
-  event.events = EPOLLIN | EPOLLOUT | 1;
+  event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
   event.data.fd = fd;
 
   if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) < 0) {

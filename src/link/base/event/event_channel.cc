@@ -29,6 +29,10 @@ Discriptor EventChannel::ChannelDiscriptor() const {
   return observer_->discriptor();
 }
 
+EventObserver::Type EventChannel::ObserverType() const {
+  return observer_->type();
+}
+
 void EventChannel::HandleEvent(const Event& event) {
   observer_->HandleEvent(event);
 }

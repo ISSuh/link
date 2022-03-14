@@ -28,6 +28,7 @@ class EventChannel {
   void CloseChannel();
 
   Discriptor ChannelDiscriptor() const;
+  EventObserver::Type ObserverType() const;
   void HandleEvent(const Event& event);
 
  private:
