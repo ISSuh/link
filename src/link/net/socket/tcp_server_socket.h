@@ -39,9 +39,7 @@ class TcpServerSocket : public ServerSocket {
     base::CompletionCallback callback,
     IpEndPoint* peer_address) override;
 
-  base::Discriptor discriptor() override;
-  base::EventObserver::Type type() override;
-  void HandleEvent(const base::Event& event) override;
+  base::Discriptor SocketDiscriptor() override;
 
  private:
   int ConvertAcceptedSocket(

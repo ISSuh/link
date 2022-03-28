@@ -9,20 +9,15 @@
 namespace link {
 namespace base {
 
-EventChannel::EventChannel(
-  EventChannelController* controller, EventObserver* observer)
-  : controller_(controller), observer_(observer) {}
+EventChannel::EventChannel(EventObserver* observer)
+  : observer_(observer) {}
 
 EventChannel::~EventChannel() {
   CloseChannel();
 }
 
-bool EventChannel::AttachChannelToController() {
-  return controller_->AttachChannel(this);
-}
-
 void EventChannel::CloseChannel() {
-  controller_->DetatchCahnnel(observer_->discriptor());
+  // controller_->DetatchCahnnel(observer_->discriptor());
 }
 
 Discriptor EventChannel::ChannelDiscriptor() const {

@@ -42,6 +42,9 @@ void SampleModule::Run() {
 
   handle.RegistEventObserver(&server);
 
+  // auto tcp_server_component = component::CreateComponent();
+  // handle.RegistComponents({tcp_server_component});
+
   while (true) {
     handle.RunOnce();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -14,7 +14,7 @@ namespace component {
 
 class LinkComponent {
  public:
-
+  
  private:
   LinkComponent();
   ~LinkComponent();

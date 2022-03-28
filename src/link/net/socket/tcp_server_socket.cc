@@ -91,29 +91,6 @@ base::Discriptor TcpServerSocket::discriptor() {
   return socket_->socket_fd();
 }
 
-base::EventObserver::Type TcpServerSocket::type() {
-  return base::EventObserver::Type::SERVER;
-}
-
-void TcpServerSocket::HandleEvent(const base::Event& event) {
-  LOG(INFO) << __func__ << " - " << base::EventTypeToString(event);
-  switch (event.type()) {
-  case base::Event::Type::ACCEPT: {
-    // Test code
-    SockaddrStorage new_peer_address;
-    int32_t new_socket = accept(
-      discriptor(), new_peer_address.addr, &new_peer_address.addr_len);
-
-    LOG(INFO) << __func__ << " - accept ret : " << new_socket;
-    break;
-  }
-  case base::Event::Type::READ:
-    break;
-  default:
-    break;
-  }
-}
-
 int TcpServerSocket::ConvertAcceptedSocket(
   int result,
   std::unique_ptr<TcpSocket>* output_accepted_socket,

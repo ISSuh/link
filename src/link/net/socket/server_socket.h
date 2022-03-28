@@ -19,7 +19,7 @@
 namespace link {
 namespace net {
 
-class ServerSocket : public base::EventObserver {
+class ServerSocket {
  public:
   ServerSocket() = default;
   virtual ~ServerSocket() = default;
@@ -37,8 +37,15 @@ class ServerSocket : public base::EventObserver {
     base::CompletionCallback callback,
     IpEndPoint* peer_address) = 0;
 
+  virtual base::Discriptor SocketDiscriptor() = 0;
+
  private:
   DISAALOW_COPY_AND_ASSIGN(ServerSocket)
+};
+
+class Connection : public base::EventObserver {
+ public:
+ private:
 };
 
 }  // namespace net
