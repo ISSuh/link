@@ -87,7 +87,7 @@ int32_t TcpServerSocket::Accept(
   return result;
 }
 
-base::Discriptor TcpServerSocket::discriptor() {
+base::Discriptor TcpServerSocket::SocketDiscriptor() {
   return socket_->socket_fd();
 }
 

@@ -20,7 +20,7 @@ class EventChannelController;
 
 class EventChannel {
  public:
-  EventChannel(EventObserver* observer);
+  explicit EventChannel(EventObserver* observer);
   virtual ~EventChannel();
 
   void CloseChannel();

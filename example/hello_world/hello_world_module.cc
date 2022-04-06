@@ -40,7 +40,7 @@ void SampleModule::Run() {
   net::IpEndPoint end_point("0.0.0.0", 33660);
   server.Listen(end_point, 10);
 
-  handle.RegistEventObserver(&server);
+  // handle.RegistEventObserver(&server);
 
   // auto tcp_server_component = component::CreateComponent();
   // handle.RegistComponents({tcp_server_component});

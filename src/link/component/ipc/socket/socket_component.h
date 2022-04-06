@@ -8,11 +8,12 @@
 #define LINK_COMPONENT_IPC_SOCKET_SOCKET_COMPONENT_H_
 
 #include "link/base/macro.h"
+#include "link/base/event/event_observer.h"
 
 namespace link {
 namespace component {
 
-class SocketComponent {
+class SocketComponent : public base::EventObserver {
  public:
  private:
   SocketComponent();

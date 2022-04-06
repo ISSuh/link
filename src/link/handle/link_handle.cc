@@ -46,7 +46,7 @@ bool LinkHandle::RegistComponent() {
 
 bool LinkHandle::RegistEventObserver(base::EventObserver* observer) {
   return event_dispatcher_->AttachChannel(
-    new base::EventChannel(event_dispatcher_.get(), observer));
+    new base::EventChannel(observer));
 }
 
 }  // namespace handle

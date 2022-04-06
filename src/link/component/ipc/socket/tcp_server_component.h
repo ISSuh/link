@@ -10,13 +10,15 @@
 #include <memory>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_observer.h"
+#include "link/base/event/event_util.h"
+#include "link/component/ipc/socket/socket_component.h"
 #include "link/net/socket/tcp_server_socket.h"
+#include "link/base/logging.h"
 
 namespace link {
 namespace component {
 
-class TcpServerComponent : public base::EventObserve {
+class TcpServerComponent : public component::SocketComponent {
  public:
 
  private:
@@ -27,7 +29,7 @@ class TcpServerComponent : public base::EventObserve {
     return tcp_server->SocketDiscriptor();
   }
 
-  base::Type type() {
+  base::EventObserver::Type type() {
     return base::EventObserver::Type::SERVER;
   }
 
@@ -36,7 +38,7 @@ class TcpServerComponent : public base::EventObserve {
     switch (event.type()) {
     case base::Event::Type::ACCEPT: {
       // Test code
-      SockaddrStorage new_peer_address;
+      net::SockaddrStorage new_peer_address;
       int32_t new_socket = accept(
         discriptor(), new_peer_address.addr, &new_peer_address.addr_len);
 
