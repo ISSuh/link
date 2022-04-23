@@ -8,12 +8,14 @@ set(LINK_NET_SRC
   ${LINK_NET_PATH}/base/sockaddr_storage.cc
   ${LINK_NET_PATH}/base/ip_address.cc
   ${LINK_NET_PATH}/base/ip_endpoint.cc
-  
+
+  ${LINK_NET_PATH}/socket/socket_descriptor.cc
+
   ${LINK_NET_PATH}/socket/posix/posix_socket.cc
   ${LINK_NET_PATH}/socket/posix/tcp_posix_socket.cc
 
-  ${LINK_NET_PATH}/socket/socket_descriptor.cc  
   ${LINK_NET_PATH}/socket/tcp_server_socket.cc
+  ${LINK_NET_PATH}/socket/tcp_client_socket.cc
 )
 
 add_library(${LINK_NET_NAME}

@@ -34,6 +34,7 @@ class TcpServerSocket : public ServerSocket {
   int32_t Accept(
     std::unique_ptr<TcpSocket>* socket,
     base::CompletionCallback callback) override;
+
   int32_t Accept(
     std::unique_ptr<TcpSocket>* socket,
     base::CompletionCallback callback,

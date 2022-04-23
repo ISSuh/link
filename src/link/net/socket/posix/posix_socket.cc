@@ -149,6 +149,20 @@ int32_t PosixSocket::DoAccept(std::unique_ptr<PosixSocket>* socket) {
   return OK;
 }
 
+int32_t PosixSocket::AcceptSync(
+  std::unique_ptr<PosixSocket>* socket,
+  base::CompletionCallback callback) {
+  int32_t res = DoAccept(socket);
+  if (res != ERR_IO_PENDING) {
+    return res;
+  }
+
+  accept_socket_ = socket;
+    accept_callback_ = std::move(callback);
+
+  return OK;
+}
+
 void PosixSocket::AcceptCompleted() {
   int32_t res = DoAccept(accept_socket_);
   if (res == ERR_IO_PENDING) {

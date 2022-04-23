@@ -7,6 +7,7 @@
 #ifndef LINK_COMPONENT_IPC_SOCKET_TCP_SERVER_COMPONENT_H_
 #define LINK_COMPONENT_IPC_SOCKET_TCP_SERVER_COMPONENT_H_
 
+#include <string>
 #include <memory>
 
 #include "link/base/macro.h"
@@ -18,39 +19,27 @@
 namespace link {
 namespace component {
 
-class TcpServerComponent : public component::SocketComponent {
+class TcpServerComponent : public SocketComponent {
  public:
+  static TcpServerComponent* CreateTcpServerComponent(
+    const std::string& name,
+    base::EventChannelController* event_controller);
+
+  void RegistReadCabllack();
+  void RegistSendCabllack();
 
  private:
-  TcpServerComponent() = default;
-  ~TcpServerComponent() = default;
+  TcpServerComponent(
+    const std::string& name,
+    base::EventChannelController* event_controller);
+  virtual ~TcpServerComponent();
 
-  base::Discriptor discriptor() override {
-    return tcp_server->SocketDiscriptor();
-  }
+  // base::EventObserver
+  base::Discriptor discriptor() override;
+  base::EventObserver::Type type() override;
+  void HandleEvent(const base::Event& event) override;
 
-  base::EventObserver::Type type() {
-    return base::EventObserver::Type::SERVER;
-  }
-
-  void HandleEvent(const base::Event& event) {
-    LOG(INFO) << __func__ << " - " << base::EventTypeToString(event);
-    switch (event.type()) {
-    case base::Event::Type::ACCEPT: {
-      // Test code
-      net::SockaddrStorage new_peer_address;
-      int32_t new_socket = accept(
-        discriptor(), new_peer_address.addr, &new_peer_address.addr_len);
-
-      LOG(INFO) << __func__ << " - accept ret : " << new_socket;
-      break;
-    }
-    case base::Event::Type::READ:
-      break;
-    default:
-      break;
-    }
-  }
+  void DoAccept();
 
   std::unique_ptr<net::TcpServerSocket> tcp_server;
   DISAALOW_COPY_AND_ASSIGN(TcpServerComponent);

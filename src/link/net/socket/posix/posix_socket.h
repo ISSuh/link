@@ -34,6 +34,9 @@ class PosixSocket {
   int32_t Accept(
     std::unique_ptr<PosixSocket>* socket,
     base::CompletionCallback callback);
+
+  int32_t AcceptSync(std::unique_ptr<PosixSocket>* socket);
+
   int32_t Connect(
     const SockaddrStorage& address,
     base::CompletionCallback callback);

@@ -35,6 +35,9 @@ class TcpPosixSocket {
     std::unique_ptr<TcpPosixSocket>* tcp_socket,
     IpEndPoint* address,
     base::CompletionCallback callback);
+  int32_t AcceptSync(
+    std::unique_ptr<TcpPosixSocket>* tcp_socket,
+    IpEndPoint* address);
   int32_t Connect(
     const IpEndPoint& address,
     base::CompletionCallback callback);
@@ -57,7 +60,8 @@ class TcpPosixSocket {
 
   int32_t AllowAddressReuse();
 
-  base::Discriptor socket_fd() const { return socket_->socket_fd(); }
+  base::Discriptor socket_fd() const;
+  bool IsValid() const;
 
  private:
   void AcceptCompleted(std::unique_ptr<TcpPosixSocket>* tcp_socket,

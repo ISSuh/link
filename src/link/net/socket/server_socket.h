@@ -12,7 +12,6 @@
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
-#include "link/base/event/event_observer.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/tcp_socket.h"
 
@@ -24,15 +23,14 @@ class ServerSocket {
   ServerSocket() = default;
   virtual ~ServerSocket() = default;
 
-  virtual int Listen(const IpEndPoint& address, int backlog) = 0;
+  virtual int32_t Listen(const IpEndPoint& address, int32_t backlog) = 0;
+  virtual int32_t GetLocalAddress(IpEndPoint* address) const = 0;
 
-  virtual int GetLocalAddress(IpEndPoint* address) const = 0;
-
-  virtual int Accept(
+  virtual int32_t Accept(
     std::unique_ptr<TcpSocket>* socket,
     base::CompletionCallback callback) = 0;
 
-  virtual int Accept(
+  virtual int32_t Accept(
     std::unique_ptr<TcpSocket>* socket,
     base::CompletionCallback callback,
     IpEndPoint* peer_address) = 0;
@@ -41,11 +39,6 @@ class ServerSocket {
 
  private:
   DISAALOW_COPY_AND_ASSIGN(ServerSocket)
-};
-
-class Connection : public base::EventObserver {
- public:
- private:
 };
 
 }  // namespace net

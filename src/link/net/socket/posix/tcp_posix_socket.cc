@@ -180,6 +180,14 @@ int TcpPosixSocket::AllowAddressReuse() {
   return res == -1 ? SystemErrorToNetError(errno) : OK;
 }
 
+base::Discriptor TcpPosixSocket::socket_fd() const {
+  return socket_->socket_fd();
+}
+
+bool TcpPosixSocket::IsValid() const {
+  return socket_ != nullptr && socket_->socket_fd() != kInvalidSocket;
+}
+
 void TcpPosixSocket::AcceptCompleted(
   std::unique_ptr<TcpPosixSocket>* tcp_socket,
   IpEndPoint* address,

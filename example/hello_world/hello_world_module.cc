@@ -34,15 +34,19 @@ void SampleModule::Run() {
   LOG(INFO) << "string_test_ : " << string_test_;
 
   handle::LinkHandle handle;
-  handle.Initialize();
+  // handle.Initialize();
 
-  net::TcpServerSocket server;
-  net::IpEndPoint end_point("0.0.0.0", 33660);
-  server.Listen(end_point, 10);
+  // net::TcpServerSocket server;
+  // net::IpEndPoint end_point("0.0.0.0", 33660);
+  // server.Listen(end_point, 10);
 
   // handle.RegistEventObserver(&server);
 
+
   // auto tcp_server_component = component::CreateComponent();
+  // tcp_server_component.Read(TEST);
+  // tcp_server_component.Send(TEST);
+
   // handle.RegistComponents({tcp_server_component});
 
   while (true) {
