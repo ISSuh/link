@@ -60,40 +60,49 @@ void EventDispatcherEpoll::Dispatch() {
     Discriptor fd = epoll_event.data.fd;
     uint32_t event_flag = epoll_event.events;
 
-    // TODO(issuh) : need test read & send on epoll
     Event::Type type;
-    if (channel_map_[fd]->ObserverType() == EventObserver::Type::SERVER) {
-      LOG(INFO) << __func__ << " - Event::Type::ACCEPT;";
-      type = Event::Type::ACCEPT;
-    } else {
-      if (event_flag & EPOLLIN) {
-        LOG(INFO) << __func__ << " - Event::Type::READ;";
-        type = Event::Type::READ;
+    switch (channel_map_[fd]->ObserverType()) {
+      case EventObserver::Type::SERVER: {
+        type = HandlingServerEvent();
+        break;
       }
-
-      if (event_flag & EPOLLOUT) {
-        LOG(INFO) << __func__ << " - Event::Type::WRITE";
-        type = Event::Type::WRITE;
-      }
-
-      if (event_flag & EPOLLERR) {
-        LOG(INFO) << __func__ << " - Event::Type::ERROR";
-        type = Event::Type::ERROR;
-      }
-
-      if (event_flag & EPOLLRDHUP) {
-        LOG(INFO) << __func__ << " - Event::Type::CLOSE";
-        type = Event::Type::CLOSE;
+      case EventObserver::Type::CLIENT: {
+        type = HandlingClientEvent(event_flag);
+        break;
       }
     }
-
-    // else {
-    //   type = Event::Type::NONE;
-    // }
 
     Event event(fd, type);
     DispatchEvent(event);
   }
+}
+
+Event::Type EventDispatcherEpoll::HandlingServerEvent() {
+  return Event::Type::ACCEPT;
+}
+
+Event::Type EventDispatcherEpoll::HandlingClientEvent(uint32_t event_flag) {
+  Event::Type type;
+  if (event_flag & EPOLLIN) {
+    LOG(INFO) << __func__ << " - Event::Type::READ;";
+    type = Event::Type::READ;
+  }
+
+  if (event_flag & EPOLLOUT) {
+    LOG(INFO) << __func__ << " - Event::Type::WRITE";
+    type = Event::Type::WRITE;
+  }
+
+  if (event_flag & EPOLLERR) {
+    LOG(INFO) << __func__ << " - Event::Type::ERROR";
+    type = Event::Type::ERROR;
+  }
+
+  if (event_flag & EPOLLRDHUP) {
+    LOG(INFO) << __func__ << " - Event::Type::CLOSE";
+    type = Event::Type::CLOSE;
+  }
+  return type;
 }
 
 bool EventDispatcherEpoll::AttachChannel(EventChannel* channel) {

@@ -44,15 +44,13 @@ base::EventObserver::Type TcpServerComponent::type() {
 void TcpServerComponent::HandleEvent(const base::Event& event) {
   LOG(INFO) << __func__ << " - " << base::EventTypeToString(event);
   switch (event.type()) {
-  case base::Event::Type::ACCEPT: {
-    DoAccept();
-    break;
-  }
-  case base::Event::Type::READ:
-    break;
-  default:
-    break;
-  }
+    case base::Event::Type::ACCEPT: {
+      DoAccept();
+      break;
+    }
+    default:
+      break;
+    }
 }
 
 void TcpServerComponent::DoAccept() {
@@ -68,7 +66,7 @@ void TcpServerComponent::DoAccept() {
   net::IpEndPoint ip_endpoint;
   tcp_server->Accept(&new_socket, base::bind(), &ip_endpoint);
 
-  TcpClientSocket client_socket(std::move(new_socket), ip_endpoint);
+  net::TcpClientSocket client_socket(std::move(new_socket), ip_endpoint);
 
   base::EventChannelController* event_controller = EventConrolloer();
   event_controller->AttachChannel();

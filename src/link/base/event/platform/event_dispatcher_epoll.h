@@ -29,6 +29,9 @@ class EventDispatcherEpoll : public EventDispatcher {
  private:
   EventDispatcherEpoll(Discriptor fd, int32_t event_size, int32_t timeout);
 
+  Event::Type HandlingServerEvent();
+  Event::Type HandlingClientEvent(uint32_t event_flag);
+
   bool AttachChannel(EventChannel* channel) override;
   void DetatchCahnnel(Discriptor fd) override;
   void DispatchEvent(const Event& event) override;

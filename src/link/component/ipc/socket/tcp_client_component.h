@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_COMPONENT_IPC_SOCKET_TCP_SERVER_COMPONENT_H_
-#define LINK_COMPONENT_IPC_SOCKET_TCP_SERVER_COMPONENT_H_
+#ifndef LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
+#define LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
 
 #include <string>
 #include <memory>
@@ -19,19 +19,20 @@
 namespace link {
 namespace component {
 
-class TcpServerComponent : public SocketComponent {
+class TcpClientComponent : public SocketComponent {
  public:
-  static TcpServerComponent* CreateTcpServerComponent(
+  static TcpClientComponent* CreateTcpClientComponent(
     const std::string& name,
     base::EventChannelController* event_controller);
 
   void RegistReadCabllack();
+  void RegistSendCabllack();
 
  private:
-  TcpServerComponent(
+  TcpClientComponent(
     const std::string& name,
     base::EventChannelController* event_controller);
-  virtual ~TcpServerComponent();
+  virtual ~TcpClientComponent();
 
   // base::EventObserver
   base::Discriptor discriptor() override;
@@ -41,10 +42,10 @@ class TcpServerComponent : public SocketComponent {
   void DoAccept();
 
   std::unique_ptr<net::TcpServerSocket> tcp_server;
-  DISAALOW_COPY_AND_ASSIGN(TcpServerComponent);
+  DISAALOW_COPY_AND_ASSIGN(TcpClientComponent);
 };
 
 }  // namespace component
 }  // namespace link
 
-#endif  // LINK_COMPONENT_IPC_SOCKET_TCP_SERVER_COMPONENT_H_
+#endif  // LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
