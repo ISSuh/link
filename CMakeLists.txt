@@ -43,6 +43,15 @@ set(LINK_COMPONENT_NAME ${LINK_LIBRARY_NAME}_component)
 set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
 
 #-------------------------------------------------------------------------------
+# Install thidparty
+#-------------------------------------------------------------------------------
+set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
+
+include_directories(
+  ${LINK_THIRDPATRY_PATH}/asio/asio/include
+)
+
+#-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
 include_directories(

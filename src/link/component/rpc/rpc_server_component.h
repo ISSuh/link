@@ -35,6 +35,8 @@ class RpcServerComponent : public RpcComponent {
   void Open();
   void RegistService()
 
+  void Run();
+
  private:
   RpcServerComponent(
     const std::string& name,

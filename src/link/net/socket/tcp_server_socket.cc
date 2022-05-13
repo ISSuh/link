@@ -91,23 +91,6 @@ base::Discriptor TcpServerSocket::SocketDiscriptor() {
   return socket_->socket_fd();
 }
 
-int TcpServerSocket::ConvertAcceptedSocket(
-  int result,
-  std::unique_ptr<TcpSocket>* output_accepted_socket,
-  IpEndPoint* output_accepted_address) {
-  std::unique_ptr<TcpSocket> temp_accepted_socket(std::move(accepted_socket_));
-  if (result != OK)
-    return result;
-
-  if (output_accepted_address)
-    *output_accepted_address = accepted_address_;
-
-  // *output_accepted_socket = std::make_unique<TCPClientSocket>(
-  //     std::move(temp_accepted_socket), accepted_address_);
-
-  return OK;
-}
-
 void TcpServerSocket::OnAcceptCompleted(
   std::unique_ptr<TcpSocket>* output_accepted_socket,
   IpEndPoint* output_accepted_address,

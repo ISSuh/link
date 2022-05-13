@@ -43,11 +43,6 @@ class TcpServerSocket : public ServerSocket {
   base::Discriptor SocketDiscriptor() override;
 
  private:
-  int ConvertAcceptedSocket(
-    int result,
-    std::unique_ptr<TcpSocket>* output_accepted_socket,
-    IpEndPoint* output_accepted_address);
-
   void OnAcceptCompleted(
     std::unique_ptr<TcpSocket>* output_accepted_socket,
     IpEndPoint* output_accepted_address,

@@ -7,13 +7,19 @@
 #ifndef LINK_NET_SOCKET_SOCKET_H_
 #define LINK_NET_SOCKET_SOCKET_H_
 
+#include "asio/ip/tcp.hpp"
+
 namespace link {
 namespace net {
 
 class Socket {
  public:
-  virtual void Read() = 0;
-  virtual void Write() = 0;
+  asio::ip::tcp::socket& Descriptor() const {
+    return sockeet_;
+  }
+
+ private:
+  asio::ip::tcp::socket socket_;
 };
 
 }  // namespace net
