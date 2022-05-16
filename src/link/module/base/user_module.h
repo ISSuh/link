@@ -12,7 +12,7 @@
 #include "link/module/base/user_module_base.h"
 #include "link/module/loader/module_register_helper.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class UserModule : public UserModuleBase {
@@ -45,14 +45,14 @@ void UserModule::GetArgument(const std::string& key, T* dest) {
 #define MODULE_CONSTRUCTOR(UserModuleClass)             \
   UserModuleClass(                                      \
     const std::string& module_name,                     \
-    link::module::ModuleClient* client)                 \
-    : link::module::UserModule(module_name, client) {}
+    nlink::module::ModuleClient* client)                 \
+    : nlink::module::UserModule(module_name, client) {}
 
 // register class macro
 #define REGIST_MODULE(UserModuleClass)    \
-  MODULE_REGISTER(UserModuleClass, link::module::UserModule)
+  MODULE_REGISTER(UserModuleClass, nlink::module::UserModule)
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_BASE_USER_MODULE_H_

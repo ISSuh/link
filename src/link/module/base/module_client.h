@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class ModuleClient {
@@ -20,6 +20,6 @@ class ModuleClient {
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_BASE_MODULE_CLIENT_H_

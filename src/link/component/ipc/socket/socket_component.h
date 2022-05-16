@@ -13,7 +13,7 @@
 #include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
 class SocketComponent : public base::EventObserver,
@@ -29,6 +29,6 @@ class SocketComponent : public base::EventObserver,
 };
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_COMPONENT_IPC_SOCKET_SOCKET_COMPONENT_H_

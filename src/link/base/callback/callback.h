@@ -11,7 +11,7 @@
 
 #include "link/base/callback/bind.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class BindStateBase;
@@ -92,6 +92,6 @@ using TaskCallback = Callback<void()>;
 using CompletionCallback = Callback<void(int32_t)>;
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_CALLBACK_CALLBACK_H_

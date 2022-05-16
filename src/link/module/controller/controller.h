@@ -18,7 +18,7 @@
 #include "link/base/task_manager.h"
 #include "link/base/macro.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class ModuleController
@@ -47,6 +47,6 @@ class ModuleController
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_CONTROLLER_CONTROLLER_H_

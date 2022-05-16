@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class IpAddress {
@@ -42,6 +42,6 @@ class IpAddress {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_IP_ADDRESS_H_

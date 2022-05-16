@@ -16,7 +16,7 @@
 #include "link/net/socket/tcp_server_socket.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
 class TcpClientComponent : public SocketComponent {
@@ -46,6 +46,6 @@ class TcpClientComponent : public SocketComponent {
 };
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_

@@ -17,7 +17,7 @@
 #include "link/module/base/specification.h"
 #include "link/base/macro.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class ModuleLoader {
@@ -40,6 +40,6 @@ class ModuleLoader {
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_LOADER_MODULE_LOADER_H_

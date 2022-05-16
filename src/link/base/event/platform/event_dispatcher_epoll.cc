@@ -18,7 +18,7 @@ namespace {
 
 #include <bitset>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 using EpollEvent = epoll_event;
@@ -137,4 +137,4 @@ void EventDispatcherEpoll::DispatchEvent(const Event& event) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

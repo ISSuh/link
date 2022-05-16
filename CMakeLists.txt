@@ -48,8 +48,10 @@ set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
 set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
 
 include_directories(
-  ${LINK_THIRDPATRY_PATH}/asio/asio/include
+  ${LINK_THIRDPATRY_PATH}/asio
 )
+
+add_definitions(-DASIO_STANDALONE)
 
 #-------------------------------------------------------------------------------
 # Build Link

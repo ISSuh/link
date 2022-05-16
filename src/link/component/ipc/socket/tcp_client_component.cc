@@ -18,7 +18,7 @@
 #include "link/net/base/ip_endpoint.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
 TcpClientComponent* TcpClientComponent::CreateTcpClientComponent(
@@ -53,4 +53,4 @@ void TcpClientComponent::HandleEvent(const base::Event& event) {
 }
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink

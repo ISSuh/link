@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 enum AddressFamily : int32_t {
@@ -21,6 +21,6 @@ enum AddressFamily : int32_t {
 int32_t ConvertAddressFamilyToPlatfrom(AddressFamily address_family);
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_ADDRESS_FAMILY_H_

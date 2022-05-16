@@ -11,34 +11,34 @@
 
 #include "link/base/macro.h"
 #include "link/base/event/event_channel_controller.h"
+#include "link/base/event/event_dispatcher.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
-class LinkComponent {
- protected:
+class LinkComponent : public base::EventChannel {
+ public:
   const std::string ComponentName() const {
     return component_name_;
   }
 
-  base::EventChannelController* EventConrolloer() const {
-    return event_controller_;
-  }
+  virtual void RegistToController(
+    base::DispatcherConext* dispatcher_context) = 0;
 
-  explicit LinkComponent(
-    const std::string& component_name,
-    base::EventChannelController* event_controller)
-    : component_name_(component_name), event_controller_(event_controller) {}
+ protected:
+  explicit LinkComponent(const std::string& component_name)
+    : component_name_(component_name), dispatcher_context(nullptr) {}
 
   virtual ~LinkComponent() = default;
 
+ private:
   std::string component_name_;
-  base::EventChannelController* event_controller_;
+  base::DispatcherConext* dispatcher_context;
 
   DISAALOW_COPY_AND_ASSIGN(LinkComponent);
 };
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_COMPONENT_BASE_COMPONENT_H_

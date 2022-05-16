@@ -8,7 +8,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 SequencedTaskRunner::SequencedTaskRunner(const std::string& label)
@@ -100,4 +100,4 @@ bool SequencedTaskRunner::CanWakeUp(uint64_t id) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

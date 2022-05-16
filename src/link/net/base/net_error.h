@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 enum NetError : int32_t {
@@ -557,6 +557,6 @@ enum NetError : int32_t {
 NetError SystemErrorToNetError(int32_t os_error);
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_NET_ERROR_H_

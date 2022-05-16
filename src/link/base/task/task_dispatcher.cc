@@ -9,7 +9,7 @@
 #include "link/base/task/task_runner.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 TaskDispatcher::TaskDispatcher(TaskManager* manager)
@@ -34,4 +34,4 @@ void TaskDispatcher::PostDelayTask(const std::string& label,
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

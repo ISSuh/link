@@ -10,11 +10,10 @@
 #include <chrono>
 #include <thread>
 
-#include <link/net/socket/tcp_server_socket.h>
 #include <link/handle/link_handle.h>
 #include <link/base/logging.h>
 
-using namespace link;
+using namespace nlink;
 
 void SampleModule::Init() {
   LOG(INFO) << "SampleModule::init";

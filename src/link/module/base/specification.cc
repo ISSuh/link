@@ -10,7 +10,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 const char* kModuleNameKey = "module_name";
@@ -115,4 +115,4 @@ Specification& Specification::operator=(Specification&& spec) {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

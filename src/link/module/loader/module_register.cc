@@ -6,7 +6,7 @@
 
 #include "link/module/loader/module_register.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 std::atomic<ModuleRegister*> ModuleRegister::instance_;
@@ -40,4 +40,4 @@ void ModuleRegister::ReleaseModuleFactory(const std::string& class_name) {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

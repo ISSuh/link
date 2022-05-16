@@ -11,7 +11,7 @@
 #include <string>
 #include <sstream>
 
-namespace link {
+namespace nlink {
 
 enum LogLevel {
   ERROR = 0X01,
@@ -60,6 +60,6 @@ LOG& LOG::operator<<(const T& message) {
   return *this;
 }
 
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_LOGGING_H_

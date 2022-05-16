@@ -11,16 +11,19 @@
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
+#include "link/base/event/event_dispatcher.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/server.h"
 #include "link/net/socket/asio/acceptor.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class TcpServer : public Server {
  public:
-  TcpServer() = default;
+  explicit TcpServer(base::DispatcherConext* dispatcher_context)
+    : acceptor_(CreateAcceptor(dispatcher_context)) {
+  }
 
   int32_t Listen(const IpEndPoint& address) override {
     acceptor_->Listen(address);
@@ -29,7 +32,7 @@ class TcpServer : public Server {
   int32_t Accept(base::CompletionCallback callback) override {
     acceptor_->Accept(std::move(callback));
   }
-  
+
  private:
   std::unique_ptr<Acceptor> acceptor_;
   
@@ -37,6 +40,6 @@ class TcpServer : public Server {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_SOCKET_TCP_SERVER_H_

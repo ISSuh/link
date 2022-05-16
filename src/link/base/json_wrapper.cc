@@ -8,7 +8,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 bool CheckKeyExist(const base::Json& json, const std::string& key) {
@@ -20,4 +20,4 @@ bool CheckKeyExist(const base::Json& json, const std::string& key) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

@@ -9,14 +9,14 @@
 
 #include "link/module/loader/module_register.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 #define MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, UniqueID)       \
 namespace {                                                                   \
   struct Proxy##UserModuleClass_##UniqueID {                                  \
     Proxy##UserModuleClass_##UniqueID() {                                     \
-        link::module::ModuleRegister::GetInstance()->CreateModuleFactory<     \
+        nlink::module::ModuleRegister::GetInstance()->CreateModuleFactory<     \
           UserModuleClass, ModuleBase>(#UserModuleClass, #ModuleBase);        \
     }                                                                         \
   };                                                                          \
@@ -28,6 +28,6 @@ namespace {                                                                   \
   MODULE_REGISTER_INTERNAL(UserModuleClass, ModuleBase, __COUNTER__)
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_LOADER_REGISTER_HELPER_HPP_

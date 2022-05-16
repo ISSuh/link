@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class SockaddrStorage {
@@ -25,6 +25,6 @@ class SockaddrStorage {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_SOCKADDR_STORAGE_H_

@@ -8,7 +8,7 @@
 
 #include <algorithm>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 SockaddrStorage::SockaddrStorage()
@@ -33,4 +33,4 @@ void SockaddrStorage::operator=(const SockaddrStorage& lhs) {
 
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink

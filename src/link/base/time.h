@@ -10,7 +10,7 @@
 #include <stddef.h>
 #include <string>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class Time {
@@ -92,6 +92,6 @@ class TimeTick {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TIME_H_

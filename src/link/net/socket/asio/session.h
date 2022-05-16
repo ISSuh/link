@@ -11,7 +11,7 @@
 
 #include "link/base/callback/callback.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class Channel {
@@ -42,6 +42,6 @@ class Channel {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_SOCKET_ASIO_CHANNEL_H_

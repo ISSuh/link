@@ -16,7 +16,7 @@
 #include "link/module/loader/module_factory.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 void ModuleDeleter(LinkModule* module) {
@@ -154,4 +154,4 @@ LinkModulePtr LinkModule::CreateModule(
 // }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

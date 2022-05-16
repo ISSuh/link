@@ -9,7 +9,7 @@
 
 #include "link/base/event/event_channel.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class EventChannel;
@@ -19,11 +19,11 @@ class EventChannelController {
   friend EventChannel;
 
   virtual bool AttachChannel(EventChannel* channel) = 0;
-  virtual void DetatchCahnnel(Discriptor fd) = 0;
+  virtual void DetatchCahnnel(EventChannel* channel) = 0;
   virtual void DispatchEvent(const Event& event) = 0;
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_

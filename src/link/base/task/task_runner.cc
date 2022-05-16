@@ -9,7 +9,7 @@
 #include <vector>
 #include <functional>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 TaskRunner::TaskRunner() = default;
@@ -31,4 +31,4 @@ std::string TaskRunnerProxy::label() const {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

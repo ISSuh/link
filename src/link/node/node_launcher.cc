@@ -8,7 +8,7 @@
 #include "link/node/base/arguments.h"
 #include "link/base/logging.h"
 
-using namespace link;
+using namespace nlink;
 
 int main(int32_t argc, char *argv[]) {
   LOG(INFO) << "Node Launcher";

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 using Discriptor = int32_t;
@@ -17,6 +17,6 @@ using Discriptor = int32_t;
 bool SetNoblocking(Discriptor fd);
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_PLATFORM_LINUX_DISCRIPTOR_H_

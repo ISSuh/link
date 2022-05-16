@@ -11,12 +11,12 @@
 
 #include "link/base/event/event.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 std::string EventTypeToString(const Event& event);
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_EVENT_UTIL_H_

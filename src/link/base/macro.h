@@ -7,7 +7,7 @@
 #ifndef LINK_BASE_MACRO_H_
 #define LINK_BASE_MACRO_H_
 
-namespace link {
+namespace nlink {
 
 #define DISAALOW_COPY(Typename)         \
   Typename(const Typename&) = delete;   \
@@ -20,6 +20,6 @@ namespace link {
   DISAALOW_COPY(Typename)                     \
   DISAALOW_ASSIGN(Typename)
 
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_MACRO_H_

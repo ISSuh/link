@@ -16,7 +16,7 @@
 #include "link/base/task/task_dispatcher.h"
 #include "link/base/macro.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class TaskDispatcher;
@@ -53,6 +53,6 @@ class TaskManager {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_MANAGER_H_

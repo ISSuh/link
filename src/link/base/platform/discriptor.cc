@@ -8,7 +8,7 @@
 
 #include <fcntl.h>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 bool SetNoblocking(Discriptor fd) {
@@ -29,4 +29,4 @@ bool SetNoblocking(Discriptor fd) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

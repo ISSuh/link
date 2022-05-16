@@ -10,7 +10,7 @@
 #include "link/base/platform/discriptor.h"
 #include "link/base/event/event.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class EventObserver {
@@ -26,6 +26,6 @@ class EventObserver {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_EVENT_OBSERVER_H_

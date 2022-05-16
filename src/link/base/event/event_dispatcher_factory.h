@@ -9,7 +9,7 @@
 
 #include "link/base/event/platform/event_dispatcher_epoll.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class EventDispatcherFactory {
@@ -21,6 +21,6 @@ class EventDispatcherFactory {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_EVENT_DISPATCHER_FACTORY_H_

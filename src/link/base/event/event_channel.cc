@@ -6,7 +6,7 @@
 
 #include "link/base/event/event_channel.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 EventChannel::EventChannel(EventObserver* observer)
@@ -33,4 +33,4 @@ void EventChannel::HandleEvent(const Event& event) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

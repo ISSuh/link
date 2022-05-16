@@ -6,7 +6,7 @@
 
 #include "link/base/event/event.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 Event::Event(int32_t fd, Type type)
@@ -43,4 +43,4 @@ Event& Event::operator=(const Event& rhs) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

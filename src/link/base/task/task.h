@@ -15,7 +15,7 @@
 #include "link/base/time.h"
 #include "link/base/callback/callback.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 struct Task {
@@ -35,6 +35,6 @@ struct Task {
 using TaskQueue = std::priority_queue<Task>;
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_TASK_H_

@@ -10,7 +10,7 @@
 #include "link/base/event/event_dispatcher_factory.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace handle {
 
 LinkHandle::LinkHandle()
@@ -50,4 +50,4 @@ bool LinkHandle::RegistEventObserver(base::EventObserver* observer) {
 }
 
 }  // namespace handle
-}  // namespace link
+}  // namespace nlink

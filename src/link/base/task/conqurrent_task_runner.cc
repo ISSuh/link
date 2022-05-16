@@ -10,7 +10,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 ConcurrentTaskRunner::ConcurrentTaskRunner(const std::string& label, size_t num)
@@ -112,4 +112,4 @@ bool ConcurrentTaskRunner::CanWakeUp(uint64_t id) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

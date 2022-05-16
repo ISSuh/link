@@ -14,7 +14,7 @@
 #include "link/base/task/conqurrent_task_runner.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 TaskManager::TaskManager()
@@ -142,4 +142,4 @@ TaskRunner* TaskManager::GetTaskRunner(const std::string& label) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

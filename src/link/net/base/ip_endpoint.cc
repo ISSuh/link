@@ -17,7 +17,7 @@
 #include "link/base/endian.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 IpEndPoint::IpEndPoint(const std::string& address, uint16_t port)
@@ -170,5 +170,5 @@ bool IpEndPoint::operator==(const IpEndPoint& lhs) const {
 }
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 

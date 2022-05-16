@@ -8,7 +8,7 @@
 
 #include "link/base/time.h"
 
-namespace link {
+namespace nlink {
 
 static bool active_logging = true;
 static LogLevel system_log_level = LogLevel::INFO;
@@ -95,4 +95,4 @@ std::string LOG::DateToStr() {
   return base::Time::CurrentTimeToDateStr();
 }
 
-}  // namespace link
+}  // namespace nlink

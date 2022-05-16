@@ -15,7 +15,7 @@
 #include "link/base/macro.h"
 #include "link/base/json_wrapper.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class LinkModule;
@@ -63,6 +63,6 @@ class LinkModule {
 // };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_BASE_MODULE_H_

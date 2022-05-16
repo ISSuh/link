@@ -12,7 +12,7 @@
 
 #include "link/module/base/specification.h"
 
-namespace link {
+namespace nlink {
 namespace node {
 
 class Arguments {
@@ -39,6 +39,6 @@ class Arguments {
 };
 
 }  // namespace node
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NODE_BASE_ARGUMENTS_H_

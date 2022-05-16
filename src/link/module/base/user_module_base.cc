@@ -6,7 +6,7 @@
 
 #include "link/module/base/user_module_base.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 UserModuleBase::UserModuleBase(
@@ -24,5 +24,5 @@ bool UserModuleBase::IsRunning() const {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 

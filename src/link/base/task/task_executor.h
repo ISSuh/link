@@ -14,7 +14,7 @@
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_executor_delegate.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class TaskRunnerProxy;
@@ -41,6 +41,6 @@ class TaskExecutor {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_TASK_EXECUTOR_H_

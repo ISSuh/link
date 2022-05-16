@@ -18,7 +18,7 @@
 #include "link/base/callback/callback.h"
 #include "link/base/callback/traits_utils.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 template <typename R, typename... Args>
@@ -110,6 +110,6 @@ template <typename Functor>
 using MakeFunctorTraits = FunctorTraits<decay_t<Functor>>;
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_CALLBACK_FUNCTION_TRAITS_H_

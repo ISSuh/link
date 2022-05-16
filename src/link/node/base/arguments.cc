@@ -12,7 +12,7 @@
 #include "link/base/json_wrapper.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace node {
 
 int32_t kMinArgsNums = 1;
@@ -104,4 +104,4 @@ bool Arguments::ParseFromeConfigureFile(const std::string& config_file_path) {
 }
 
 }  // namespace node
-}  // namespace link
+}  // namespace nlink

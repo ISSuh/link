@@ -17,7 +17,7 @@
 #include "link/module/loader/module_factory.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class ModuleRegister {
@@ -79,6 +79,6 @@ AbstractModlueFactory<UserModule>*
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_LOADER_MODULE_LOADER_UTIL_H_

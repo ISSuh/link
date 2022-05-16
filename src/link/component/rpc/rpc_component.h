@@ -13,18 +13,17 @@
 #include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
-class RpcComponent : public base::EventObserver,
-                     public LinkComponent {
+class RpcComponent : public LinkComponent {
  public:
   RpcComponent* CreateCoponent()  {}
 
  protected:
   RpcComponent(
-    const std::string& name, base::EventChannelController* event_controller)
-    : LinkComponent(name, event_controller) {}
+    const std::string& name)
+    : LinkComponent(name) {}
 
   virtual ~RpcComponent() = default;
 
@@ -32,6 +31,6 @@ class RpcComponent : public base::EventObserver,
 };
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_COMPONENT_RPC_RPC_COMPONENT_H_

@@ -11,7 +11,7 @@
 
 #include "link/third_party/json/json.hpp"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 using Json = nlohmann::json;
@@ -19,6 +19,6 @@ using Json = nlohmann::json;
 bool CheckKeyExist(const base::Json& json, const std::string& key);
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_JSON_WRAPPER_H_

@@ -11,7 +11,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 NetError SystemErrorToNetError(int32_t os_error) {
@@ -116,4 +116,4 @@ NetError SystemErrorToNetError(int32_t os_error) {
 }
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink

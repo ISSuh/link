@@ -13,7 +13,7 @@
 #include "link/module/loader/module_register.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 bool ModuleLoader::LoadModule(
@@ -73,4 +73,4 @@ const std::vector<std::string> ModuleLoader::ModuleNames() const {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

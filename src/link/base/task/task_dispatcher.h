@@ -15,7 +15,7 @@
 #include "link/base/callback/callback.h"
 #include "link/base/time.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class TaskManager;
@@ -36,6 +36,6 @@ class TaskDispatcher {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_TASK_DISPATCHER_H_

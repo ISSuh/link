@@ -9,7 +9,7 @@
 
 #include "link/base/task/task.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class TaskExecutorDelegate {
@@ -24,6 +24,6 @@ class TaskExecutorDelegate {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_TASK_EXECUTOR_DELEGATE_H_

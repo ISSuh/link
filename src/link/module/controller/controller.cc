@@ -10,7 +10,7 @@
 
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 const char* kModuleTaskRunnerName = "ModuleTaskRunner";
@@ -102,4 +102,4 @@ bool ModuleController::CreateModuleExecutor(
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

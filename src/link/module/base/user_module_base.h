@@ -12,7 +12,7 @@
 #include "link/module/base/module_client.h"
 #include "link/base/json_wrapper.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class UserModuleBase {
@@ -34,6 +34,6 @@ class UserModuleBase {
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_BASE_USER_MODULE_BASE_H_

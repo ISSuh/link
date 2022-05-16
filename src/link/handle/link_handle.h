@@ -12,7 +12,7 @@
 #include "link/base/event/event_dispatcher.h"
 #include "link/base/event/event_observer.h"
 
-namespace link {
+namespace nlink {
 namespace handle {
 
 class LinkHandle {
@@ -34,6 +34,6 @@ class LinkHandle {
 };
 
 }  // namespace handle
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_HANDLE_LINK_HANDLE_H_

@@ -9,7 +9,7 @@
 
 #include <vector>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class Buffer {
@@ -24,6 +24,6 @@ class Buffer {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_BUFFER_H_

@@ -18,7 +18,7 @@
 #include "link/net/base/ip_endpoint.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
 TcpServerComponent* TcpServerComponent::CreateTcpServerComponent(
@@ -74,4 +74,4 @@ void TcpServerComponent::DoAccept() {
 
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink

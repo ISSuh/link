@@ -6,7 +6,7 @@
 
 #include "link/node/base/node.h"
 
-namespace link {
+namespace nlink {
 namespace node {
 
 LinkNode::LinkNode()
@@ -43,4 +43,4 @@ bool LinkNode::CreateModuleControllerAndLoadModules() {
 }
 
 }  // namespace node
-}  // namespace link
+}  // namespace nlink

@@ -13,48 +13,37 @@
 #include "link/base/macro.h"
 #include "link/base/event/event_util.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/net/socket/tcp_server_socket.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace component {
 
 class RpcComponent;
 
 class RpcServerComponent : public RpcComponent {
  public:
-  class Service {
-   public:
+  void RegistToController(base::DispatcherConext* dispatcher_context) {
     
-  };
+  }
 
-  static RpcServerComponent* CreateTcpServerComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
+  void Open() {}
+  void Close() {}
+  void RegistService() {}
 
-  void Open();
-  void RegistService()
-
-  void Run();
+  void Run() {}
 
  private:
-  RpcServerComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
+  RpcServerComponent(const std::string& name);
   virtual ~RpcServerComponent();
 
-  // base::EventObserver
-  base::Discriptor discriptor() override;
-  base::EventObserver::Type type() override;
+  // base::EventChannel
   void HandleEvent(const base::Event& event) override;
+  void CloseChannel() override;
 
-  void DoAccept();
-
-  std::unique_ptr<net::TcpServerSocket> tcp_server;
   DISAALOW_COPY_AND_ASSIGN(RpcServerComponent);
 };
 
 }  // namespace component
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_COMPONENT_RPC_RPC_SERVER_COMPONENT_H_

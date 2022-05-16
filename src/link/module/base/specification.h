@@ -11,7 +11,7 @@
 
 #include "link/base/json_wrapper.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class Specification {
@@ -43,6 +43,6 @@ class Specification {
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_SPECIFICATION_H_

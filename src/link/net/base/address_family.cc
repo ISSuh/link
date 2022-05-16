@@ -8,7 +8,7 @@
 
 #include <sys/socket.h>
 
-namespace link {
+namespace nlink {
 namespace net {
 
 int32_t ConvertAddressFamilyToPlatfrom(AddressFamily address_family) {
@@ -25,4 +25,4 @@ int32_t ConvertAddressFamilyToPlatfrom(AddressFamily address_family) {
 
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink

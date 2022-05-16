@@ -14,7 +14,7 @@
 #include "link/base/task/task_runner.h"
 #include "link/base/macro.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class ModuleExecutor
@@ -47,6 +47,6 @@ class ModuleExecutor
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_CONTROLLER_EXECUTOR_H_

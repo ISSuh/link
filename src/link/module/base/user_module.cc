@@ -14,7 +14,7 @@
 #include "link/module/loader/module_register_helper.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 UserModule::UserModule(
@@ -47,4 +47,4 @@ void UserModule::Terminate() {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink

@@ -9,7 +9,7 @@
 
 #include "asio/ip/tcp.hpp"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class Socket {
@@ -23,6 +23,6 @@ class Socket {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_SOCKET_SOCKET_H_

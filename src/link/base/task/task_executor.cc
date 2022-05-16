@@ -9,7 +9,7 @@
 #include "link/base/task/task.h"
 #include "link/base/logging.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
@@ -62,4 +62,4 @@ void TaskExecutor::TerminateWorker() {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

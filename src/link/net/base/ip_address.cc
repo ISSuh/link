@@ -6,7 +6,7 @@
 
 #include "link/net/base/ip_address.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 IpAddress::IpAddress(const std::string& address)
@@ -65,4 +65,4 @@ bool IpAddress::operator==(const IpAddress& lhs) const {
 }
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink

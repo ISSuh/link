@@ -13,7 +13,7 @@
 
 #include "link/module/base/user_module_base.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 class AbstractModuleFactoryBase {
@@ -69,6 +69,6 @@ class ModuleFactory : public AbstractModlueFactory<UserModule> {
 };
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_MODULE_LOADER_MODULE_FACTORY_H_

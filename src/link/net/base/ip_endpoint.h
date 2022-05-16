@@ -14,7 +14,7 @@
 #include "link/net/base/ip_address.h"
 #include "link/net/base/address_family.h"
 
-namespace link {
+namespace nlink {
 namespace net {
 
 class IpEndPoint {
@@ -49,6 +49,6 @@ class IpEndPoint {
 };
 
 }  // namespace net
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NET_BASE_IP_ENDPOINT_H_

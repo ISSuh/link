@@ -9,7 +9,7 @@
 
 #include "link/base/platform/discriptor.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class Event {
@@ -42,6 +42,6 @@ class Event {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_EVENT_H_

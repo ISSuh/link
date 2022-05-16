@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 template <typename T>
@@ -157,6 +157,6 @@ template<typename... T>
 using index_sequence_for = make_index_sequence<sizeof...(T)>;
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_CALLBACK_TRAITS_UTILS_H_

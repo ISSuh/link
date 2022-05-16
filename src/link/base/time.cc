@@ -12,7 +12,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace link {
+namespace nlink {
 namespace base {
 
 const int64_t kNanosecondsPerMicrosecond = 1000;
@@ -70,4 +70,4 @@ TimeTick::TimeTick(int64_t us)
 TimeTick::~TimeTick() = default;
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

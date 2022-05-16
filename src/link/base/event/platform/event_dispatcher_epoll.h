@@ -14,11 +14,14 @@
 #include "link/base/platform/discriptor.h"
 #include "link/base/event/event_channel.h"
 #include "link/base/event/event_dispatcher.h"
+#include "link/base/event/event_channel_controller.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
-class EventDispatcherEpoll : public EventDispatcher {
+class EventDispatcherEpoll
+  : public EventDispatcher,
+    public EventChannelController {
  public:
   static EventDispatcherEpoll* CreateEventDispatcher(
     int32_t evnet_size, int32_t timeout);
@@ -46,6 +49,6 @@ class EventDispatcherEpoll : public EventDispatcher {
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_

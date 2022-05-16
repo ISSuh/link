@@ -15,7 +15,7 @@
 #include "link/base/callback/callback.h"
 #include "link/base/time.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 class TaskRunner {
@@ -51,6 +51,6 @@ class TaskRunnerProxy : public TaskRunner,
 };
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_TASK_TASK_RUNNER_H_

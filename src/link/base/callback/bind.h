@@ -19,7 +19,7 @@
 #include "link/base/callback/callback.h"
 #include "link/base/callback/function_traits.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 template <typename R, typename... Args>
@@ -215,6 +215,6 @@ Callback<Signature> BindRepeating(Callback<Signature> closure) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_BASE_CALLBACK_BIND_H_

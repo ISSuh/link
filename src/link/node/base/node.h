@@ -14,7 +14,7 @@
 #include "link/node/base/arguments.h"
 #include "link/base/macro.h"
 
-namespace link {
+namespace nlink {
 namespace node {
 
 class LinkNode {
@@ -36,6 +36,6 @@ class LinkNode {
 };
 
 }  // namespace node
-}  // namespace link
+}  // namespace nlink
 
 #endif  // LINK_NODE_BASE_NODE_H_

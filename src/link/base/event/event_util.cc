@@ -6,7 +6,7 @@
 
 #include "link/base/event/event_util.h"
 
-namespace link {
+namespace nlink {
 namespace base {
 
 std::string EventTypeToString(const Event& event) {
@@ -31,4 +31,4 @@ std::string EventTypeToString(const Event& event) {
 }
 
 }  // namespace base
-}  // namespace link
+}  // namespace nlink

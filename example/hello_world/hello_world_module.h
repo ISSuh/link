@@ -11,7 +11,7 @@
 
 #include <link/module/base/user_module.h>
 
-class SampleModule final : public link::module::UserModule {
+class SampleModule final : public nlink::module::UserModule {
  public:
   MODULE_CONSTRUCTOR(SampleModule)
 

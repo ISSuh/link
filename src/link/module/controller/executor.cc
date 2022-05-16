@@ -6,7 +6,7 @@
 
 #include "link/module/controller/executor.h"
 
-namespace link {
+namespace nlink {
 namespace module {
 
 ModuleExecutor::ModuleExecutor(
@@ -37,4 +37,4 @@ void ModuleExecutor::AfterTerminate(const std::string& module_name) {
 }
 
 }  // namespace module
-}  // namespace link
+}  // namespace nlink
