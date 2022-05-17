@@ -19,10 +19,14 @@ class DispatcherConext {
   virtual std::shared_ptr<void> context() const = 0;
 };
 
-class EventDispatcher : public EventChannelController {
+class EventDispatcher  {
  public:
   virtual void Dispatch() = 0;
   virtual DispatcherConext* GetDispatcherConext() = 0;
+
+  virtual void AttachChannel(EventChannel* channel) = 0;
+  virtual void DetatchCahnnel(EventChannel* channel) = 0;
+  virtual void DispatchEvent(const Event& event) = 0;
 };
 
 }  // namespace base

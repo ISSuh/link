@@ -11,6 +11,7 @@
 
 #include "link/base/event/event_dispatcher.h"
 #include "link/base/event/event_observer.h"
+#include "link/component/base/component.h"
 
 namespace nlink {
 namespace handle {
@@ -24,10 +25,7 @@ class LinkHandle {
   void RunOnce();
   void Shutdown();
 
-  bool RegistComponent();
-
-  // temporary
-  bool RegistEventObserver(base::EventObserver* observer);
+  void RegistComponent(component::LinkComponent* component);
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;

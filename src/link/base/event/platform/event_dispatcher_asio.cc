@@ -37,17 +37,15 @@ DispatcherConext* EventDispatcherAsio::GetDispatcherConext() {
   return dynamic_cast<DispatcherConext*>(&context_);
 }
 
-bool EventDispatcherAsio::AttachChannel(EventChannel* channel) {
-  
-  
+void EventDispatcherAsio::AttachChannel(EventChannel* channel) {
+  channel->OpenChannel(&context_);
 }
 
 void EventDispatcherAsio::DetatchCahnnel(EventChannel* channel) {
-
+  channel->CloseChannel();
 }
 
 void EventDispatcherAsio::DispatchEvent(const Event& event) {
-
 }
 
 }  // namespace base

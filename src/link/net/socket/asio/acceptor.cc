@@ -46,13 +46,13 @@ AcceptorImpl::AcceptorImpl(asio::io_context* io_context)
 }
 
 void AcceptorImpl::Listen(const IpEndPoint& address) {
-    acceptor_.reset(new asio::ip::tcp::acceptor(*io_context_));
-    asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.port());
+  acceptor_.reset(new asio::ip::tcp::acceptor(*io_context_));
+  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.port());
 
-    acceptor_->open(endpoint.protocol());
-    acceptor_->set_option(asio::ip::tcp::acceptor::reuse_address(true));
-    acceptor_->bind(endpoint);
-    acceptor_->listen();
+  acceptor_->open(endpoint.protocol());
+  acceptor_->set_option(asio::ip::tcp::acceptor::reuse_address(true));
+  acceptor_->bind(endpoint);
+  acceptor_->listen();
 }
 
 void AcceptorImpl::Accept(base::CompletionCallback callback) {
@@ -68,6 +68,7 @@ void AcceptorImpl::DoAccept() {
       }
 
       if (!ec) {
+        accept_callback_.Run(1);
         // call callback
       }
 

@@ -16,25 +16,15 @@
 namespace nlink {
 namespace component {
 
-class LinkComponent : public base::EventChannel {
+class LinkComponent {
  public:
-  const std::string ComponentName() const {
-    return component_name_;
-  }
-
-  virtual void RegistToController(
-    base::DispatcherConext* dispatcher_context) = 0;
+  virtual base::EventChannel* GetEventChannel() = 0;
 
  protected:
-  explicit LinkComponent(const std::string& component_name)
-    : component_name_(component_name), dispatcher_context(nullptr) {}
-
+  LinkComponent() = default;
   virtual ~LinkComponent() = default;
 
  private:
-  std::string component_name_;
-  base::DispatcherConext* dispatcher_context;
-
   DISAALOW_COPY_AND_ASSIGN(LinkComponent);
 };
 

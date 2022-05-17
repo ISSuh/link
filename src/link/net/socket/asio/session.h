@@ -10,27 +10,30 @@
 #include <memory>
 
 #include "link/base/callback/callback.h"
+#include "link/third_party/asio/asio/ip/tcp.hpp"
 
 namespace nlink {
 namespace net {
 
-class Channel {
+class SessionManager;
+
+class Session {
  public:
+  class Delegate {
+    virtual void OnSessionClose() = 0;
+  };
+
   using ConnectCallback = base::Callback<void(bool)>;
   using ReadCallback = base::Callback<void(bool)>;
   using WriteCallback = base::Callback<void(bool)>;
 
-  static Channel* Create() {
-    return nullptr;
-  }
+  Session(Delegate* delegate)
+    : delegate_(delegate) {}
 
-  Channel() {}
-  ~Channel() {}
+  ~Session() {}
 
-  void Connect() {}
+  void Open() {}
   void Close() {}
-
-  void Write() {}
 
  private:
   void DoWrite() {}
@@ -39,6 +42,9 @@ class Channel {
   ConnectCallback connect_callback_;
   ReadCallback read_callback_;
   WriteCallback write_callback_;
+
+  asio::ip::tcp::socket socket_;
+  Delegate* delegate_;
 };
 
 }  // namespace net

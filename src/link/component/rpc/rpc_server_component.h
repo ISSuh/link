@@ -14,6 +14,7 @@
 #include "link/base/event/event_util.h"
 #include "link/component/rpc/rpc_component.h"
 #include "link/base/logging.h"
+#include "link/net/socket/server.h"
 
 namespace nlink {
 namespace component {
@@ -22,8 +23,8 @@ class RpcComponent;
 
 class RpcServerComponent : public RpcComponent {
  public:
-  void RegistToController(base::DispatcherConext* dispatcher_context) {
-    
+  base::EventChannel* GetEventChannel() override {
+    return sserver_.get();
   }
 
   void Open() {}
@@ -33,12 +34,12 @@ class RpcServerComponent : public RpcComponent {
   void Run() {}
 
  private:
-  RpcServerComponent(const std::string& name);
-  virtual ~RpcServerComponent();
+  RpcServerComponent()
+    : sserver_(nullptr) {}
 
-  // base::EventChannel
-  void HandleEvent(const base::Event& event) override;
-  void CloseChannel() override;
+  virtual ~RpcServerComponent() = default;
+
+  std::unique_ptr<net::Server> sserver_;
 
   DISAALOW_COPY_AND_ASSIGN(RpcServerComponent);
 };

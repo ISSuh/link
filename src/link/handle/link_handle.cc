@@ -40,13 +40,9 @@ void LinkHandle::RunOnce() {
 void LinkHandle::Shutdown() {
 }
 
-bool LinkHandle::RegistComponent() {
-  return false;
-}
-
-bool LinkHandle::RegistEventObserver(base::EventObserver* observer) {
-  return event_dispatcher_->AttachChannel(
-    new base::EventChannel(observer));
+void LinkHandle::RegistComponent(component::LinkComponent* component) {
+  base::EventChannel* channel = component->GetEventChannel();
+  event_dispatcher_->AttachChannel(channel);
 }
 
 }  // namespace handle

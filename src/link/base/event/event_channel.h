@@ -16,10 +16,9 @@
 namespace nlink {
 namespace base {
 
-class EventChannelController;
-
 class EventChannel {
  public:
+  virtual void OpenChannel(DispatcherConext* context) = 0;
   virtual void CloseChannel() = 0;
   virtual void HandleEvent(const Event& event) = 0;
 };

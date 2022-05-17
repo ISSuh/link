@@ -21,10 +21,7 @@ class RpcComponent : public LinkComponent {
   RpcComponent* CreateCoponent()  {}
 
  protected:
-  RpcComponent(
-    const std::string& name)
-    : LinkComponent(name) {}
-
+  RpcComponent() = default;
   virtual ~RpcComponent() = default;
 
   DISAALOW_COPY_AND_ASSIGN(RpcComponent);

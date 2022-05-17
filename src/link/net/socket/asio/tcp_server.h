@@ -8,6 +8,7 @@
 #define LINK_NET_SOCKET_TCP_SERVER_H_
 
 #include <memory>
+#include <utility>
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
@@ -15,14 +16,28 @@
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/server.h"
 #include "link/net/socket/asio/acceptor.h"
+#include "link/net/socket/asio/session_manager.h"
 
 namespace nlink {
 namespace net {
 
 class TcpServer : public Server {
  public:
-  explicit TcpServer(base::DispatcherConext* dispatcher_context)
-    : acceptor_(CreateAcceptor(dispatcher_context)) {
+  TcpServer() : acceptor_(nullptr) {}
+  virtual ~TcpServer() = default;
+
+  void OpenChannel(base::DispatcherConext* context) {
+    if (!context) {
+      return;
+    }
+
+    acceptor_ = CreateAcceptor(context);
+  }
+
+  void CloseChannel() {
+  }
+
+  void HandleEvent(const base::Event& event) {
   }
 
   int32_t Listen(const IpEndPoint& address) override {
@@ -35,7 +50,8 @@ class TcpServer : public Server {
 
  private:
   std::unique_ptr<Acceptor> acceptor_;
-  
+  SessionManager session_manager_;
+
   DISAALOW_COPY_AND_ASSIGN(TcpServer)
 };
 

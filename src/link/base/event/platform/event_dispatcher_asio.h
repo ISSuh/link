@@ -33,7 +33,7 @@ class EventDispatcherAsio : public EventDispatcher {
   void Dispatch() override;
   DispatcherConext* GetDispatcherConext() override;
 
-  bool AttachChannel(EventChannel* channel) override;
+  void AttachChannel(EventChannel* channel) override;
   void DetatchCahnnel(EventChannel* channel) override;
   void DispatchEvent(const Event& event) override;
 
