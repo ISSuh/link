@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 
+#include "link/base/macro.h"
 #include "link/net/socket/asio/session.h"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
 
@@ -20,31 +21,15 @@ class Session;
 
 class SessionManager : public Session::Delegate {
  public:
-  class Delegate {
-    virtual void OnClose() = 0;
-  };
+  SessionManager();
+  ~SessionManager();
 
-  SessionManager() = default;
-  ~SessionManager() = default;
+  void CreateSession(asio::ip::tcp::socket socket);
+  void DeleteSession(std::shared_ptr<Session> session);
+  void DeleteAllSessions();
 
-  void CreateSession(asio::ip::tcp::socket socket) {
-    auto session = std::make_shared<Session>(socket, this);
-    session->Open();
-
-    sessions_.insert(session);
-  }
-
-  void DeleteSession() {
-  }
-
-  void DeleteAllSessions() {
-    for (auto session : sessions_) {
-      session->Close();
-    }
-    sessions_.clear();
-  }
-
-  void OnSessionClose() override {}
+  // Session::Delegate
+  void OnSessionClose() override;
 
  private:
   std::set<std::shared_ptr<Session>> sessions_;

@@ -14,7 +14,7 @@
 namespace nlink {
 namespace net {
 
-class Server : base::EventChannel {
+class Server : public base::EventChannel {
  public:
   virtual int32_t Listen(const IpEndPoint& address) = 0;
   virtual int32_t Accept(base::CompletionCallback callback) = 0;

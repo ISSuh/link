@@ -3,7 +3,7 @@ project(link_component)
 message("Build Link component")
 
 set(LINK_COMPONENT_SRC
-
+  ${LINK_COMPONENT_PATH}/rpc/rpc_server_component.cc
 )
 
 add_library(${LINK_COMPONENT_NAME}

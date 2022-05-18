@@ -7,14 +7,11 @@
 #ifndef LINK_COMPONENT_RPC_RPC_SERVER_COMPONENT_H_
 #define LINK_COMPONENT_RPC_RPC_SERVER_COMPONENT_H_
 
-#include <string>
 #include <memory>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_util.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/base/logging.h"
-#include "link/net/socket/server.h"
+#include "link/net/socket/asio/tcp_server.h"
 
 namespace nlink {
 namespace component {
@@ -23,23 +20,19 @@ class RpcComponent;
 
 class RpcServerComponent : public RpcComponent {
  public:
-  base::EventChannel* GetEventChannel() override {
-    return sserver_.get();
-  }
+  static RpcServerComponent* CreateComponent();
 
-  void Open() {}
-  void Close() {}
-  void RegistService() {}
+  base::EventChannel* GetEventChannel() override;
 
-  void Run() {}
+  void Open();
+  void Close();
+  void RegistService();
 
  private:
-  RpcServerComponent()
-    : sserver_(nullptr) {}
+  RpcServerComponent();
+  virtual ~RpcServerComponent();
 
-  virtual ~RpcServerComponent() = default;
-
-  std::unique_ptr<net::Server> sserver_;
+  std::unique_ptr<net::Server> server_;
 
   DISAALOW_COPY_AND_ASSIGN(RpcServerComponent);
 };

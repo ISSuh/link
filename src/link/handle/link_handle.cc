@@ -21,11 +21,8 @@ LinkHandle::~LinkHandle() {
 }
 
 void LinkHandle::Initialize() {
-  int32_t evnet_size = 5;
-  int32_t timeout = -1;
-
   base::EventDispatcher* dispatcher =
-    base::EventDispatcherFactory::CreateEventDispatcher(evnet_size, timeout);
+    base::EventDispatcherFactory::CreateEventDispatcher();
   if (!dispatcher) {
     return;
   }
@@ -33,7 +30,19 @@ void LinkHandle::Initialize() {
   event_dispatcher_.reset(dispatcher);
 }
 
+void LinkHandle::Run() {
+  if (!event_dispatcher_) {
+    return;
+  }
+
+  event_dispatcher_->Dispatch();
+}
+
 void LinkHandle::RunOnce() {
+  if (!event_dispatcher_) {
+    return;
+  }
+
   event_dispatcher_->Dispatch();
 }
 
@@ -41,6 +50,10 @@ void LinkHandle::Shutdown() {
 }
 
 void LinkHandle::RegistComponent(component::LinkComponent* component) {
+  if (!event_dispatcher_) {
+    return;
+  }
+
   base::EventChannel* channel = component->GetEventChannel();
   event_dispatcher_->AttachChannel(channel);
 }

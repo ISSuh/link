@@ -12,9 +12,12 @@
 #include "link/base/platform/discriptor.h"
 #include "link/base/event/event.h"
 #include "link/base/event/event_observer.h"
+#include "link/base/event/event_dispatcher.h"
 
 namespace nlink {
 namespace base {
+
+class DispatcherConext;
 
 class EventChannel {
  public:

@@ -23,6 +23,7 @@ class LinkHandle {
 
   void Initialize();
   void RunOnce();
+  void Run();
   void Shutdown();
 
   void RegistComponent(component::LinkComponent* component);

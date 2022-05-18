@@ -11,34 +11,42 @@
 namespace nlink {
 namespace base {
 
-AsioDispatcherConext::AsioDispatcherConext()
-  : context_(static_cast<void*>(new asio::io_context())) {
-}
+class AsioDispatcherConext : public DispatcherConext {
+ public:
+  AsioDispatcherConext()
+    : context_(1) {}
 
-std::shared_ptr<void> AsioDispatcherConext::context() const {
-  return context_;
-}
+  void* context() const override {
+    return (void*)(&context_);
+  }
+
+ private:
+  asio::io_context context_;
+};
 
 EventDispatcherAsio* EventDispatcherAsio::CreateEventDispatcher() {
   return new EventDispatcherAsio();
 }
 
-EventDispatcherAsio::EventDispatcherAsio() {
+EventDispatcherAsio::EventDispatcherAsio()
+  : context_(new AsioDispatcherConext()) {
 }
 
 EventDispatcherAsio::~EventDispatcherAsio() {
 }
 
 void EventDispatcherAsio::Dispatch() {
-
+  asio::io_context* io_context =
+    static_cast<asio::io_context*>(context_->context());
+  io_context->run();
 }
 
 DispatcherConext* EventDispatcherAsio::GetDispatcherConext() {
-  return dynamic_cast<DispatcherConext*>(&context_);
+  return context_.get();
 }
 
 void EventDispatcherAsio::AttachChannel(EventChannel* channel) {
-  channel->OpenChannel(&context_);
+  channel->OpenChannel(context_.get());
 }
 
 void EventDispatcherAsio::DetatchCahnnel(EventChannel* channel) {

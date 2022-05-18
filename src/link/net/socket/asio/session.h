@@ -17,7 +17,7 @@ namespace net {
 
 class SessionManager;
 
-class Session {
+class Session : public std::enable_shared_from_this<Session> {
  public:
   class Delegate {
     virtual void OnSessionClose() = 0;
@@ -27,17 +27,15 @@ class Session {
   using ReadCallback = base::Callback<void(bool)>;
   using WriteCallback = base::Callback<void(bool)>;
 
-  Session(Delegate* delegate)
-    : delegate_(delegate) {}
+  Session(asio::ip::tcp::socket socket, Delegate* delegate);
+  ~Session();
 
-  ~Session() {}
-
-  void Open() {}
-  void Close() {}
+  void Open();
+  void Close();
 
  private:
-  void DoWrite() {}
-  void DoRead() {}
+  void DoWrite();
+  void DoRead();
 
   ConnectCallback connect_callback_;
   ReadCallback read_callback_;

@@ -18,6 +18,8 @@ set(LINK_BASE_SRC
   ${LINK_BASE_PATH}/event/event_util.cc
   # ${LINK_BASE_PATH}/event/event_channel.cc
   # ${LINK_BASE_PATH}/event/platform/event_dispatcher_epoll.cc
+
+  ${LINK_BASE_PATH}/event/platform/event_dispatcher_asio.cc
 )
 
 add_library(${LINK_BASE_NAME}

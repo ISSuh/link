@@ -11,6 +11,7 @@
 #include <thread>
 
 #include <link/handle/link_handle.h>
+#include <link/component/rpc/rpc_server_component.h>
 #include <link/base/logging.h>
 
 using namespace nlink;
@@ -33,25 +34,16 @@ void SampleModule::Run() {
   LOG(INFO) << "string_test_ : " << string_test_;
 
   handle::LinkHandle handle;
-  // handle.Initialize();
+  handle.Initialize();
 
-  // net::TcpServerSocket server;
-  // net::IpEndPoint end_point("0.0.0.0", 33660);
-  // server.Listen(end_point, 10);
+  component::RpcServerComponent* rpc_server =
+    component::RpcServerComponent::CreateComponent();
 
-  // handle.RegistEventObserver(&server);
+  handle.RegistComponent(rpc_server);
 
+  rpc_server->Open();
 
-  // auto tcp_server_component = component::CreateComponent();
-  // tcp_server_component.Read(TEST);
-  // tcp_server_component.Send(TEST);
-
-  // handle.RegistComponents({tcp_server_component});
-
-  while (true) {
-    handle.RunOnce();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  }
+  handle.Run();
 }
 
 void SampleModule::Shutdown() {

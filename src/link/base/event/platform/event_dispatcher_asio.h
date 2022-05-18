@@ -15,15 +15,6 @@
 namespace nlink {
 namespace base {
 
-class AsioDispatcherConext : public DispatcherConext {
- public:
-  AsioDispatcherConext();
-  std::shared_ptr<void> context() const override;
-
- private:
-  std::shared_ptr<void> context_;
-};
-
 class EventDispatcherAsio : public EventDispatcher {
  public:
   static EventDispatcherAsio* CreateEventDispatcher();
@@ -40,7 +31,7 @@ class EventDispatcherAsio : public EventDispatcher {
  private:
   EventDispatcherAsio();
 
-  AsioDispatcherConext context_;
+  std::unique_ptr<DispatcherConext> context_;
 
   DISAALOW_COPY_AND_ASSIGN(EventDispatcherAsio);
 };

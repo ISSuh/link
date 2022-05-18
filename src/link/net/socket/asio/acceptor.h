@@ -18,12 +18,14 @@ namespace net {
 
 class Acceptor {
  public:
+  static Acceptor* CreateAcceptor(base::DispatcherConext* dispatcher_context);
+
   virtual void Listen(const IpEndPoint& address) = 0;
   virtual void Accept(base::CompletionCallback callback) = 0;
+  virtual void Close() = 0;
 };
 
-std::unique_ptr<Acceptor> CreateAcceptor(
-  base::DispatcherConext* dispatcher_context);
+
 
 }  // namespace net
 }  // namespace nlink

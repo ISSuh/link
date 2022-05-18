@@ -17,36 +17,35 @@ namespace net {
 
 class AcceptorImpl;
 
-std::unique_ptr<Acceptor> CreateAcceptor(
-  base::DispatcherConext* dispatcher_context) {
-  asio::io_context* context =
-    static_cast<asio::io_context*>(dispatcher_context->context().get());
-
-  return std::unique_ptr<Acceptor>(new AcceptorImpl(context));
-}
-
 class AcceptorImpl : public Acceptor {
  public:
-  explicit AcceptorImpl(asio::io_context* io_context);
+  explicit AcceptorImpl(base::DispatcherConext* context);
+  virtual ~AcceptorImpl() = default;
 
   void Listen(const IpEndPoint& address) override;
   void Accept(base::CompletionCallback callback) override;
+  void Close() override;
 
  private:
   void DoAccept();
 
-  asio::io_context* io_context_;
+  base::DispatcherConext* dispatcher_contex_;
+  // asio::io_context* io_context_;
   std::unique_ptr<asio::ip::tcp::acceptor> acceptor_;
 
   base::CompletionCallback accept_callback_;
 };
 
-AcceptorImpl::AcceptorImpl(asio::io_context* io_context)
-  : io_context_(io_context), acceptor_(nullptr) {
+AcceptorImpl::AcceptorImpl(base::DispatcherConext* dispatcher_context)
+  : dispatcher_contex_(dispatcher_context),
+    acceptor_(nullptr) {
 }
 
 void AcceptorImpl::Listen(const IpEndPoint& address) {
-  acceptor_.reset(new asio::ip::tcp::acceptor(*io_context_));
+  void* context = dispatcher_contex_->context();
+  asio::io_context* io_context = static_cast<asio::io_context*>(context);
+
+  acceptor_.reset(new asio::ip::tcp::acceptor(*io_context));
   asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.port());
 
   acceptor_->open(endpoint.protocol());
@@ -74,6 +73,14 @@ void AcceptorImpl::DoAccept() {
 
       DoAccept();
     });
+}
+
+void AcceptorImpl::Close() {
+  acceptor_->close();
+}
+
+Acceptor* Acceptor::CreateAcceptor(base::DispatcherConext* dispatcher_context) {
+  return new AcceptorImpl(dispatcher_context);
 }
 
 }  // namespace net

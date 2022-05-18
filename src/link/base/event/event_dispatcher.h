@@ -14,9 +14,14 @@
 namespace nlink {
 namespace base {
 
+class EventChannel;
+
 class DispatcherConext {
  public:
-  virtual std::shared_ptr<void> context() const = 0;
+  virtual void* context() const = 0;
+
+  template<typename T>
+  T* Cast() { return nullptr; }
 };
 
 class EventDispatcher  {

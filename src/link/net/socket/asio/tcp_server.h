@@ -8,7 +8,6 @@
 #define LINK_NET_SOCKET_TCP_SERVER_H_
 
 #include <memory>
-#include <utility>
 
 #include "link/base/macro.h"
 #include "link/base/callback/callback.h"
@@ -23,30 +22,17 @@ namespace net {
 
 class TcpServer : public Server {
  public:
-  TcpServer() : acceptor_(nullptr) {}
-  virtual ~TcpServer() = default;
+  TcpServer();
+  virtual ~TcpServer();
 
-  void OpenChannel(base::DispatcherConext* context) {
-    if (!context) {
-      return;
-    }
+  // EventChannel
+  void OpenChannel(base::DispatcherConext* context) override;
+  void CloseChannel() override;
+  void HandleEvent(const base::Event& event) override;
 
-    acceptor_ = CreateAcceptor(context);
-  }
-
-  void CloseChannel() {
-  }
-
-  void HandleEvent(const base::Event& event) {
-  }
-
-  int32_t Listen(const IpEndPoint& address) override {
-    acceptor_->Listen(address);
-  }
-
-  int32_t Accept(base::CompletionCallback callback) override {
-    acceptor_->Accept(std::move(callback));
-  }
+  // Server
+  int32_t Listen(const IpEndPoint& address) override;
+  int32_t Accept(base::CompletionCallback callback) override;
 
  private:
   std::unique_ptr<Acceptor> acceptor_;

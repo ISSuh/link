@@ -7,16 +7,16 @@
 #ifndef LINK_BASE_EVENT_EVENT_DISPATCHER_FACTORY_H_
 #define LINK_BASE_EVENT_EVENT_DISPATCHER_FACTORY_H_
 
-#include "link/base/event/platform/event_dispatcher_epoll.h"
+// #include "link/base/event/platform/event_dispatcher_epoll.h"
+#include "link/base/event/platform/event_dispatcher_asio.h"
 
 namespace nlink {
 namespace base {
 
 class EventDispatcherFactory {
  public:
-  static EventDispatcher* CreateEventDispatcher(
-    int32_t evnet_size, int32_t timeout) {
-    return EventDispatcherEpoll::CreateEventDispatcher(evnet_size, timeout);
+  static EventDispatcher* CreateEventDispatcher() {
+    return EventDispatcherAsio::CreateEventDispatcher();
   }
 };
 
