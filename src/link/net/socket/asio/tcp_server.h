@@ -15,7 +15,6 @@
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/server.h"
 #include "link/net/socket/asio/acceptor.h"
-#include "link/net/socket/asio/session_manager.h"
 
 namespace nlink {
 namespace net {
@@ -25,18 +24,19 @@ class TcpServer : public Server {
   TcpServer();
   virtual ~TcpServer();
 
+  // Server
+  base::EventChannel* GetChanel() override;
+  int32_t Listen(const IpEndPoint& address) override;
+  int32_t Accept(base::CompletionCallback callback) override;
+  void Close() override;
+
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
   void CloseChannel() override;
   void HandleEvent(const base::Event& event) override;
 
-  // Server
-  int32_t Listen(const IpEndPoint& address) override;
-  int32_t Accept(base::CompletionCallback callback) override;
-
  private:
   std::unique_ptr<Acceptor> acceptor_;
-  SessionManager session_manager_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpServer)
 };

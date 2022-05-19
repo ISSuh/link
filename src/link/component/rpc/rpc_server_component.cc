@@ -20,9 +20,7 @@ RpcServerComponent::RpcServerComponent()
 RpcServerComponent::~RpcServerComponent() = default;
 
 base::EventChannel* RpcServerComponent::GetEventChannel() {
-  base::EventChannel* chaneel =
-    static_cast<base::EventChannel*>(server_.get());
-  return chaneel;
+  return dynamic_cast<base::EventChannel*>(server_.get());
 }
 
 void RpcServerComponent::Open() {
@@ -31,6 +29,7 @@ void RpcServerComponent::Open() {
 }
 
 void RpcServerComponent::Close() {
+  server_->Close();
 }
 
 void RpcServerComponent::RegistService() {

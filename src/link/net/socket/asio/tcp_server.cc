@@ -19,6 +19,10 @@ TcpServer::TcpServer()
 TcpServer::~TcpServer() {
 }
 
+base::EventChannel* TcpServer::GetChanel() {
+  return this;
+}
+
 void TcpServer::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;
@@ -27,8 +31,7 @@ void TcpServer::OpenChannel(base::DispatcherConext* context) {
 }
 
 void TcpServer::CloseChannel() {
-  acceptor_->Close();
-  session_manager_.DeleteAllSessions();
+  Close();
 }
 
 void TcpServer::HandleEvent(const base::Event& event) {
@@ -40,6 +43,10 @@ int32_t TcpServer::Listen(const IpEndPoint& address) {
 
 int32_t TcpServer::Accept(base::CompletionCallback callback) {
   acceptor_->Accept(std::move(callback));
+}
+
+void TcpServer::Close() {
+  acceptor_->Close();
 }
 
 }  // namespace net

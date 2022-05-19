@@ -22,13 +22,13 @@ class RpcServerComponent : public RpcComponent {
  public:
   static RpcServerComponent* CreateComponent();
 
-  base::EventChannel* GetEventChannel() override;
-
   void Open();
   void Close();
   void RegistService();
 
  private:
+  base::EventChannel* GetEventChannel() override;
+
   RpcServerComponent();
   virtual ~RpcServerComponent();
 

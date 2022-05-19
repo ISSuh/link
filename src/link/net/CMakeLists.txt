@@ -13,6 +13,7 @@ set(LINK_NET_SRC
   ${LINK_NET_PATH}/socket/asio/session_manager.cc
   ${LINK_NET_PATH}/socket/asio/session.cc
   ${LINK_NET_PATH}/socket/asio/tcp_server.cc
+  ${LINK_NET_PATH}/socket/asio/tcp_client.cc
 )
 
 add_library(${LINK_NET_NAME}

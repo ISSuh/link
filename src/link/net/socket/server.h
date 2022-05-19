@@ -18,6 +18,7 @@ class Server : public base::EventChannel {
  public:
   virtual int32_t Listen(const IpEndPoint& address) = 0;
   virtual int32_t Accept(base::CompletionCallback callback) = 0;
+  virtual void Close() = 0;
 };
 
 class Writer {

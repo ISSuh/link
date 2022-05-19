@@ -4,50 +4,39 @@
  *
  */
 
-#ifndef LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
-#define LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
+#ifndef LINK_COMPONENT_RPC_RPC_CLIENT_COMPONENT_H_
+#define LINK_COMPONENT_RPC_RPC_CLIENT_COMPONENT_H_
 
-#include <string>
 #include <memory>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_util.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/net/socket/tcp_server_socket.h"
-#include "link/base/logging.h"
+#include "link/net/socket/asio/tcp_client.h"
 
 namespace nlink {
 namespace component {
 
 class RpcComponent;
 
-class TcpClientComponent : public RpcComponent {
+class RpcClientComponent : public RpcComponent {
  public:
-  static TcpClientComponent* CreateTcpClientComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
+  static RpcClientComponent* CreateComponent();
 
-  void RegistReadCabllack();
-  void RegistSendCabllack();
+  void Connect();
+  void DisConnect();
 
  private:
-  TcpClientComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
-  virtual ~TcpClientComponent();
+  base::EventChannel* GetEventChannel() override;
 
-  // base::EventObserver
-  base::Discriptor discriptor() override;
-  base::EventObserver::Type type() override;
-  void HandleEvent(const base::Event& event) override;
+  RpcClientComponent();
+  virtual ~RpcClientComponent();
 
-  void DoAccept();
+  std::unique_ptr<net::Client> client_;
 
-  std::unique_ptr<net::TcpServerSocket> tcp_server;
-  DISAALOW_COPY_AND_ASSIGN(TcpClientComponent);
+  DISAALOW_COPY_AND_ASSIGN(RpcClientComponent);
 };
 
 }  // namespace component
 }  // namespace nlink
 
-#endif  // LINK_COMPONENT_IPC_SOCKET_TCP_CLIENT_COMPONENT_H_
+#endif  // LINK_COMPONENT_RPC_RPC_CLIENT_COMPONENT_H_
