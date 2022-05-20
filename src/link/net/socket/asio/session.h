@@ -8,6 +8,7 @@
 #define LINK_NET_SOCKET_ASIO_CHANNEL_H_
 
 #include <memory>
+#include <string>
 
 #include "link/base/callback/callback.h"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
@@ -32,6 +33,8 @@ class Session : public std::enable_shared_from_this<Session> {
 
   void Open();
   void Close();
+
+  void Connect(const std::string& address, int32_t port);
 
  private:
   void DoWrite();

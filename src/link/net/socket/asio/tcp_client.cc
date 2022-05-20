@@ -6,6 +6,8 @@
 
 #include "link/net/socket/asio/tcp_client.h"
 
+#include <utility>
+
 #include "link/base/event/event_dispatcher.h"
 #include "link/third_party/asio/asio/io_context.hpp"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
@@ -21,7 +23,7 @@ TcpClient::~TcpClient() {
 }
 
 void TcpClient::Connect(IpEndPoint address) {
-  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.port());
+  session_->Connect(address.address().ToString(), address.port());
 }
 
 void TcpClient::DisConnect() {
@@ -38,7 +40,7 @@ void TcpClient::OpenChannel(base::DispatcherConext* context) {
   void* context_ptr = context->context();
   asio::io_context* io_context = static_cast<asio::io_context*>(context_ptr);
 
-  asio::ip::tcp::socket socket(io_context);
+  asio::ip::tcp::socket socket(*io_context);
   session_.reset(new Session(std::move(socket), this));
 }
 
