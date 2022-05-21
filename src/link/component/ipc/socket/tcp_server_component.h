@@ -11,36 +11,29 @@
 #include <memory>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_util.h"
-#include "link/component/ipc/socket/socket_component.h"
-#include "link/net/socket/tcp_server_socket.h"
-#include "link/base/logging.h"
+#include "link/component/rpc/rpc_component.h"
+#include "link/net/socket/server.h"
 
 namespace nlink {
 namespace component {
 
-class TcpServerComponent : public SocketComponent {
- public:
-  static TcpServerComponent* CreateTcpServerComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
+class RpcComponent;
 
-  void RegistReadCabllack();
+class TcpServerComponent : public RpcComponent {
+ public:
+  static TcpServerComponent* CreateComponent();
+
+  void Open(const std::string& address, int32_t port);
+  void Close();
 
  private:
-  TcpServerComponent(
-    const std::string& name,
-    base::EventChannelController* event_controller);
+  base::EventChannel* GetEventChannel() override;
+
+  TcpServerComponent();
   virtual ~TcpServerComponent();
 
-  // base::EventObserver
-  base::Discriptor discriptor() override;
-  base::EventObserver::Type type() override;
-  void HandleEvent(const base::Event& event) override;
+  std::unique_ptr<net::Server> server_;
 
-  void DoAccept();
-
-  std::unique_ptr<net::TcpServerSocket> tcp_server;
   DISAALOW_COPY_AND_ASSIGN(TcpServerComponent);
 };
 

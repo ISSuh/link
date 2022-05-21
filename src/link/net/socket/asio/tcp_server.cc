@@ -19,10 +19,6 @@ TcpServer::TcpServer()
 TcpServer::~TcpServer() {
 }
 
-base::EventChannel* TcpServer::GetChanel() {
-  return this;
-}
-
 void TcpServer::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;

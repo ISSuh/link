@@ -11,7 +11,7 @@
 
 #include "link/base/macro.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/net/socket/asio/tcp_server.h"
+#include "link/net/socket/server.h"
 
 namespace nlink {
 namespace component {

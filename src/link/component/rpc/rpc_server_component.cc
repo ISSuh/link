@@ -9,6 +9,7 @@
 #include "link/base/macro.h"
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
+#include "link/net/socket/asio/tcp_server.h"
 
 namespace nlink {
 namespace component {

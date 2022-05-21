@@ -21,7 +21,6 @@ class DispatcherConext;
 
 class EventChannel {
  public:
-  virtual base::EventChannel* GetChanel() = 0;
   virtual void OpenChannel(DispatcherConext* context) = 0;
   virtual void CloseChannel() = 0;
   virtual void HandleEvent(const Event& event) = 0;

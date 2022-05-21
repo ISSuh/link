@@ -8,10 +8,14 @@
 
 #include <utility>
 
+#include "link/base/logging.h"
+
 namespace nlink {
 namespace net {
 
 void ConnectHnadler(const asio::error_code& error) {
+  LOG(INFO) << __func__;
+
   if (!error) {
     // todo
   }
@@ -29,6 +33,8 @@ void Session::Open() {
 }
 
 void Session::Connect(const std::string& address, int32_t port) {
+  LOG(INFO) << __func__ << " - " << address << ":" << port;
+
   asio::ip::tcp::endpoint endpoint(
     asio::ip::address::from_string(address), port);
   socket_.async_connect(endpoint, ConnectHnadler);

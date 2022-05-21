@@ -1,0 +1,34 @@
+{
+  "node_name": "socket",
+  "log_level": "debug",
+  "modules": [
+    {
+      "module_name": "Server",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libserver_example.so",
+      "module": {
+        "class_name": "ExampleServerModule",
+        "arguments": {
+          "address": "0.0.0.0",
+          "port": 33669
+        },
+        "configure": {
+          "threading": false
+        }
+      }
+    },
+    {
+      "module_name": "Client",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libclient_example.so",
+      "module": {
+        "class_name": "ExampleClientModule",
+        "arguments": {
+          "address": "127.0.0.1",
+          "port": 33669
+        },
+        "configure": {
+          "threading": false
+        }
+      }
+    }
+  ]
+}

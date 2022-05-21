@@ -25,7 +25,6 @@ class TcpServer : public Server {
   virtual ~TcpServer();
 
   // Server
-  base::EventChannel* GetChanel() override;
   int32_t Listen(const IpEndPoint& address) override;
   int32_t Accept(base::CompletionCallback callback) override;
   void Close() override;

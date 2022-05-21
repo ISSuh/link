@@ -10,7 +10,7 @@
             "macFrameworkPath": [
                 "/Library/Developer/CommandLineTools/SDKs/MacOSX12.sdk/System/Library/Frameworks"
             ],
-            "compilerPath": "/opt/homebrew/opt/llvm/bin/clang",
+            "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++11"
         }

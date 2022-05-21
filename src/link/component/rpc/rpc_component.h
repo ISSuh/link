@@ -16,11 +16,7 @@
 namespace nlink {
 namespace component {
 
-class RpcServerComponent;
-
 class RpcComponent : public LinkComponent {
- public:
-
  protected:
   RpcComponent() = default;
   virtual ~RpcComponent() = default;

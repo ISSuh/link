@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "(lldb) node_launcher",
+      "name": "hellp_world",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/link/node_launcher",
@@ -17,6 +17,20 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb"
-    }
+    },
+    {
+      "name": "socket",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/link/node_launcher",
+      "args": [
+        "${workspaceFolder}/example/socket/socket_conf.json"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb"
+    },
   ]
 }

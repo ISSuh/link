@@ -16,13 +16,9 @@
 namespace nlink {
 namespace component {
 
-class SocketComponent : public base::EventObserver,
-                        public LinkComponent {
+class SocketComponent : public LinkComponent {
  protected:
-  SocketComponent(
-    const std::string& name, base::EventChannelController* event_controller)
-    : LinkComponent(name, event_controller) {}
-
+  SocketComponent() = default;
   virtual ~SocketComponent() = default;
 
   DISAALOW_COPY_AND_ASSIGN(SocketComponent);

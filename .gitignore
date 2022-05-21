@@ -33,3 +33,5 @@
 
 # Build Dir
 build/*
+
+.vscode

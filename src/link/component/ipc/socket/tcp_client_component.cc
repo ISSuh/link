@@ -6,50 +6,34 @@
 
 #include "link/component/ipc/socket/tcp_client_component.h"
 
-#include <string>
-#include <memory>
-#include <utility>
-
-#include "link/base/macro.h"
-#include "link/base/event/event_util.h"
-#include "link/component/ipc/socket/socket_component.h"
-#include "link/net/socket/tcp_server_socket.h"
-#include "link/net/socket/tcp_client_socket.h"
-#include "link/net/base/ip_endpoint.h"
 #include "link/base/logging.h"
+#include "link/net/socket/asio/tcp_client.h"
 
 namespace nlink {
 namespace component {
 
-TcpClientComponent* TcpClientComponent::CreateTcpClientComponent(
-  const std::string& name, base::EventChannelController* event_controller) {
-  return new TcpClientComponent(name, event_controller);
+TcpClientComponent::TcpClientComponent()
+  : client_(new net::TcpClient()) {
 }
-
-TcpClientComponent::TcpClientComponent(
-  const std::string& name,
-  base::EventChannelController* event_controller)
-  : SocketComponent(name, event_controller) {}
 
 TcpClientComponent::~TcpClientComponent() = default;
 
-base::Discriptor TcpClientComponent::discriptor() {
-  return tcp_server->SocketDiscriptor();
+void TcpClientComponent::Connect(
+  const std::string& address, int32_t port) {
+  client_->Connect(net::IpEndPoint(address, port));
 }
 
-base::EventObserver::Type TcpClientComponent::type() {
-  return base::EventObserver::Type::CLIENT;
+void TcpClientComponent::DisConnect() {
+  client_->CloseChannel();
+  client_->DisConnect();
 }
 
-void TcpClientComponent::HandleEvent(const base::Event& event) {
-  LOG(INFO) << __func__ << " - " << base::EventTypeToString(event);
-  switch (event.type()) {
-    case base::Event::Type::ACCEPT: {
-      break;
-    }
-    default:
-      break;
-    }
+base::EventChannel* TcpClientComponent::GetEventChannel() {
+  return dynamic_cast<base::EventChannel*>(client_.get());
+}
+
+TcpClientComponent* TcpClientComponent::CreateComponent() {
+  return new TcpClientComponent();
 }
 
 }  // namespace component

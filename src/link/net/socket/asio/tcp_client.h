@@ -12,6 +12,7 @@
 #include "link/base/macro.h"
 #include "link/base/event/event_channel.h"
 #include "link/net/socket/client.h"
+#include "link/net/socket/asio/connector.h"
 #include "link/net/socket/asio/session.h"
 
 namespace nlink {

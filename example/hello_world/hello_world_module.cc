@@ -6,12 +6,6 @@
 
 #include "hello_world_module.h"
 
-#include <iostream>
-#include <chrono>
-#include <thread>
-
-#include <link/handle/link_handle.h>
-#include <link/component/rpc/rpc_server_component.h>
 #include <link/base/logging.h>
 
 using namespace nlink;
@@ -32,18 +26,6 @@ void SampleModule::Run() {
   LOG(INFO) << "float_test_ : " << float_test_;
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
-
-  handle::LinkHandle handle;
-  handle.Initialize();
-
-  component::RpcServerComponent* rpc_server =
-    component::RpcServerComponent::CreateComponent();
-
-  handle.RegistComponent(rpc_server);
-
-  rpc_server->Open();
-
-  handle.Run();
 }
 
 void SampleModule::Shutdown() {

@@ -8,15 +8,15 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <functional>
 
+#include "link/base/logging.h"
 #include "link/net/socket/asio/session_manager.h"
 #include "link/third_party/asio/asio/io_context.hpp"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
 
 namespace nlink {
 namespace net {
-
-class AcceptorImpl;
 
 class AcceptorImpl : public Acceptor {
  public:
@@ -29,6 +29,7 @@ class AcceptorImpl : public Acceptor {
 
  private:
   void DoAccept();
+  void AcceptHandler(std::error_code ec, asio::ip::tcp::socket socket);
 
   SessionManager session_manager_;
   base::DispatcherConext* dispatcher_contex_;
@@ -62,19 +63,25 @@ void AcceptorImpl::Accept(base::CompletionCallback callback) {
 
 void AcceptorImpl::DoAccept() {
   acceptor_->async_accept(
-    [this](std::error_code ec, asio::ip::tcp::socket socket) {
-      if (!acceptor_->is_open()) {
-        return;
-      }
+    std::bind(
+      &AcceptorImpl::AcceptHandler, this,
+      std::placeholders::_1, std::placeholders::_2));
+}
 
-      if (!ec) {
-        session_manager_.CreateSession(std::move(socket));
-        accept_callback_.Run(1);
-        // call callback
-      }
+void AcceptorImpl::AcceptHandler(
+  std::error_code ec, asio::ip::tcp::socket socket) {
+  LOG(INFO) << __func__;
+  if (!acceptor_->is_open()) {
+    return;
+  }
 
-      DoAccept();
-    });
+  if (!ec) {
+    session_manager_.CreateSession(std::move(socket));
+    accept_callback_.Run(1);
+    // call callback
+  }
+
+  DoAccept();
 }
 
 void AcceptorImpl::Close() {

@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-project(example_hello_world)
+project(example_socket_server_client)
 
-message("link module hello_world Example")
+message("link module Socket Example")
+
+set(SERVER_EXAMPLE "server_example")
+set(CLIENT_EXAMPLE "client_example")
 
 #-------------------------------------------------------------------------------
 # Compile Option
@@ -27,24 +30,48 @@ link_directories(
   ${BUILD_DIR}
 )
 
-add_library(hello_world
+# Server Example
+add_library(${SERVER_EXAMPLE}
  MODULE
-  hello_world_module.cc
+  server/server_module.cc
 )
 
-target_include_directories(hello_world
+target_include_directories(${SERVER_EXAMPLE}
  PRIVATE
   ${PROJECT_LINK_INCLUDE_DIR}
 )
 
-target_link_libraries(hello_world
+target_link_libraries(${SERVER_EXAMPLE}
  PRIVATE
   ${LINK_LIBRARY_NAME}
 )
 
-set_target_properties(hello_world
+set_target_properties(${SERVER_EXAMPLE}
  PROPERTIES
   LINKER_LANGUAGE CXX 
   # LINK_FLAGS "-Wl,-all_load"
-  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/hello_world
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/socket
+)
+
+# Server Example
+add_library(${CLIENT_EXAMPLE}
+ MODULE
+  client/client_module.cc
+)
+
+target_include_directories(${CLIENT_EXAMPLE}
+ PRIVATE
+  ${PROJECT_LINK_INCLUDE_DIR}
+)
+
+target_link_libraries(${CLIENT_EXAMPLE}
+ PRIVATE
+  ${LINK_LIBRARY_NAME}
+)
+
+set_target_properties(${CLIENT_EXAMPLE}
+ PROPERTIES
+  LINKER_LANGUAGE CXX 
+  # LINK_FLAGS "-Wl,-all_load"
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/socket
 )
