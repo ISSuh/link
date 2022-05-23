@@ -38,9 +38,12 @@ void ExampleClientModule::Run() {
 
   client->Connect(address_, port_);
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  std::string temp("helloworld");
+  client->Write({temp.begin(), temp.end()});
+
   handle.Run();
-
-
 }
 
 void ExampleClientModule::Shutdown() {

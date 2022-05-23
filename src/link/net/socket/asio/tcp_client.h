@@ -8,6 +8,7 @@
 #define LINK_NET_SOCKET_ASIO_TCP_CLIENT_H_
 
 #include <memory>
+#include <vector>
 
 #include "link/base/macro.h"
 #include "link/base/event/event_channel.h"
@@ -28,7 +29,7 @@ class TcpClient
   // Client
   void Connect(IpEndPoint endpoint) override;
   void DisConnect() override;
-  void Write() override;
+  void Write(const std::vector<uint8_t>& buffer) override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
@@ -39,6 +40,8 @@ class TcpClient
   void OnSessionClose() override;
 
  private:
+  void WriteHandler(std::size_t length);
+
   std::unique_ptr<Session> session_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpClient)

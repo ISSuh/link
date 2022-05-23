@@ -28,6 +28,10 @@ void TcpClientComponent::DisConnect() {
   client_->DisConnect();
 }
 
+void TcpClientComponent::Write(const std::vector<uint8_t>& buffer) {
+  client_->Write(buffer);
+}
+
 base::EventChannel* TcpClientComponent::GetEventChannel() {
   return dynamic_cast<base::EventChannel*>(client_.get());
 }

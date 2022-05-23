@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "link/base/macro.h"
 #include "link/base/event/event_util.h"
@@ -27,6 +28,8 @@ class TcpClientComponent : public SocketComponent {
 
   void Connect(const std::string& address, int32_t port);
   void DisConnect();
+
+  void Write(const std::vector<uint8_t>& buffer);
 
  private:
   TcpClientComponent();

@@ -33,7 +33,8 @@ void TcpClient::Connect(IpEndPoint address) {
 void TcpClient::DisConnect() {
 }
 
-void TcpClient::Write() {
+void TcpClient::Write(const std::vector<uint8_t>& buffer) {
+  session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
 }
 
 void TcpClient::OpenChannel(base::DispatcherConext* context) {
@@ -45,7 +46,7 @@ void TcpClient::OpenChannel(base::DispatcherConext* context) {
   asio::io_context* io_context = static_cast<asio::io_context*>(context_ptr);
 
   asio::ip::tcp::socket socket(*io_context);
-  session_.reset(new Session(std::move(socket), this));
+  session_.reset(new Session(std::move(socket)));
 }
 
 void TcpClient::CloseChannel() {
@@ -56,6 +57,10 @@ void TcpClient::HandleEvent(const base::Event& event) {
 }
 
 void TcpClient::OnSessionClose() {
+}
+
+void TcpClient::WriteHandler(std::size_t length) {
+  LOG(INFO) << __func__ << " - length : " << length;
 }
 
 }  // namespace net

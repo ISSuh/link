@@ -16,7 +16,7 @@ SessionManager::~SessionManager() = default;
 
 void SessionManager::CreateSession(asio::ip::tcp::socket socket) {
   std::shared_ptr<Session> session =
-    std::make_shared<Session>(std::move(socket), this);
+    std::make_shared<Session>(std::move(socket));
   session->Open();
 
   sessions_.insert(session);
