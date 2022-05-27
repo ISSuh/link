@@ -9,20 +9,23 @@
 
 #include <memory>
 
+#include "link/base/callback/callback.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/net/base/ip_endpoint.h"
-#include "link/net/socket/asio/session.h"
+#include "link/net/socket/asio/client_side_session.h"
 
 namespace nlink {
 namespace net {
 
 class Connector {
  public:
-  static Connector* CreateConnector(asio::ip::tcp::socket socket);
+  using ConnectHandler =
+    base::Callback<void(std::shared_ptr<ClientSideSession>)>;
+
+  static Connector* CreateConnector(base::DispatcherConext* dispatcher_context);
 
   virtual void Connect(
-    const IpEndPoint& address, Session::Delegate* delegate) = 0;
-  virtual void Close() = 0;
+    const IpEndPoint& address, ConnectHandler handler) = 0;
 };
 
 }  // namespace net

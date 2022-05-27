@@ -6,6 +6,7 @@ set(LINK_BASE_SRC
   ${LINK_BASE_PATH}/logging.cc
   ${LINK_BASE_PATH}/time.cc
   ${LINK_BASE_PATH}/json_wrapper.cc
+  ${LINK_BASE_PATH}/buffer.cc
 
   ${LINK_BASE_PATH}/task/task_runner.cc
   ${LINK_BASE_PATH}/task/sequenced_task_runner.cc
@@ -18,7 +19,6 @@ set(LINK_BASE_SRC
   ${LINK_BASE_PATH}/event/event_util.cc
   # ${LINK_BASE_PATH}/event/event_channel.cc
   # ${LINK_BASE_PATH}/event/platform/event_dispatcher_epoll.cc
-
   ${LINK_BASE_PATH}/event/platform/event_dispatcher_asio.cc
 )
 

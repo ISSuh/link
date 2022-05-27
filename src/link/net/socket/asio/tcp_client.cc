@@ -17,7 +17,7 @@ namespace nlink {
 namespace net {
 
 TcpClient::TcpClient()
-  : session_(nullptr) {
+  : connector_(nullptr), session_(nullptr) {
 }
 
 TcpClient::~TcpClient() {
@@ -27,26 +27,21 @@ void TcpClient::Connect(IpEndPoint address) {
   if (!session_) {
     return;
   }
-  session_->Connect(address.address().ToString(), address.port());
+  connector_->Connect(address);
 }
 
 void TcpClient::DisConnect() {
 }
 
 void TcpClient::Write(const std::vector<uint8_t>& buffer) {
-  session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
+  // session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
 }
 
 void TcpClient::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;
   }
-
-  void* context_ptr = context->context();
-  asio::io_context* io_context = static_cast<asio::io_context*>(context_ptr);
-
-  asio::ip::tcp::socket socket(*io_context);
-  session_.reset(new Session(std::move(socket)));
+  connector_.reset(Connector::CreateConnector(context));
 }
 
 void TcpClient::CloseChannel() {
@@ -56,12 +51,18 @@ void TcpClient::CloseChannel() {
 void TcpClient::HandleEvent(const base::Event& event) {
 }
 
-void TcpClient::OnSessionClose() {
+// void TcpClient::OnSessionClose() {
+// }
+
+// void TcpClient::WriteHandler(std::size_t length) {
+//   LOG(INFO) << __func__ << " - length : " << length;
+// }
+
+void TcpClient::InternalConnectHandler(
+  std::shared_ptr<ClientSideSession> session) {
+  session_ = session;
 }
 
-void TcpClient::WriteHandler(std::size_t length) {
-  LOG(INFO) << __func__ << " - length : " << length;
-}
 
 }  // namespace net
 }  // namespace nlink

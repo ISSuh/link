@@ -22,6 +22,22 @@ TcpServer::TcpServer()
 TcpServer::~TcpServer() {
 }
 
+void TcpServer::RegistAcceptHandler(Server::AcceptHandler handler) {
+  accept_handler_ = std::move(handler);
+}
+
+void TcpServer::RegistCloseHandler(Server::CloseHandler handler) {
+  close_handler_ = std::move(handler);
+}
+
+void TcpServer::RegistReadHandler(Server::ReadHandler handler) {
+  read_handler_ = std::move(handler);
+}
+
+void TcpServer::RegistWriteHandler(Server::WriteHandler handler) {
+  write_handler_ = std::move(handler);
+}
+
 void TcpServer::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;
@@ -45,10 +61,6 @@ int32_t TcpServer::Accept(base::CompletionCallback callback) {
     base::Bind(&TcpServer::AcceptHandler, this));
 }
 
-void TcpServer::RegistReadHandler(Server::ReadHandler read_handler) {
-
-}
-
 void TcpServer::Close() {
   CloseAllSessions();
   acceptor_->Close();
@@ -57,15 +69,34 @@ void TcpServer::Close() {
 void TcpServer::AcceptHandler(std::shared_ptr<Session> session) {
   sessions_.insert(session);
   session->Open(base::Bind(&TcpServer::ReadHandler, this));
-}
 
-void TcpServer::ReadHandler(const std::vector<uint8_t>& buffer) {
-  std::string temp(buffer.begin(), buffer.end());
-  LOG(INFO) << __func__ << " - temp : " << temp << " / size : " << temp.size();
+  if (accept_handler_.is_null()) {
+    return;
+  }
+  accept_handler_.Run(session);
 }
 
 void TcpServer::CloseHandler(std::shared_ptr<Session> session) {
   sessions_.erase(session);
+
+  if (close_handler_.is_null()) {
+    return;
+  }
+  close_handler_.Run(session);
+}
+
+void TcpServer::ReadHandler(const base::Buffer& buffer) {
+  if (read_handler_.is_null()) {
+    return;
+  }
+  read_handler_.Run(buffer);
+}
+
+void TcpServer::WriteHandler(size_t length) {
+  if (write_handler_.is_null()) {
+    return;
+  }
+  write_handler_.Run(length);
 }
 
 void TcpServer::CloseAllSessions() {

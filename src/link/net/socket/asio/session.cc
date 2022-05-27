@@ -47,7 +47,7 @@ void Session::Disconnect() {
 
 void Session::ConnectHandler(const asio::error_code& error) {
   LOG(INFO) << __func__;
-
+  
   if (!error) {
     DoRead();
   }

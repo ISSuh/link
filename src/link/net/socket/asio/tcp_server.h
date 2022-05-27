@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "link/base/macro.h"
+#include "link/base/buffer.h"
 #include "link/base/callback/callback.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/net/base/ip_endpoint.h"
@@ -30,8 +31,12 @@ class TcpServer : public Server {
   // Server
   int32_t Listen(const IpEndPoint& address) override;
   int32_t Accept(base::CompletionCallback callback) override;
-  void RegistReadHandler(Server::ReadHandler read_handler) override;
   void Close() override;
+
+  void RegistAcceptHandler(Server::AcceptHandler handler) override;
+  void RegistCloseHandler(Server::CloseHandler handler) override;
+  void RegistReadHandler(Server::ReadHandler handler) override;
+  void RegistWriteHandler(Server::WriteHandler handler) override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
@@ -40,12 +45,19 @@ class TcpServer : public Server {
 
  private:
   void AcceptHandler(std::shared_ptr<Session> session);
-  void ReadHandler(const std::vector<uint8_t>& buffer);
   void CloseHandler(std::shared_ptr<Session> session);
+  void ReadHandler(const base::Buffer& buffer);
+  void WriteHandler(size_t length);
+
   void CloseAllSessions();
 
   std::unique_ptr<Acceptor> acceptor_;
   std::set<std::shared_ptr<Session>> sessions_;
+
+  Server::AcceptHandler accept_handler_;
+  Server::CloseHandler close_handler_;
+  Server::ReadHandler read_handler_;
+  Server::WriteHandler write_handler_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpServer)
 };

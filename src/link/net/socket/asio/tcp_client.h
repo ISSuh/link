@@ -20,16 +20,19 @@ namespace nlink {
 namespace net {
 
 class TcpClient
-  : public Client,
-    public Session::Delegate {
+  : public Client {
  public:
   TcpClient();
   virtual ~TcpClient();
 
   // Client
-  void Connect(IpEndPoint endpoint) override;
+  void Connect(
+    IpEndPoint endpoint,
+    Client::ConnectHandler connect_handler,
+    Client::CloseHandler close_handler) override;
   void DisConnect() override;
-  void Write(const std::vector<uint8_t>& buffer) override;
+  void Write(const base::Buffer& buffer, Client::WriteHandler handler) override;
+  void RegistReadHandler(Client::ReadHandler handler) override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
@@ -37,12 +40,14 @@ class TcpClient
   void HandleEvent(const base::Event& event) override;
 
   // Session::Delegate
-  void OnSessionClose() override;
+  // void OnSessionClose() override;
 
  private:
-  void WriteHandler(std::size_t length);
+  void InternalConnectHandler(std::shared_ptr<ClientSideSession> session);
+  // void WriteHandler(std::size_t length);
 
-  std::unique_ptr<Session> session_;
+  std::unique_ptr<Connector> connector_;
+  std::shared_ptr<ClientSideSession> session_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpClient)
 };

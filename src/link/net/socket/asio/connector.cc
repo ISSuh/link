@@ -18,46 +18,55 @@ namespace net {
 
 class ConnectorImpl;
 
-Connector* Connector::CreateConnector(asio::ip::tcp::socket socket) {
-  return new ConnectorImpl(std::move(socket));
+Connector* Connector::CreateConnector(
+  base::DispatcherConext* dispatcher_context) {
+  void* context_ptr = dispatcher_context->context();
+  if (nullptr == context_ptr) {
+    return nullptr;
+  }
+
+  asio::io_context* io_context = static_cast<asio::io_context*>(context_ptr);
+  return new ConnectorImpl(io_context);
 }
 
 class ConnectorImpl : public Connector {
  public:
-  explicit ConnectorImpl(asio::ip::tcp::socket socket);
+  explicit ConnectorImpl(asio::io_context* io_context);
   virtual ~ConnectorImpl() = default;
 
   void Connect(
-    const IpEndPoint& address, Session::Delegate* delegate) override;
-  void Close() override;
+    const IpEndPoint& address, Connector::ConnectHandler handler) override;
 
  private:
-  void ConnectHnadler(const asio::error_code& error);
+  void InternalConnectHnadler(const asio::error_code& error);
 
   asio::ip::tcp::socket socket_;
-  Session::Delegate* delegate_;
+  Connector::ConnectHandler connect_handler_;
 };
 
-ConnectorImpl::ConnectorImpl(asio::ip::tcp::socket socket)
-  : socket_(std::move(socket)), delegate_(nullptr) {
+ConnectorImpl::ConnectorImpl(asio::io_context* io_context)
+  : socket_(*io_context) {
 }
 
 void ConnectorImpl::Connect(
-  const IpEndPoint& address, Session::Delegate* delegate) {
-  delegate_ = delegate;
+  const IpEndPoint& address, Connector::ConnectHandler handler) {
+  connect_handler_ = handler;
 
   const std::string address_str = address.address().ToString();
   int32_t port = address.port();
 
   asio::ip::tcp::endpoint endpoint(
     asio::ip::address::from_string(address_str), port);
-  socket_.async_connect(endpoint, ConnectHnadler);
+  socket_.async_connect(endpoint, InternalConnectHnadler);
 }
 
-void ConnectorImpl::ConnectHnadler(const asio::error_code& error) {
+void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
+  std::shared_ptr<ClientSideSession> session = nullptr;
+
   if (!error) {
-    // todo
+    session = std::make_shared<ClientSideSession>(std::move(socket_));
   }
+  connect_handler_.Run(session);
 }
 
 }  // namespace net

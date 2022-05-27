@@ -12,7 +12,7 @@
 #include "link/base/callback/callback.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/net/base/ip_endpoint.h"
-#include "link/net/socket/asio/session.h"
+#include "link/net/socket/session.h"
 
 namespace nlink {
 namespace net {
@@ -24,7 +24,7 @@ class Acceptor {
   static Acceptor* CreateAcceptor(base::DispatcherConext* dispatcher_context);
 
   virtual void Listen(const IpEndPoint& address) = 0;
-  virtual void Accept(AcceptorHandler callback) = 0;
+  virtual void Accept(AcceptorHandler handler) = 0;
   virtual void Close() = 0;
 };
 

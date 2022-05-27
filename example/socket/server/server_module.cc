@@ -7,8 +7,9 @@
 #include "server_module.h"
 
 #include <link/handle/link_handle.h>
-#include <link/component/ipc/socket/tcp_server_component.h>
 #include <link/base/logging.h>
+
+#include "example_server.h"
 
 using namespace nlink;
 
@@ -26,12 +27,9 @@ void ExampleServerModule::Run() {
   handle::LinkHandle handle;
   handle.Initialize();
 
-  component::TcpServerComponent* server =
-    component::TcpServerComponent::CreateComponent();
-
-  handle.RegistComponent(server);
-
-  server->Open(address_, port_);
+  ExampleServer server;
+  server.RegistComponent(&handle);
+  server.ServerOpen(address_, port_);
 
   handle.Run();
 }
