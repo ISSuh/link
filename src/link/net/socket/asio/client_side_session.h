@@ -14,6 +14,7 @@
 #include "link/base/buffer.h"
 #include "link/base/callback/callback.h"
 #include "link/net/socket/session.h"
+#include "link/net/socket/handler.h"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
 
 namespace nlink {
@@ -23,33 +24,33 @@ class ClientSideSession
   : public Session,
     public std::enable_shared_from_this<ClientSideSession> {
  public:
-  class Delegate {
-    virtual void OnSessionClose() = 0;
-  };
-
   explicit ClientSideSession(asio::ip::tcp::socket socket);
   ~ClientSideSession();
 
   // Session
-  void Open() override;
+  void Open(
+    handler::ReadHandler read_handler,
+    handler::WriteHandler write_handler,
+    handler::CloseHandler close_handler) override;
   void Close() override;
-  void Write(const base::Buffer& buffer);
+  void Write(const base::Buffer& buffer) override;
+
+  bool IsConnected() const override;
 
  private:
-  void ConnectHandler(const asio::error_code& error);
+  void InternalWriteHandler(std::error_code ec, std::size_t length);
 
-  // void DoWrite(
-    // const std::vector<uint8_t>& buffer, WriteCallback write_callback);
-  // void WriteHandler(
-  //   WriteCallback write_callback, std::error_code ec, std::size_t length);
-
-  // void DoRead();
-  // void ReadHandler(std::error_code ec, std::size_t length);
+  void DoRead();
+  void InternalReadHandler(
+    const std::vector<uint8_t>& buffer,
+    std::error_code ec, std::size_t length);
 
   asio::ip::tcp::socket socket_;
-  Delegate* delegate_;
 
   base::Buffer read_buffer_;
+  handler::ReadHandler read_handler_;
+  handler::WriteHandler write_handler_;
+  handler::CloseHandler close_handler_;
 };
 
 }  // namespace net

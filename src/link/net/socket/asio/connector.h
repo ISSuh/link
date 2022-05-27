@@ -19,13 +19,10 @@ namespace net {
 
 class Connector {
  public:
-  using ConnectHandler =
-    base::Callback<void(std::shared_ptr<ClientSideSession>)>;
-
   static Connector* CreateConnector(base::DispatcherConext* dispatcher_context);
 
   virtual void Connect(
-    const IpEndPoint& address, ConnectHandler handler) = 0;
+    const IpEndPoint& address, handler::ConnectHandler handler) = 0;
 };
 
 }  // namespace net

@@ -23,18 +23,35 @@ TcpClient::TcpClient()
 TcpClient::~TcpClient() {
 }
 
-void TcpClient::Connect(IpEndPoint address) {
+void TcpClient::Connect(
+  IpEndPoint address,
+  handler::ConnectHandler connect_handler,
+  handler::CloseHandler close_handler) {
   if (!session_) {
     return;
   }
-  connector_->Connect(address);
+
+  connect_handler_ = connect_handler;
+  close_handler_ = close_handler_;
+
+  connector_->Connect(address,
+    base::Bind(&TcpClient::InternalConnectHandler, this));
 }
 
-void TcpClient::DisConnect() {
+void TcpClient::Disconnect() {
+  session_->Close();
 }
 
-void TcpClient::Write(const std::vector<uint8_t>& buffer) {
-  // session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
+void TcpClient::Write(const base::Buffer& buffer) {
+  session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
+}
+
+void TcpClient::RegistReadHandler(handler::ReadHandler handler) {
+  read_handler_ = handler;
+}
+
+void TcpClient::RegistWriteHandler(handler::WriteHandler handler) {
+  write_handler_ = handler;
 }
 
 void TcpClient::OpenChannel(base::DispatcherConext* context) {
@@ -45,7 +62,7 @@ void TcpClient::OpenChannel(base::DispatcherConext* context) {
 }
 
 void TcpClient::CloseChannel() {
-  session_->Close();
+  Disconnect();
 }
 
 void TcpClient::HandleEvent(const base::Event& event) {
@@ -59,8 +76,10 @@ void TcpClient::HandleEvent(const base::Event& event) {
 // }
 
 void TcpClient::InternalConnectHandler(
-  std::shared_ptr<ClientSideSession> session) {
-  session_ = session;
+  std::shared_ptr<ClientSideSession> client_session) {
+  session_ = client_session;
+
+  connect_handler_.Run(client_session);
 }
 
 

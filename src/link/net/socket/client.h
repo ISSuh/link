@@ -14,24 +14,22 @@
 #include "link/base/callback/callback.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/session.h"
+#include "link/net/socket/asio/handler.h"
 
 namespace nlink {
 namespace net {
 
 class Client : public base::EventChannel {
  public:
-  using ConnectHandler = base::Callback<void(std::shared_ptr<Session>)>;
-  using CloseHandler = base::Callback<void(std::shared_ptr<Session>)>;
-  using ReadHandler = base::Callback<void(const base::Buffer&)>;
-  using WriteHandler = base::Callback<void(size_t)>;
-
   virtual void Connect(
     IpEndPoint endpoint,
-    ConnectHandler connect_handler, CloseHandler close_handler) = 0;
-  virtual void DisConnect() = 0;
-  virtual void Write(const base::Buffer& buffer, WriteHandler handler) = 0;
+    handler::ConnectHandler connect_handler,
+    handler::CloseHandler close_handler) = 0;
+  virtual void Disconnect() = 0;
+  virtual void Write(const base::Buffer& buffer) = 0;
 
-  virtual void RegistReadHandler(ReadHandler handler) = 0;
+  virtual void RegistReadHandler(handler::ReadHandler handler) = 0;
+  virtual void RegistWriteHandler(handler::WriteHandler handler) = 0;
 };
 
 }  // namespace net

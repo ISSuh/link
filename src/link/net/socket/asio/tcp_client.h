@@ -28,11 +28,12 @@ class TcpClient
   // Client
   void Connect(
     IpEndPoint endpoint,
-    Client::ConnectHandler connect_handler,
-    Client::CloseHandler close_handler) override;
-  void DisConnect() override;
-  void Write(const base::Buffer& buffer, Client::WriteHandler handler) override;
-  void RegistReadHandler(Client::ReadHandler handler) override;
+    handler::ConnectHandler connect_handler,
+    handler::CloseHandler close_handler) override;
+  void Disconnect() override;
+  void Write(const base::Buffer& buffer) override;
+  void RegistReadHandler(handler::ReadHandler handler) override;
+  void RegistWriteHandler(handler::WriteHandler handler) override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
@@ -43,11 +44,17 @@ class TcpClient
   // void OnSessionClose() override;
 
  private:
-  void InternalConnectHandler(std::shared_ptr<ClientSideSession> session);
+  void InternalConnectHandler(
+    std::shared_ptr<ClientSideSession> client_session);
   // void WriteHandler(std::size_t length);
 
   std::unique_ptr<Connector> connector_;
   std::shared_ptr<ClientSideSession> session_;
+
+  handler::ConnectHandler connect_handler_;
+  handler::CloseHandler close_handler_;
+  handler::ReadHandler read_handler_;
+  handler::WriteHandler write_handler_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpClient)
 };
