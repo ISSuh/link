@@ -8,15 +8,33 @@
 #define LINK_COMPONENT_IPC_SOCKET_SOCKET_COMPONENT_H_
 
 #include <string>
+#include <memory>
 
 #include "link/base/macro.h"
 #include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
+#include "link/net/socket/session.h"
 
 namespace nlink {
 namespace component {
 
 class SocketComponent : public LinkComponent {
+ public:
+  class Handler {
+   public:
+    using AcceptHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+    using ConnectHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+    using CloseHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+    using ReadHandler = base::Callback<void(const base::Buffer&)>;
+    using WriteHandler = base::Callback<void(size_t)>;
+
+    AcceptHandler accept_handler;
+    ConnectHandler connect_handler;
+    CloseHandler close_handler;
+    ReadHandler read_handler;
+    WriteHandler write_handler;
+  };
+
  protected:
   SocketComponent() = default;
   virtual ~SocketComponent() = default;

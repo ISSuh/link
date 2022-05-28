@@ -41,7 +41,17 @@ EventDispatcherAsio::~EventDispatcherAsio() {
 void EventDispatcherAsio::Dispatch() {
   asio::io_context* io_context =
     static_cast<asio::io_context*>(context_->context());
-  io_context->run();
+  if (nullptr != io_context) {
+    io_context->run();
+  }
+}
+
+void EventDispatcherAsio::DispatchOnce() {
+  asio::io_context* io_context =
+    static_cast<asio::io_context*>(context_->context());
+  if (nullptr != io_context) {
+    io_context->poll();
+  }
 }
 
 DispatcherConext* EventDispatcherAsio::GetDispatcherConext() {

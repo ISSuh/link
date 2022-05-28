@@ -4,28 +4,24 @@
  *
  */
 
-#include "link/net/socket/asio/client_side_session.h"
+#include "link/net/socket/asio/server_side_session.h"
 
 #include <utility>
 
 #include "link/base/logging.h"
-#include "link/third_party/asio/asio/read.hpp"
 
 namespace nlink {
 namespace net {
 
 const int32_t kMaxPacketSize = 8192;
 
-ClientSideSession::ClientSideSession(asio::ip::tcp::socket socket)
+ServerSideSession::ServerSideSession(asio::ip::tcp::socket socket)
   : socket_(std::move(socket)),
+    // delegate_(delegate),
     read_buffer_(kMaxPacketSize) {
 }
 
-ClientSideSession::~ClientSideSession() {
-  if (socket_.is_open()) {
-    Close();
-  }
-}
+ServerSideSession::~ServerSideSession() {}
 
 void ClientSideSession::Open(
   handler::ReadHandler read_handler,
@@ -34,9 +30,11 @@ void ClientSideSession::Open(
   read_handler_ = read_handler;
   write_handler_ = write_handler;
   close_handler_ = close_handler;
+
+  DoRead();
 }
 
-void ClientSideSession::Close() {
+void ServerSideSession::Close() {
   socket_.close();
 
   close_handler_.Run(shared_from_this());
@@ -48,11 +46,7 @@ void ClientSideSession::Write(const base::Buffer& buffer) {
       std::placeholders::_1, std::placeholders::_2));
 }
 
-bool ClientSideSession::IsConnected() const {
-  return socket_.is_open();
-}
-
-void ClientSideSession::InternalWriteHandler(
+void ServerSideSession::InternalWriteHandler(
   std::error_code ec, std::size_t length) {
   if (ec) {
     return;

@@ -8,7 +8,7 @@
 #ifndef SRC_LINK_BASE_BUFFER_H_
 #define SRC_LINK_BASE_BUFFER_H_
 
-#include <cstdint>
+#include <string>
 #include <vector>
 
 namespace nlink {
@@ -18,7 +18,9 @@ class Buffer {
  public:
   Buffer();
   explicit Buffer(size_t length);
-  Buffer(uint8_t* data, size_t length);
+  explicit Buffer(const std::string& data);
+  explicit Buffer(const std::vector<uint8_t>& data);
+  Buffer(const uint8_t* data, size_t length);
   Buffer(const Buffer& buffer);
   Buffer(Buffer&& buffer);
 
@@ -27,6 +29,8 @@ class Buffer {
   size_t Size() const;
   bool IsEmpty() const;
   void Clear();
+
+  void FromString(const std::string& buffer);
 
   const std::vector<uint8_t>& Data() const;
   const uint8_t* RawData() const;

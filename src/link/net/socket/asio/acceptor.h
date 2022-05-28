@@ -19,12 +19,12 @@ namespace net {
 
 class Acceptor {
  public:
-  using AcceptorHandler = base::Callback<void(std::shared_ptr<Session>)>;
+  using OnAccept = base::Callback<void(std::shared_ptr<net::Session>)>;
 
   static Acceptor* CreateAcceptor(base::DispatcherConext* dispatcher_context);
 
-  virtual void Listen(const IpEndPoint& address) = 0;
-  virtual void Accept(AcceptorHandler handler) = 0;
+  virtual bool Listen(const IpEndPoint& address) = 0;
+  virtual void Accept(OnAccept handler) = 0;
   virtual void Close() = 0;
 };
 

@@ -12,13 +12,15 @@
 #include "link/base/callback/callback.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/net/base/ip_endpoint.h"
-#include "link/net/socket/asio/client_side_session.h"
+#include "link/net/socket/session.h"
 
 namespace nlink {
 namespace net {
 
 class Connector {
  public:
+  using OnConnect = base::Callback<void(std::shared_ptr<net::Session>)>;
+
   static Connector* CreateConnector(base::DispatcherConext* dispatcher_context);
 
   virtual void Connect(

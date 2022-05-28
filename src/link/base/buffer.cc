@@ -18,7 +18,17 @@ Buffer::Buffer(size_t length)
   : raw_buffer_(length) {
 }
 
-Buffer::Buffer(uint8_t* data, size_t length)
+Buffer::Buffer(const std::string& buffer)
+  : Buffer(
+      reinterpret_cast<const uint8_t*>(buffer.data()),
+      buffer.size()) {
+}
+
+Buffer::Buffer(const std::vector<uint8_t>& buffer)
+  : Buffer(buffer.data(), buffer.size()) {
+}
+
+Buffer::Buffer(const uint8_t* data, size_t length)
   : raw_buffer_(data, data + length) {
 }
 
@@ -52,7 +62,6 @@ const std::vector<uint8_t>& Buffer::Data() const {
 const uint8_t* Buffer::RawData() const {
   return raw_buffer_.data();
 }
-
 
 }  // namespace base
 }  // namespace nlink

@@ -6,14 +6,17 @@
 
 #include "client_module.h"
 
-#include <chrono>
+#include <string>
 #include <thread>
+#include <chrono>
 
 #include <link/handle/link_handle.h>
-#include <link/component/ipc/socket/tcp_client_component.h>
 #include <link/base/logging.h>
 
 using namespace nlink;
+
+const int32_t kSecond = 1000;
+const int32_t KSleepInterval = 1 * kSecond;
 
 void ExampleClientModule::Init() {
   LOG(INFO) << "ExampleClientModule::init";
@@ -29,21 +32,17 @@ void ExampleClientModule::Run() {
   handle::LinkHandle handle;
   handle.Initialize();
 
-  component::TcpClientComponent* client =
-    component::TcpClientComponent::CreateComponent();
+  client_.RegistComponent(&handle);
+  client_.Connect(address_, port_);
 
-  handle.RegistComponent(client);
+  int32_t count = 0;
+  while (count < 10) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(KSleepInterval));
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  client->Connect(address_, port_);
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  std::string temp("helloworld");
-  client->Write({temp.begin(), temp.end()});
-
-  handle.Run();
+    std::string message = "test-" + std::to_string(count);
+    client_.Write(message);
+    handle.RunOnce();
+  }
 }
 
 void ExampleClientModule::Shutdown() {

@@ -4,27 +4,27 @@
  *
  */
 
-#ifndef LINK_NET_SOCKET_ASIO_CLIENT_SIDE_SESSION_H_
-#define LINK_NET_SOCKET_ASIO_CLIENT_SIDE_SESSION_H_
+#ifndef LINK_NET_SOCKET_ASIO_SERVER_SIDE_SESSION_H_
+#define LINK_NET_SOCKET_ASIO_SERVER_SIDE_SESSION_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "link/base/buffer.h"
 #include "link/base/callback/callback.h"
+#include "link/net/socket/server.h"
 #include "link/net/socket/session.h"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
 
 namespace nlink {
 namespace net {
 
-class ClientSideSession
+class ServerSideSession
   : public Session,
-    public std::enable_shared_from_this<ClientSideSession> {
+    public std::enable_shared_from_this<ServerSideSession> {
  public:
-  explicit ClientSideSession(asio::ip::tcp::socket socket);
-  ~ClientSideSession();
+  explicit ServerSideSession(asio::ip::tcp::socket socket);
+  ~ServerSideSession();
 
   // Session
   void Open(
@@ -44,6 +44,9 @@ class ClientSideSession
     const std::vector<uint8_t>& buffer,
     std::error_code ec, std::size_t length);
 
+  void DoRead();
+  void ReadHandler(std::error_code ec, std::size_t length);
+
   asio::ip::tcp::socket socket_;
 
   base::Buffer read_buffer_;
@@ -55,4 +58,4 @@ class ClientSideSession
 }  // namespace net
 }  // namespace nlink
 
-#endif  // LINK_NET_SOCKET_ASIO_CLIENT_SIDE_SESSION_H_
+#endif  // LINK_NET_SOCKET_ASIO_SERVER_SIDE_SESSION_H_

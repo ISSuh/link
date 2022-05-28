@@ -13,8 +13,8 @@
 #include "link/base/macro.h"
 #include "link/base/event/event_channel.h"
 #include "link/net/socket/client.h"
+#include "link/net/socket/session.h"
 #include "link/net/socket/asio/connector.h"
-#include "link/net/socket/asio/session.h"
 
 namespace nlink {
 namespace net {
@@ -31,25 +31,24 @@ class TcpClient
     handler::ConnectHandler connect_handler,
     handler::CloseHandler close_handler) override;
   void Disconnect() override;
+  void RegistIOHandler(
+    handler::ReadHandler read_handler,
+    handler::WriteHandler write_handler) override;
   void Write(const base::Buffer& buffer) override;
-  void RegistReadHandler(handler::ReadHandler handler) override;
-  void RegistWriteHandler(handler::WriteHandler handler) override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
   void CloseChannel() override;
   void HandleEvent(const base::Event& event) override;
 
-  // Session::Delegate
-  // void OnSessionClose() override;
-
  private:
-  void InternalConnectHandler(
-    std::shared_ptr<ClientSideSession> client_session);
-  // void WriteHandler(std::size_t length);
+  void InternalConnectHandler(std::shared_ptr<Session> session);
+  void InternalCloseHandler(std::shared_ptr<Session> session);
+  void InternalReadHandler(const base::Buffer& buffer);
+  void InternalWriteHandler(size_t length);
 
   std::unique_ptr<Connector> connector_;
-  std::shared_ptr<ClientSideSession> session_;
+  std::shared_ptr<Session> session_;
 
   handler::ConnectHandler connect_handler_;
   handler::CloseHandler close_handler_;

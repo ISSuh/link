@@ -8,12 +8,22 @@
 
 #include "link/base/logging.h"
 
+using namespace nlink;
+
 ExampleServer::ExampleServer()
-  : server_component_(component::TcpServerComponent::CreateComponent()) {}
+  : handlers_({
+      base::Bind(&ExampleServer::OnAccept, this),
+      component::SocketComponent::Handler::ConnectHandler(),
+      base::Bind(&ExampleServer::OnClose, this),
+      base::Bind(&ExampleServer::OnRead, this),
+      base::Bind(&ExampleServer::OnWrite, this),
+    }),
+    server_component_(
+      component::TcpServerComponent::CreateComponent(handlers_)) {}
 
 ExampleServer::~ExampleServer() = default;
 
-void ExampleServer::RegistComponent(handle::LinkHandle* handle) {
+void ExampleServer::RegistComponent(nlink::handle::LinkHandle* handle) {
   handle->RegistComponent(server_component_);
 }
 
@@ -21,19 +31,22 @@ void ExampleServer::ServerOpen(const std::string& address, int32_t port) {
   server_component_->Open(address, port);
 }
 
-void ExampleServer::OnAccept() {
-
+void ExampleServer::OnAccept(std::shared_ptr<nlink::net::Session> session) {
+  LOG(INFO) << "[ExampleServer::OnAccept]"
+            << " session : " << session.get();
 }
 
-void ExampleServer::OnClose() {
-
+void ExampleServer::OnClose(std::shared_ptr<nlink::net::Session> session) {
+  LOG(INFO) << "[ExampleServer::OnClose]"
+            << " session : " << session.get();
 }
 
-void ExampleServer::OnWrite() {
-
+void ExampleServer::OnRead(const nlink::base::Buffer& buffer) {
+  LOG(INFO) << "[ExampleServer::OnRead]"
+            << " size : " << buffer.Size();
 }
 
-void ExampleServer::OnRead(const base::Buffer& buffer) {
-  std::string temp(buffer.RawData(), buffer.RawData() + buffer.Size());
-  LOG(INFO) << __func__ << " - temp : " << temp << " / size : " << temp.size();
+void ExampleServer::OnWrite(size_t lengeh) {
+  LOG(INFO) << "[ExampleServer::OnWrite]"
+            << " lengeh : " << lengeh;
 }

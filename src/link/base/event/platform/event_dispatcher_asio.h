@@ -21,9 +21,10 @@ class EventDispatcherAsio : public EventDispatcher {
 
   virtual ~EventDispatcherAsio();
 
+  // nlink::base::EventDispatcher
   void Dispatch() override;
+  void DispatchOnce() override;
   DispatcherConext* GetDispatcherConext() override;
-
   void AttachChannel(EventChannel* channel) override;
   void DetatchCahnnel(EventChannel* channel) override;
   void DispatchEvent(const Event& event) override;

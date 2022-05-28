@@ -9,10 +9,12 @@ set(LINK_NET_SRC
   ${LINK_NET_PATH}/base/ip_address.cc
   ${LINK_NET_PATH}/base/ip_endpoint.cc
 
-  ${LINK_NET_PATH}/socket/asio/acceptor.cc
-  ${LINK_NET_PATH}/socket/asio/session.cc
+  ${LINK_NET_PATH}/socket/asio/tcp_session.cc
   ${LINK_NET_PATH}/socket/asio/tcp_server.cc
   ${LINK_NET_PATH}/socket/asio/tcp_client.cc
+  ${LINK_NET_PATH}/socket/asio/acceptor.cc
+  ${LINK_NET_PATH}/socket/asio/connector.cc
+
 )
 
 add_library(${LINK_NET_NAME}

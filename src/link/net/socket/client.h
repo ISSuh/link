@@ -14,7 +14,6 @@
 #include "link/base/callback/callback.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/session.h"
-#include "link/net/socket/asio/handler.h"
 
 namespace nlink {
 namespace net {
@@ -26,10 +25,10 @@ class Client : public base::EventChannel {
     handler::ConnectHandler connect_handler,
     handler::CloseHandler close_handler) = 0;
   virtual void Disconnect() = 0;
+  virtual void RegistIOHandler(
+    handler::ReadHandler read_handler,
+    handler::WriteHandler write_handler) = 0;
   virtual void Write(const base::Buffer& buffer) = 0;
-
-  virtual void RegistReadHandler(handler::ReadHandler handler) = 0;
-  virtual void RegistWriteHandler(handler::WriteHandler handler) = 0;
 };
 
 }  // namespace net

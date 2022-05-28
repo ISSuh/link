@@ -9,8 +9,6 @@
 #include <link/handle/link_handle.h>
 #include <link/base/logging.h>
 
-#include "example_server.h"
-
 using namespace nlink;
 
 void ExampleServerModule::Init() {
@@ -27,9 +25,8 @@ void ExampleServerModule::Run() {
   handle::LinkHandle handle;
   handle.Initialize();
 
-  ExampleServer server;
-  server.RegistComponent(&handle);
-  server.ServerOpen(address_, port_);
+  server_.RegistComponent(&handle);
+  server_.ServerOpen(address_, port_);
 
   handle.Run();
 }

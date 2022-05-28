@@ -16,21 +16,20 @@
 
 class ExampleServer {
  public:
-  using namespace nlink;
-
   ExampleServer();
   ~ExampleServer();
 
-  void RegistComponent(handle::LinkHandle* handle);
+  void RegistComponent(nlink::handle::LinkHandle* handle);
   void ServerOpen(const std::string& address, int32_t port);
 
  private:
-  void OnAccept(std::shared_ptr<net::Session> session);
-  void OnClose(std::shared_ptr<net::Session> session);
+  void OnAccept(std::shared_ptr<nlink::net::Session> session);
+  void OnClose(std::shared_ptr<nlink::net::Session> session);
   void OnWrite(size_t lengeh);
-  void OnRead(const base::Buffer& buffer);
+  void OnRead(const nlink::base::Buffer& buffer);
 
-  component::TcpServerComponent* server_component_;
+  nlink::component::SocketComponent::Handler handlers_;
+  nlink::component::TcpServerComponent* server_component_;
 };
 
 #endif  // EXAMPLE_SOCKET_SERVER_EXAMPLE_SERVER_H_

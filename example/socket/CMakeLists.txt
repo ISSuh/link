@@ -33,6 +33,7 @@ link_directories(
 # Server Example
 add_library(${SERVER_EXAMPLE}
  MODULE
+  server/example_server.cc
   server/server_module.cc
 )
 
@@ -56,6 +57,7 @@ set_target_properties(${SERVER_EXAMPLE}
 # Server Example
 add_library(${CLIENT_EXAMPLE}
  MODULE
+  client/example_client.cc
   client/client_module.cc
 )
 

@@ -15,14 +15,10 @@
 
 namespace nlink {
 namespace net {
-namespace handler {
 
-using ConnectHandler = base::Callback<void(std::shared_ptr<Session>)>;
-using CloseHandler = base::Callback<void(std::shared_ptr<Session>)>;
-using ReadHandler = base::Callback<void(const base::Buffer&)>;
-using WriteHandler = base::Callback<void(size_t)>;
+class Session;
 
-}  // namespace handler
+
 }  // namespace net
 }  // namespace nlink
 

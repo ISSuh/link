@@ -12,8 +12,7 @@
 #include <vector>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_util.h"
-#include "link/base/logging.h"
+#include "link/base/buffer.h"
 #include "link/component/ipc/socket/socket_component.h"
 #include "link/net/socket/client.h"
 
@@ -24,20 +23,31 @@ class RpcComponent;
 
 class TcpClientComponent : public SocketComponent {
  public:
-  static TcpClientComponent* CreateComponent();
+  static TcpClientComponent* CreateComponent(
+    SocketComponent::Handler handlers);
 
   void Connect(const std::string& address, int32_t port);
   void DisConnect();
 
-  void Write(const std::vector<uint8_t>& buffer);
+  void Write(const base::Buffer& buffer);
 
  private:
-  TcpClientComponent();
+  explicit TcpClientComponent(SocketComponent::Handler handlers);
   virtual ~TcpClientComponent();
 
+  // LinkComponent
   base::EventChannel* GetEventChannel() override;
 
+  void InternalConnectHandler(std::shared_ptr<net::Session> session);
+  void InternalCloseHandler(std::shared_ptr<net::Session> session);
+  void InternalReadHandler(const base::Buffer& buffer);
+  void InternalWriteHandler(size_t length);
+
   std::unique_ptr<net::Client> client_;
+  SocketComponent::Handler::ConnectHandler connect_handler_;
+  SocketComponent::Handler::CloseHandler close_handler_;
+  SocketComponent::Handler::ReadHandler read_handler_;
+  SocketComponent::Handler::WriteHandler write_handler_;
 
   DISAALOW_COPY_AND_ASSIGN(TcpClientComponent);
 };

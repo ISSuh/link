@@ -4,7 +4,7 @@
  *
  */
 
-#include "link/net/socket/asio/client_side_session.h"
+#include "link/net/socket/asio/tcp_session.h"
 
 #include <utility>
 
@@ -16,43 +16,41 @@ namespace net {
 
 const int32_t kMaxPacketSize = 8192;
 
-ClientSideSession::ClientSideSession(asio::ip::tcp::socket socket)
+TcpSession::TcpSession(asio::ip::tcp::socket socket)
   : socket_(std::move(socket)),
     read_buffer_(kMaxPacketSize) {
 }
 
-ClientSideSession::~ClientSideSession() {
-  if (socket_.is_open()) {
-    Close();
-  }
-}
+TcpSession::~TcpSession() {}
 
-void ClientSideSession::Open(
+void TcpSession::Open(
   handler::ReadHandler read_handler,
   handler::WriteHandler write_handler,
   handler::CloseHandler close_handler) {
   read_handler_ = read_handler;
   write_handler_ = write_handler;
   close_handler_ = close_handler;
+
+  DoRead();
 }
 
-void ClientSideSession::Close() {
+void TcpSession::Close() {
   socket_.close();
 
   close_handler_.Run(shared_from_this());
 }
 
-void ClientSideSession::Write(const base::Buffer& buffer) {
+void TcpSession::Write(const base::Buffer& buffer) {
   socket_.async_write_some(asio::buffer(buffer.Data()),
-    std::bind(&ClientSideSession::InternalWriteHandler, this,
+    std::bind(&TcpSession::InternalWriteHandler, this,
       std::placeholders::_1, std::placeholders::_2));
 }
 
-bool ClientSideSession::IsConnected() const {
+bool TcpSession::IsConnected() const {
   return socket_.is_open();
 }
 
-void ClientSideSession::InternalWriteHandler(
+void TcpSession::InternalWriteHandler(
   std::error_code ec, std::size_t length) {
   if (ec) {
     return;
@@ -61,18 +59,17 @@ void ClientSideSession::InternalWriteHandler(
   write_handler_.Run(length);
 }
 
-void ClientSideSession::DoRead() {
+void TcpSession::DoRead() {
   std::vector<uint8_t> buffer(kMaxPacketSize);
 
   asio::async_read(socket_, asio::buffer(buffer),
-    std::bind(&ClientSideSession::InternalReadHandler, this,
+    std::bind(&TcpSession::InternalReadHandler, this,
       buffer, std::placeholders::_1, std::placeholders::_2));
 }
 
-void ClientSideSession::InternalReadHandler(
+void TcpSession::InternalReadHandler(
   const std::vector<uint8_t>& buffer, std::error_code ec, std::size_t length) {
-  buffer.resize(length);
-  read_handler_.Run(base::Buffer(buffer.data(), length));
+  read_handler_.Run(base::Buffer(buffer));
   DoRead();
 }
 

@@ -32,7 +32,7 @@ void TcpClient::Connect(
   }
 
   connect_handler_ = connect_handler;
-  close_handler_ = close_handler_;
+  close_handler_ = close_handler;
 
   connector_->Connect(address,
     base::Bind(&TcpClient::InternalConnectHandler, this));
@@ -43,15 +43,17 @@ void TcpClient::Disconnect() {
 }
 
 void TcpClient::Write(const base::Buffer& buffer) {
-  session_->Write(buffer, base::Bind(&TcpClient::WriteHandler, this));
+  if (buffer.IsEmpty()) {
+    return;
+  }
+  session_->Write(buffer);
 }
 
-void TcpClient::RegistReadHandler(handler::ReadHandler handler) {
-  read_handler_ = handler;
-}
-
-void TcpClient::RegistWriteHandler(handler::WriteHandler handler) {
-  write_handler_ = handler;
+void TcpClient::RegistIOHandler(
+  handler::ReadHandler read_handler,
+  handler::WriteHandler write_handler) {
+  read_handler_ = read_handler;
+  write_handler_ = write_handler;
 }
 
 void TcpClient::OpenChannel(base::DispatcherConext* context) {
@@ -68,18 +70,27 @@ void TcpClient::CloseChannel() {
 void TcpClient::HandleEvent(const base::Event& event) {
 }
 
-// void TcpClient::OnSessionClose() {
-// }
+void TcpClient::InternalConnectHandler(std::shared_ptr<Session> session) {
+  session_ = session;
 
-// void TcpClient::WriteHandler(std::size_t length) {
-//   LOG(INFO) << __func__ << " - length : " << length;
-// }
+  session_->Open(
+    base::Bind(&TcpClient::InternalReadHandler, this),
+    base::Bind(&TcpClient::InternalWriteHandler, this),
+    base::Bind(&TcpClient::InternalCloseHandler, this));
 
-void TcpClient::InternalConnectHandler(
-  std::shared_ptr<ClientSideSession> client_session) {
-  session_ = client_session;
+  connect_handler_.Run(session);
+}
 
-  connect_handler_.Run(client_session);
+void TcpClient::InternalCloseHandler(std::shared_ptr<Session> session) {
+  close_handler_.Run(session);
+}
+
+void TcpClient::InternalReadHandler(const base::Buffer& buffer) {
+  read_handler_.Run(buffer);
+}
+
+void TcpClient::InternalWriteHandler(size_t length) {
+  write_handler_.Run(length);
 }
 
 

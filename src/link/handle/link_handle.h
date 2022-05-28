@@ -22,8 +22,8 @@ class LinkHandle {
   ~LinkHandle();
 
   void Initialize();
-  void RunOnce();
   void Run();
+  void RunOnce();
   void Shutdown();
 
   void RegistComponent(component::LinkComponent* component);
