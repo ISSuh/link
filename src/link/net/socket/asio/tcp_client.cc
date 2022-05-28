@@ -8,10 +8,7 @@
 
 #include <utility>
 
-#include "link/base/event/event_dispatcher.h"
 #include "link/base/logging.h"
-#include "link/third_party/asio/asio/io_context.hpp"
-#include "link/third_party/asio/asio/ip/tcp.hpp"
 
 namespace nlink {
 namespace net {
@@ -27,10 +24,6 @@ void TcpClient::Connect(
   IpEndPoint address,
   handler::ConnectHandler connect_handler,
   handler::CloseHandler close_handler) {
-  if (!session_) {
-    return;
-  }
-
   connect_handler_ = connect_handler;
   close_handler_ = close_handler;
 
@@ -39,11 +32,14 @@ void TcpClient::Connect(
 }
 
 void TcpClient::Disconnect() {
+  if (nullptr == session_) {
+    return;
+  }
   session_->Close();
 }
 
 void TcpClient::Write(const base::Buffer& buffer) {
-  if (buffer.IsEmpty()) {
+  if (nullptr == session_ || buffer.IsEmpty()) {
     return;
   }
   session_->Write(buffer);

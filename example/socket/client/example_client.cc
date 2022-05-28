@@ -19,7 +19,8 @@ ExampleClient::ExampleClient()
       base::Bind(&ExampleClient::OnWrite, this),
     }),
     client_component_(
-      component::TcpClientComponent::CreateComponent(handlers_)) {}
+      component::TcpClientComponent::CreateComponent(handlers_)),
+    is_connected(false) {}
 
 ExampleClient::~ExampleClient() = default;
 
@@ -36,9 +37,15 @@ void ExampleClient::Write(const std::string& message) {
   client_component_->Write(buffer);
 }
 
+bool ExampleClient::IsConnected() {
+  return is_connected;
+}
+
 void ExampleClient::OnConnect(std::shared_ptr<nlink::net::Session> session) {
   LOG(INFO) << "[ExampleClient::OnConnect]"
             << " session : " << session.get();
+
+  is_connected = true;
 }
 
 void ExampleClient::OnClose(std::shared_ptr<nlink::net::Session> session) {

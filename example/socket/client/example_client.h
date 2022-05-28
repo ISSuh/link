@@ -23,6 +23,8 @@ class ExampleClient {
   void Connect(const std::string& address, int32_t port);
   void Write(const std::string& message);
 
+  bool IsConnected();
+
  private:
   void OnConnect(std::shared_ptr<nlink::net::Session> session);
   void OnClose(std::shared_ptr<nlink::net::Session> session);
@@ -31,6 +33,7 @@ class ExampleClient {
 
   nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpClientComponent* client_component_;
+  bool is_connected;
 };
 
 #endif  // EXAMPLE_SOCKET_CLIENT_EXAMPLE_CLIENT_H_

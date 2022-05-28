@@ -41,6 +41,7 @@ void TcpSession::Close() {
 }
 
 void TcpSession::Write(const base::Buffer& buffer) {
+  LOG(INFO) << "[TcpSession::Write]";
   socket_.async_write_some(asio::buffer(buffer.Data()),
     std::bind(&TcpSession::InternalWriteHandler, this,
       std::placeholders::_1, std::placeholders::_2));

@@ -15,7 +15,7 @@
 
 using namespace nlink;
 
-const int32_t kSecond = 1000;
+const int32_t kSecond = 100;
 const int32_t KSleepInterval = 1 * kSecond;
 
 void ExampleClientModule::Init() {
@@ -37,11 +37,20 @@ void ExampleClientModule::Run() {
 
   int32_t count = 0;
   while (count < 10) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(KSleepInterval));
+    handle.RunOnce();
 
+    if (!client_.IsConnected()) {
+      LOG(INFO) << "[ExampleClientModule] wait for connect";
+      continue;
+    }
+
+    LOG(INFO) << "[ExampleClientModule] write : ";
     std::string message = "test-" + std::to_string(count);
     client_.Write(message);
-    handle.RunOnce();
+    LOG(INFO) << "[ExampleClientModule] write : " << message;
+
+    ++count;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
 

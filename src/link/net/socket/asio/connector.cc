@@ -9,54 +9,117 @@
 #include <string>
 #include <memory>
 #include <utility>
+#include <chrono>
 
+#include "link/base/logging.h"
 #include "link/net/socket/asio/tcp_session.h"
 #include "link/third_party/asio/asio/io_context.hpp"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
+#include "link/third_party/asio/asio/steady_timer.hpp"
 
 namespace nlink {
 namespace net {
 
+const int32_t kExpireTime = 10;
+
 class ConnectorImpl : public Connector {
  public:
   explicit ConnectorImpl(asio::io_context* io_context);
-  virtual ~ConnectorImpl() = default;
+  virtual ~ConnectorImpl();
 
   void Connect(
     const IpEndPoint& address, Connector::OnConnect handler) override;
 
  private:
   void InternalConnectHnadler(const asio::error_code& error);
+  void CheckingExpired();
 
-  asio::ip::tcp::socket socket_;
+  asio::io_context* io_context_;
+  std::unique_ptr<asio::ip::tcp::socket> socket_;
+
+  IpEndPoint address_;
   Connector::OnConnect on_connect_;
+
+  asio::steady_timer expired_timer_;
+  uint64_t try_connection_count_;
 };
 
 ConnectorImpl::ConnectorImpl(asio::io_context* io_context)
-  : socket_(*io_context) {
+  : io_context_(io_context),
+    socket_(nullptr),
+    expired_timer_(*io_context),
+    try_connection_count_(0) {
+}
+
+ConnectorImpl::~ConnectorImpl() {
+  expired_timer_.cancel();
 }
 
 void ConnectorImpl::Connect(
   const IpEndPoint& address, Connector::OnConnect handler) {
-  on_connect_ = std::move(handler);
+  LOG(INFO) << "[ConnectorImpl::Connect]";
+  address_ = address;
+
+  if (on_connect_.is_null()) {
+    on_connect_ = std::move(handler);
+  }
+
+  if (nullptr == socket_) {
+    socket_.reset(new asio::ip::tcp::socket(*io_context_));
+  }
 
   const std::string address_str = address.address().ToString();
   int32_t port = address.port();
 
   asio::ip::tcp::endpoint endpoint(
     asio::ip::address::from_string(address_str), port);
-  socket_.async_connect(endpoint,
+
+  socket_->async_connect(endpoint,
     std::bind(&ConnectorImpl::InternalConnectHnadler, this,
       std::placeholders::_1));
+
+  expired_timer_.expires_after(std::chrono::seconds(kExpireTime));
+  expired_timer_.async_wait(
+    std::bind(&ConnectorImpl::CheckingExpired, this));
 }
 
 void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
+  LOG(INFO) << "[ConnectorImpl::InternalConnectHnadler]";
   std::shared_ptr<Session> session = nullptr;
+  if (!socket_->is_open()) {
+    LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
+              << " timeout";
+    Connect(address_, on_connect_);
+  } else if (error) {
+    LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
+              << " connect error : " << error.message();
+    Connect(address_, on_connect_);
+  } else {
+    expired_timer_.expires_at(asio::steady_timer::time_point::max());
 
-  if (!error) {
-    session = std::make_shared<TcpSession>(std::move(socket_));
+    session = std::make_shared<TcpSession>(std::move(*socket_));
+    on_connect_.Run(session);
+
+    socket_.reset();
   }
-  on_connect_.Run(session);
+}
+
+void ConnectorImpl::CheckingExpired() {
+  LOG(INFO) << "[ConnectorImpl::CheckingExpired]"
+            << " try_connection_count : " << try_connection_count_;
+
+  if (nullptr == socket_) {
+    return;
+  }
+
+  if (expired_timer_.expiry() <= asio::steady_timer::clock_type::now()) {
+    socket_->cancel();
+    socket_->close();
+    expired_timer_.expires_at(asio::steady_timer::time_point::max());
+  }
+
+  ++try_connection_count_;
+  Connect(address_, on_connect_);
 }
 
 Connector* Connector::CreateConnector(

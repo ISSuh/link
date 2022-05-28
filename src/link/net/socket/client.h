@@ -12,6 +12,7 @@
 
 #include "link/base/buffer.h"
 #include "link/base/callback/callback.h"
+#include "link/base/event/event_channel.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/session.h"
 

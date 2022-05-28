@@ -11,7 +11,8 @@
 #include <vector>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_channel.h"
+#include "link/base/buffer.h"
+#include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/client.h"
 #include "link/net/socket/session.h"
 #include "link/net/socket/asio/connector.h"
