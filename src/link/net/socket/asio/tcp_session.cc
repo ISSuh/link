@@ -35,8 +35,8 @@ void TcpSession::Open(
 }
 
 void TcpSession::Close() {
+  LOG(INFO) << "[TcpSession::Close]";
   socket_.close();
-
   close_handler_.Run(shared_from_this());
 }
 
@@ -61,15 +61,16 @@ void TcpSession::InternalWriteHandler(
 }
 
 void TcpSession::DoRead() {
+  LOG(INFO) << "[TcpSession::DoRead]";
   std::vector<uint8_t> buffer(kMaxPacketSize);
 
-  asio::async_read(socket_, asio::buffer(buffer),
+  socket_.async_read_some(asio::buffer(read_buffer_.TestData())),
     std::bind(&TcpSession::InternalReadHandler, this,
-      buffer, std::placeholders::_1, std::placeholders::_2));
+      std::placeholders::_1, std::placeholders::_2));
 }
 
-void TcpSession::InternalReadHandler(
-  const std::vector<uint8_t>& buffer, std::error_code ec, std::size_t length) {
+void TcpSession::InternalReadHandler(std::error_code ec, std::size_t length) {
+  LOG(INFO) << "[TcpSession::InternalReadHandler] - length : " << length;
   read_handler_.Run(base::Buffer(buffer));
   DoRead();
 }

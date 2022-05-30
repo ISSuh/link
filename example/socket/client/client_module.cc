@@ -38,13 +38,11 @@ void ExampleClientModule::Run() {
   int32_t count = 0;
   while (count < 10) {
     handle.RunOnce();
-
     if (!client_.IsConnected()) {
       LOG(INFO) << "[ExampleClientModule] wait for connect";
       continue;
     }
 
-    LOG(INFO) << "[ExampleClientModule] write : ";
     std::string message = "test-" + std::to_string(count);
     client_.Write(message);
     LOG(INFO) << "[ExampleClientModule] write : " << message;

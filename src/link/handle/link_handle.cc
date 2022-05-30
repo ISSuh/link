@@ -41,7 +41,7 @@ void LinkHandle::RunOnce() {
   if (!event_dispatcher_) {
     return;
   }
-  event_dispatcher_->Dispatch();
+  event_dispatcher_->DispatchOnce();
 }
 
 void LinkHandle::Shutdown() {

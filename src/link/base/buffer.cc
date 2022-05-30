@@ -24,8 +24,8 @@ Buffer::Buffer(const std::string& buffer)
       buffer.size()) {
 }
 
-Buffer::Buffer(const std::vector<uint8_t>& buffer)
-  : Buffer(buffer.data(), buffer.size()) {
+Buffer::Buffer(const std::vector<uint8_t>& buffer) {
+  raw_buffer_ = buffer;
 }
 
 Buffer::Buffer(const uint8_t* data, size_t length)
@@ -61,6 +61,10 @@ const std::vector<uint8_t>& Buffer::Data() const {
 
 const uint8_t* Buffer::RawData() const {
   return raw_buffer_.data();
+}
+
+std::vector<uint8_t> Buffer::TestData() const {
+  return raw_buffer_;
 }
 
 }  // namespace base

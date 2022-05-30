@@ -86,13 +86,18 @@ void ConnectorImpl::Connect(
 void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
   LOG(INFO) << "[ConnectorImpl::InternalConnectHnadler]";
   std::shared_ptr<Session> session = nullptr;
-  if (!socket_->is_open()) {
+  if (nullptr != socket_ && !socket_->is_open()) {
     LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
               << " timeout";
     Connect(address_, on_connect_);
   } else if (error) {
     LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
               << " connect error : " << error.message();
+
+  if (nullptr != socket_) {
+    socket_.reset();
+  }
+
     Connect(address_, on_connect_);
   } else {
     expired_timer_.expires_at(asio::steady_timer::time_point::max());
