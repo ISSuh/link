@@ -24,7 +24,7 @@ class AcceptorImpl : public Acceptor {
   virtual ~AcceptorImpl() = default;
 
   bool Listen(const IpEndPoint& address) override;
-  void Accept(Acceptor::OnAccept callback) override;
+  void Accept(handler::AcceptHandler callback) override;
   void Close() override;
 
  private:
@@ -32,7 +32,7 @@ class AcceptorImpl : public Acceptor {
   void InternalAcceptHandler(std::error_code ec, asio::ip::tcp::socket socket);
 
   asio::ip::tcp::acceptor acceptor_;
-  Acceptor::OnAccept on_accept_;
+  handler::AcceptHandler on_accept_;
 };
 
 AcceptorImpl::AcceptorImpl(asio::io_context* io_context)
@@ -49,7 +49,7 @@ bool AcceptorImpl::Listen(const IpEndPoint& address) {
   return acceptor_.is_open();
 }
 
-void AcceptorImpl::Accept(Acceptor::OnAccept callback) {
+void AcceptorImpl::Accept(handler::AcceptHandler callback) {
   on_accept_ = std::move(callback);
   DoAccept();
 }

@@ -44,7 +44,8 @@ class TcpServer : public Server {
  private:
   void InternalAcceptHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
-  void InternalReadHandler(const base::Buffer& buffer);
+  void InternalReadHandler(
+    const base::Buffer& buffer, std::shared_ptr<net::Session> session);
   void InternalWriteHandler(size_t length);
 
   void CloseAllSessions();

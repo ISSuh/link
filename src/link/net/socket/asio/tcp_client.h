@@ -45,7 +45,8 @@ class TcpClient
  private:
   void InternalConnectHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
-  void InternalReadHandler(const base::Buffer& buffer);
+  void InternalReadHandler(
+    const base::Buffer& buffer, std::shared_ptr<net::Session> session);
   void InternalWriteHandler(size_t length);
 
   std::unique_ptr<Connector> connector_;

@@ -6,6 +6,8 @@
 
 #include "example_client.h"
 
+#include <vector>
+
 #include "link/base/logging.h"
 
 using namespace nlink;
@@ -32,6 +34,10 @@ void ExampleClient::Connect(const std::string& address, int32_t port) {
   client_component_->Connect(address, port);
 }
 
+void ExampleClient::Disconnect() {
+  client_component_->DisConnect();
+}
+
 void ExampleClient::Write(const std::string& message) {
   base::Buffer buffer(message);
   client_component_->Write(buffer);
@@ -53,12 +59,17 @@ void ExampleClient::OnClose(std::shared_ptr<nlink::net::Session> session) {
             << " session : " << session.get();
 }
 
-void ExampleClient::OnRead(const nlink::base::Buffer& buffer) {
+void ExampleClient::OnRead(
+  const nlink::base::Buffer& buffer,
+  std::shared_ptr<nlink::net::Session> session) {
+  const std::vector<uint8_t>& received_data = buffer.Data();
+  std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleClient::OnRead]"
-            << " size : " << buffer.Size();
+            << " received : " << received;
+
 }
 
 void ExampleClient::OnWrite(size_t lengeh) {
-  LOG(INFO) << "[ExampleClient::OnWrite]"
-            << " lengeh : " << lengeh;
+  // LOG(INFO) << "[ExampleClient::OnWrite]"
+  //           << " lengeh : " << lengeh;
 }

@@ -28,7 +28,7 @@ class ConnectorImpl : public Connector {
   virtual ~ConnectorImpl();
 
   void Connect(
-    const IpEndPoint& address, Connector::OnConnect handler) override;
+    const IpEndPoint& address, handler::ConnectHandler handler) override;
 
  private:
   void InternalConnectHnadler(const asio::error_code& error);
@@ -38,7 +38,7 @@ class ConnectorImpl : public Connector {
   std::unique_ptr<asio::ip::tcp::socket> socket_;
 
   IpEndPoint address_;
-  Connector::OnConnect on_connect_;
+  handler::ConnectHandler connect_handler_;
 
   asio::steady_timer expired_timer_;
   uint64_t try_connection_count_;
@@ -56,12 +56,12 @@ ConnectorImpl::~ConnectorImpl() {
 }
 
 void ConnectorImpl::Connect(
-  const IpEndPoint& address, Connector::OnConnect handler) {
+  const IpEndPoint& address, handler::ConnectHandler handler) {
   LOG(INFO) << "[ConnectorImpl::Connect]";
   address_ = address;
 
-  if (on_connect_.is_null()) {
-    on_connect_ = std::move(handler);
+  if (connect_handler_.is_null()) {
+    connect_handler_ = std::move(handler);
   }
 
   if (nullptr == socket_) {
@@ -89,7 +89,7 @@ void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
   if (nullptr != socket_ && !socket_->is_open()) {
     LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
               << " timeout";
-    Connect(address_, on_connect_);
+    Connect(address_, connect_handler_);
   } else if (error) {
     LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
               << " connect error : " << error.message();
@@ -98,12 +98,12 @@ void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
     socket_.reset();
   }
 
-    Connect(address_, on_connect_);
+    Connect(address_, connect_handler_);
   } else {
     expired_timer_.expires_at(asio::steady_timer::time_point::max());
 
     session = std::make_shared<TcpSession>(std::move(*socket_));
-    on_connect_.Run(session);
+    connect_handler_.Run(session);
 
     socket_.reset();
   }
@@ -124,7 +124,7 @@ void ConnectorImpl::CheckingExpired() {
   }
 
   ++try_connection_count_;
-  Connect(address_, on_connect_);
+  Connect(address_, connect_handler_);
 }
 
 Connector* Connector::CreateConnector(

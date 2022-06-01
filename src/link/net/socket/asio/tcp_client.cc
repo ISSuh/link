@@ -81,8 +81,9 @@ void TcpClient::InternalCloseHandler(std::shared_ptr<Session> session) {
   close_handler_.Run(session);
 }
 
-void TcpClient::InternalReadHandler(const base::Buffer& buffer) {
-  read_handler_.Run(buffer);
+void TcpClient::InternalReadHandler(
+  const base::Buffer& buffer, std::shared_ptr<net::Session> session) {
+  read_handler_.Run(buffer, session);
 }
 
 void TcpClient::InternalWriteHandler(size_t length) {

@@ -18,7 +18,16 @@ namespace net {
 
 class Session;
 
+namespace handler {
 
+using AcceptHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+using ConnectHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+using CloseHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+using ReadHandler =
+  base::Callback<void(const base::Buffer&, std::shared_ptr<net::Session>)>;
+using WriteHandler = base::Callback<void(size_t)>;
+
+}  // namespace handler
 }  // namespace net
 }  // namespace nlink
 

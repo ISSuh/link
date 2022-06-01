@@ -19,8 +19,6 @@ namespace net {
 
 class Connector {
  public:
-  using OnConnect = base::Callback<void(std::shared_ptr<net::Session>)>;
-
   static Connector* CreateConnector(base::DispatcherConext* dispatcher_context);
 
   virtual void Connect(

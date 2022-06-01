@@ -53,8 +53,9 @@ void TcpServerComponent::InternalCloseHandler(
   close_handler_.Run(session);
 }
 
-void TcpServerComponent::InternalReadHandler(const base::Buffer& buffer) {
-  read_handler_.Run(buffer);
+void TcpServerComponent::InternalReadHandler(
+  const base::Buffer& buffer, std::shared_ptr<net::Session> session) {
+  read_handler_.Run(buffer, session);
 }
 
 void TcpServerComponent::InternalWriteHandler(size_t length) {

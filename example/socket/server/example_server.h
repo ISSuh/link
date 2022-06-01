@@ -26,7 +26,9 @@ class ExampleServer {
   void OnAccept(std::shared_ptr<nlink::net::Session> session);
   void OnClose(std::shared_ptr<nlink::net::Session> session);
   void OnWrite(size_t lengeh);
-  void OnRead(const nlink::base::Buffer& buffer);
+  void OnRead(
+    const nlink::base::Buffer& buffer,
+    std::shared_ptr<nlink::net::Session> session);
 
   nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpServerComponent* server_component_;

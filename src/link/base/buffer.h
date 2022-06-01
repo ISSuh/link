@@ -35,8 +35,6 @@ class Buffer {
   const std::vector<uint8_t>& Data() const;
   const uint8_t* RawData() const;
 
-  std::vector<uint8_t> TestData() const;
-
  private:
   std::vector<uint8_t> raw_buffer_;
 };

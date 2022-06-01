@@ -25,7 +25,8 @@ class SocketComponent : public LinkComponent {
     using AcceptHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
     using ConnectHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
     using CloseHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
-    using ReadHandler = base::Callback<void(const base::Buffer&)>;
+    using ReadHandler =
+      base::Callback<void(const base::Buffer&, std::shared_ptr<net::Session>)>;
     using WriteHandler = base::Callback<void(size_t)>;
 
     AcceptHandler accept_handler;

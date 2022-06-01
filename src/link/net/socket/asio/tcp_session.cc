@@ -41,7 +41,6 @@ void TcpSession::Close() {
 }
 
 void TcpSession::Write(const base::Buffer& buffer) {
-  LOG(INFO) << "[TcpSession::Write]";
   socket_.async_write_some(asio::buffer(buffer.Data()),
     std::bind(&TcpSession::InternalWriteHandler, this,
       std::placeholders::_1, std::placeholders::_2));
@@ -61,18 +60,22 @@ void TcpSession::InternalWriteHandler(
 }
 
 void TcpSession::DoRead() {
-  LOG(INFO) << "[TcpSession::DoRead]";
   std::vector<uint8_t> buffer(kMaxPacketSize);
 
-  socket_.async_read_some(asio::buffer(read_buffer_.TestData())),
+  socket_.async_read_some(asio::buffer(buffer),
     std::bind(&TcpSession::InternalReadHandler, this,
-      std::placeholders::_1, std::placeholders::_2));
+      std::move(buffer), std::placeholders::_1, std::placeholders::_2));
 }
 
-void TcpSession::InternalReadHandler(std::error_code ec, std::size_t length) {
-  LOG(INFO) << "[TcpSession::InternalReadHandler] - length : " << length;
-  read_handler_.Run(base::Buffer(buffer));
-  DoRead();
+void TcpSession::InternalReadHandler(
+  const std::vector<uint8_t>& buffer,
+  const std::error_code& ec, std::size_t length) {
+  if ((asio::error::eof == ec) || (asio::error::connection_reset == ec)) {
+    close_handler_.Run(shared_from_this());
+  } else {
+    read_handler_.Run(base::Buffer(buffer.data(), length), shared_from_this());
+    DoRead();
+  }
 }
 
 }  // namespace net
