@@ -87,11 +87,11 @@ void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
   LOG(INFO) << "[ConnectorImpl::InternalConnectHnadler]";
   std::shared_ptr<Session> session = nullptr;
   if (nullptr != socket_ && !socket_->is_open()) {
-    LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
+    LOG(WARNING) << "[ConnectorImpl::InternalConnectHnadler]"
               << " timeout";
     Connect(address_, connect_handler_);
   } else if (error) {
-    LOG(WARN) << "[ConnectorImpl::InternalConnectHnadler]"
+    LOG(WARNING) << "[ConnectorImpl::InternalConnectHnadler]"
               << " connect error : " << error.message();
 
   if (nullptr != socket_) {

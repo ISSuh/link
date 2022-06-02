@@ -33,7 +33,7 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
     base::TaskRunner* task_runner =
       CreateTaskRunnerForModule(module_name);
     if (!task_runner) {
-      LOG(WARN) << " Can not create task runner for module. "
+      LOG(WARNING) << " Can not create task runner for module. "
                 << module_name;
       continue;
     }
@@ -54,7 +54,7 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
 void ModuleController::RunningModule() {
   std::vector<std::string > module_names = loader_.ModuleNames();
   if (module_names.empty()) {
-    LOG(WARN) << " Empty module on loader";
+    LOG(WARNING) << " Empty module on loader";
     return;
   }
 
@@ -72,7 +72,7 @@ void ModuleController::Destroy() {
 }
 
 void ModuleController::TerminateModule(const std::string& module_name) {
-  LOG(TRACE) << __func__;
+  VLOG(2) << __func__;
   base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
 
   task_dispatcher->PostTask(module_name,
@@ -91,7 +91,7 @@ base::TaskRunner* ModuleController::CreateTaskRunnerForModule(
 bool ModuleController::CreateModuleExecutor(
   const std::string& module_name, base::TaskRunner* task_runner) {
   if (executors_.find(module_name) != executors_.end()) {
-    LOG(WARN) << " ModuleExecutor already exist. " << module_name;
+    LOG(WARNING) << " ModuleExecutor already exist. " << module_name;
     return false;
   }
 

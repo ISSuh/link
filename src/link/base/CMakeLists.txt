@@ -3,7 +3,6 @@ project(link_base)
 message("Build Link base")
 
 set(LINK_BASE_SRC
-  ${LINK_BASE_PATH}/logging.cc
   ${LINK_BASE_PATH}/time.cc
   ${LINK_BASE_PATH}/json_wrapper.cc
   ${LINK_BASE_PATH}/buffer.cc
@@ -30,4 +29,5 @@ add_library(${LINK_BASE_NAME}
 target_link_libraries(${LINK_BASE_NAME}
  PUBLIC
   pthread
+  ${LINK_THIRDPARTY_GLOG_NAME}
 )

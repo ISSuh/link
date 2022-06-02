@@ -22,7 +22,7 @@ bool ModuleLoader::LoadModule(
 
   const std::string module_name = spec.module_name();
   if (modules_.find(module_name) != modules_.end()) {
-    LOG(WARN) << __func__ << " - already loaded " << module_name;
+    LOG(WARNING) << __func__ << " - already loaded " << module_name;
     return false;
   }
 

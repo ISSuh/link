@@ -22,7 +22,7 @@ TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
 TaskExecutor::~TaskExecutor() = default;
 
 void TaskExecutor::Join() {
-  LOG(TRACE) << __func__;
+  VLOG(2) << __func__;
   if (worker_.joinable()) {
     worker_.join();
   }

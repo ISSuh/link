@@ -11,7 +11,7 @@
 namespace nlink {
 
 static bool active_logging = true;
-static LogLevel system_log_level = LogLevel::INFO;
+static LogLevel system_log_level = INFO;
 
 void ActiveLogging() {
   active_logging = true;
@@ -56,7 +56,7 @@ LOG::LogColorCode LOG::SelectLogColor(LogLevel level) {
   case LogLevel::WARN:
     color = LogColorCode::YELLOW;
     break;
-  case LogLevel::INFO:
+  case INFO:
     color = LogColorCode::GREEN;
     break;
   case LogLevel::DEBUG:
@@ -78,7 +78,7 @@ std::string LOG::LogLevelToStr(LogLevel level) {
   case LogLevel::WARN:
     label = "WARN";
     break;
-  case LogLevel::INFO:
+  case INFO:
     label = "INFO";
     break;
   case LogLevel::DEBUG:

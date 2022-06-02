@@ -108,7 +108,7 @@ NetError SystemErrorToNetError(int32_t os_error) {
     case 0:
       return OK;
     default:
-      LOG(WARN) << "Unknown error " << strerror(errno)
+      LOG(WARNING) << "Unknown error " << strerror(errno)
                 << " (" << strerror(errno)
                 << ") mapped to net::ERR_FAILED";
       return ERR_FAILED;

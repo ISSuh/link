@@ -9,8 +9,9 @@
 
 #include <string>
 
-#include "link/module/base/module_client.h"
+#include "link/base/logging.h"
 #include "link/base/json_wrapper.h"
+#include "link/module/base/module_client.h"
 
 namespace nlink {
 namespace module {
@@ -31,6 +32,7 @@ class UserModuleBase {
   const std::string module_name_;
   bool running_state_;
   ModuleClient* client_;
+  base::LinkLogger logger_;
 };
 
 }  // namespace module

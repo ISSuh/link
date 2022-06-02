@@ -27,7 +27,7 @@ ConcurrentTaskRunner::~ConcurrentTaskRunner() = default;
 
 void ConcurrentTaskRunner::PostDelayTask(
   const TaskCallback& task_callback, TimeTick delay) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.push(Task(task_callback, delay));
@@ -36,7 +36,7 @@ void ConcurrentTaskRunner::PostDelayTask(
 }
 
 void ConcurrentTaskRunner::StopRunner() {
-  LOG(LogLevel::INFO) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     running_ = false;
@@ -45,7 +45,7 @@ void ConcurrentTaskRunner::StopRunner() {
 }
 
 void ConcurrentTaskRunner::WiatForTerminateWorkers() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
   for (auto iter = executors_.begin() ; iter != executors_.end();) {
     TaskExecutor* executor = iter->second.get();
     executor->Join();
@@ -56,7 +56,7 @@ void ConcurrentTaskRunner::WiatForTerminateWorkers() {
 }
 
 std::vector<uint64_t> ConcurrentTaskRunner::WorkersIdLists() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
   std::vector<uint64_t> id_lists;
   for (auto& excutor : executors_) {
     uint64_t id = excutor.first;
@@ -70,25 +70,25 @@ bool ConcurrentTaskRunner::IsRunning() {
 }
 
 void ConcurrentTaskRunner::OnStartWorker(uint64_t id) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] "
+  VLOG(2) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void ConcurrentTaskRunner::OnTerminateWorker(uint64_t id) {
-  LOG(LogLevel::TRACE) << "[" << label() << "] "
+  VLOG(2) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void ConcurrentTaskRunner::OnStartTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
 }
 
 void ConcurrentTaskRunner::OnDidFinishTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
 }
 
 Task ConcurrentTaskRunner::NextTask() {
-  LOG(LogLevel::TRACE) << "[" << label() << "] " << __func__;
+  VLOG(2) << "[" << label() << "] " << __func__;
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {

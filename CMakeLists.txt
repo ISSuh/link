@@ -46,6 +46,7 @@ set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
 # Install thidparty
 #-------------------------------------------------------------------------------
 set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
+set(LINK_THIRDPARTY_NAME "")
 
 # asio
 include_directories(
@@ -57,12 +58,21 @@ add_definitions(-DASIO_STANDALONE)
 # glog
 include(cmake/glog.cmake)
 
-message(PROJECT_BINARY_DIR : ${PROJECT_BINARY_DIR})
+set(LINK_THIRDPARTY_GLOG_PATH ${LINK_THIRDPATRY_PATH}/glog)
+
+set(THIRDPARTY_GLOG_BUILD_DIR "")
 
 fetch_glog(
+    ${LINK_THIRDPARTY_GLOG_PATH}
     ${PROJECT_SOURCE_DIR}/cmake
     ${PROJECT_BINARY_DIR}/glog
 )
+
+link_directories(
+  ${PROJECT_BINARY_DIR}/glog/glog-build
+)
+  
+set(LINK_THIRDPARTY_GLOG_NAME glog)
 
 #-------------------------------------------------------------------------------
 # Build Link
@@ -96,6 +106,7 @@ target_link_libraries(${LINK_LIBRARY_NAME}
   ${LINK_NET_NAME}
   ${LINK_COMPONENT_NAME}
   ${LINK_HANDLE_NAME}
+  ${LINK_THIRDPARTY_GLOG_NAME}
 )
 
 set_target_properties(${LINK_LIBRARY_NAME}
