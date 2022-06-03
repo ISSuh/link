@@ -29,5 +29,5 @@ add_library(${LINK_BASE_NAME}
 target_link_libraries(${LINK_BASE_NAME}
  PUBLIC
   pthread
-  ${LINK_THIRDPARTY_GLOG_NAME}
+  ${LINK_THIRDPARTY_LIBS}
 )

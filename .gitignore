@@ -35,3 +35,8 @@
 build/*
 
 .vscode*
+
+# Third Party
+src/link/third_party/json
+src/link/third_party/glog
+src/link/third_party/asio

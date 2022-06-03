@@ -3,13 +3,13 @@
 # download and unpack googletest at configure time
 
 macro(fetch_thridparty _third_party_dir _download_module_path _download_root)
-  set(GLOG_DOWNLOAD_ROOT ${_download_root})
+  set(ASIO_DOWNLOAD_ROOT ${_download_root})
   configure_file(
-    ${_download_module_path}/glog-fetch.cmake
+    ${_download_module_path}/asio-fetch.cmake
     ${_download_root}/CMakeLists.txt
     @ONLY
   )
-  unset(GLOG_DOWNLOAD_ROOT)
+  unset(ASIO_DOWNLOAD_ROOT)
 
   execute_process(
     COMMAND
@@ -25,13 +25,16 @@ macro(fetch_thridparty _third_party_dir _download_module_path _download_root)
       ${_download_root}
   )
 
-  file(COPY ${_download_root}/glog-install/include/glog DESTINATION ${_third_party_dir})
+  file(GLOB ASIO_INCLUDES
+    "${_download_root}/asio-install/include/*.hpp"
+    "${_download_root}/asio-install/include/asio"
+  )
+
+  file(COPY ${ASIO_INCLUDES} DESTINATION ${_third_party_dir}/asio)
 
   include_directories(
-    ${_third_party_dir}
+    ${_third_party_dir}/asio
   )
 
-  link_directories(
-    ${PROJECT_BINARY_DIR}/glog/glog-install/lib
-  )
+  add_definitions(-DASIO_STANDALONE)
 endmacro()

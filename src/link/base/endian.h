@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+namespace nlink {
 namespace base {
 
 // Returns a value with all bytes in |x| swapped, i.e. reverses the endianness.
@@ -108,5 +109,6 @@ inline uint64_t HostToNet64(uint64_t x) {
 }
 
 }  // namespace base
+}  // namespace nlink
 
 #endif  // LINK_BASE_ENDIAN_H_

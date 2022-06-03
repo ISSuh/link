@@ -46,33 +46,28 @@ set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
 # Install thidparty
 #-------------------------------------------------------------------------------
 set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
-set(LINK_THIRDPARTY_NAME "")
 
-# asio
-include_directories(
-  ${LINK_THIRDPATRY_PATH}/asio
+set(LINK_THIRD_PARTY_LIST
+  json
+  asio
+  glog
 )
 
-add_definitions(-DASIO_STANDALONE)
+foreach(third_party ${LINK_THIRD_PARTY_LIST})
+  if (EXISTS not ${LINK_THIRDPATRY_PATH}/${third_party})
+    include(${PROJECT_DIR}/cmake/${third_party}.cmake)
+    
+    fetch_thridparty(
+      ${LINK_THIRDPATRY_PATH}
+      ${PROJECT_DIR}/cmake
+      ${BUILD_DIR}/${third_party}
+    )
+  endif()
+endforeach()
 
-# glog
-include(cmake/glog.cmake)
-
-set(LINK_THIRDPARTY_GLOG_PATH ${LINK_THIRDPATRY_PATH}/glog)
-
-set(THIRDPARTY_GLOG_BUILD_DIR "")
-
-fetch_glog(
-    ${LINK_THIRDPARTY_GLOG_PATH}
-    ${PROJECT_SOURCE_DIR}/cmake
-    ${PROJECT_BINARY_DIR}/glog
+set(LINK_THIRDPARTY_LIBS
+  glog
 )
-
-link_directories(
-  ${PROJECT_BINARY_DIR}/glog/glog-build
-)
-  
-set(LINK_THIRDPARTY_GLOG_NAME glog)
 
 #-------------------------------------------------------------------------------
 # Build Link

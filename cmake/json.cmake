@@ -3,13 +3,13 @@
 # download and unpack googletest at configure time
 
 macro(fetch_thridparty _third_party_dir _download_module_path _download_root)
-  set(GLOG_DOWNLOAD_ROOT ${_download_root})
+  set(JSON_DOWNLOAD_ROOT ${_download_root})
   configure_file(
-    ${_download_module_path}/glog-fetch.cmake
+    ${_download_module_path}/json-fetch.cmake
     ${_download_root}/CMakeLists.txt
     @ONLY
   )
-  unset(GLOG_DOWNLOAD_ROOT)
+  unset(JSON_DOWNLOAD_ROOT)
 
   execute_process(
     COMMAND
@@ -25,13 +25,9 @@ macro(fetch_thridparty _third_party_dir _download_module_path _download_root)
       ${_download_root}
   )
 
-  file(COPY ${_download_root}/glog-install/include/glog DESTINATION ${_third_party_dir})
-
-  include_directories(
-    ${_third_party_dir}
+  file(GLOB JSON_INCLUDES
+    "${_download_root}/json-install/include/nlohmann/*.hpp"
   )
 
-  link_directories(
-    ${PROJECT_BINARY_DIR}/glog/glog-install/lib
-  )
+  file(COPY ${JSON_INCLUDES} DESTINATION ${_third_party_dir}/json)
 endmacro()
