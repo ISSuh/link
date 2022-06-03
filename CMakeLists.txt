@@ -54,7 +54,7 @@ set(LINK_THIRD_PARTY_LIST
 )
 
 foreach(third_party ${LINK_THIRD_PARTY_LIST})
-  if (EXISTS not ${LINK_THIRDPATRY_PATH}/${third_party})
+  if (NOT EXISTS ${LINK_THIRDPATRY_PATH}/${third_party})
     include(${PROJECT_DIR}/cmake/${third_party}.cmake)
     
     fetch_thridparty(
