@@ -24,7 +24,7 @@ namespace module {
 class ModuleController
   : public ModuleExecutor::ModuleExecutorClient {
  public:
-  explicit ModuleController(base::TaskManager* task_manager);
+  explicit ModuleController(std::shared_ptr<base::TaskManager> task_manager_);
   ~ModuleController();
 
   bool LoadingModule(const std::vector<Specification>& specs);
@@ -32,14 +32,16 @@ class ModuleController
   void Destroy();
 
   // ModuleExecutorClient
-  void TerminateModule(const std::string& module_name);
+  void TerminateModule(const std::string& module_name) override;
 
  private:
   base::TaskRunner* CreateTaskRunnerForModule(const std::string& module_name);
   bool CreateModuleExecutor(
     const std::string& module_name, base::TaskRunner* task_runner);
 
-  base::TaskManager* task_manager_;
+  std::shared_ptr<base::TaskManager> task_manager_;
+  base::TaskRunner* controller_task_runner_;
+
   ModuleLoader loader_;
   std::map<std::string, std::unique_ptr<ModuleExecutor>> executors_;
 

@@ -13,6 +13,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
+#include "link/base/task/task_runner.h"
 #include "link/base/callback/callback.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/server.h"
@@ -23,7 +24,7 @@ namespace net {
 
 class TcpServer : public Server {
  public:
-  TcpServer();
+  explicit TcpServer(base::TaskRunner* task_runner);
   virtual ~TcpServer();
 
   // Server
@@ -49,6 +50,8 @@ class TcpServer : public Server {
   void InternalWriteHandler(size_t length);
 
   void CloseAllSessions();
+
+  base::TaskRunner* task_runner_;
 
   std::unique_ptr<Acceptor> acceptor_;
   std::set<std::shared_ptr<Session>> sessions_;

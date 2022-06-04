@@ -20,13 +20,17 @@ ExampleClient::ExampleClient()
       base::Bind(&ExampleClient::OnRead, this),
       base::Bind(&ExampleClient::OnWrite, this),
     }),
-    client_component_(
-      component::TcpClientComponent::CreateComponent(handlers_)),
+    client_component_(nullptr),
     is_connected(false) {}
 
 ExampleClient::~ExampleClient() = default;
 
-void ExampleClient::RegistComponent(nlink::handle::LinkHandle* handle) {
+void ExampleClient::CreateAndRegistComponent(
+  nlink::base::TaskRunner* task_runner,
+  nlink::handle::LinkHandle* handle) {
+  client_component_ =
+    component::TcpClientComponent::CreateComponent(task_runner, handlers_);
+
   handle->RegistComponent(client_component_);
 }
 
@@ -65,7 +69,7 @@ void ExampleClient::OnRead(
   const std::vector<uint8_t>& received_data = buffer.Data();
   std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleClient::OnRead]"
-            << " received : " << received;
+            << " received : " << buffer.Size();
 
 }
 

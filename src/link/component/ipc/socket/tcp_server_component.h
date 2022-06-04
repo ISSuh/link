@@ -12,6 +12,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
+#include "link/base/task/task_runner.h"
 #include "link/component/ipc/socket/socket_component.h"
 #include "link/net/socket/server.h"
 
@@ -23,6 +24,7 @@ class SocketComponent;
 class TcpServerComponent : public SocketComponent {
  public:
   static TcpServerComponent* CreateComponent(
+    base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
 
   void Open(const std::string& address, int32_t port);
@@ -32,7 +34,8 @@ class TcpServerComponent : public SocketComponent {
   base::EventChannel* GetEventChannel() override;
 
   // LinkComponent
-  explicit TcpServerComponent(SocketComponent::Handler handlers);
+  explicit TcpServerComponent(
+    base::TaskRunner* task_runner, SocketComponent::Handler handlers);
   virtual ~TcpServerComponent();
 
   void InternalAcceptHandler(std::shared_ptr<net::Session> session);

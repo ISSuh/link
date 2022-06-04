@@ -14,8 +14,8 @@
 namespace nlink {
 namespace net {
 
-TcpServer::TcpServer()
-  : acceptor_(nullptr) {
+TcpServer::TcpServer(base::TaskRunner* task_runner)
+  : task_runner_(task_runner), acceptor_(nullptr) {
 }
 
 TcpServer::~TcpServer() {

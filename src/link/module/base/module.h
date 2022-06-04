@@ -10,10 +10,11 @@
 #include <string>
 #include <memory>
 
-#include "link/module/base/module_client.h"
-#include "link/module/base/specification.h"
 #include "link/base/macro.h"
 #include "link/base/json_wrapper.h"
+#include "link/base/task/task_runner.h"
+#include "link/module/base/module_client.h"
+#include "link/module/base/specification.h"
 
 namespace nlink {
 namespace module {
@@ -28,7 +29,9 @@ class LinkModule {
   virtual ~LinkModule() = default;
 
   static LinkModulePtr CreateModule(
-    ModuleClient* client, const Specification& spec);
+    base::TaskRunner* task_runner,
+    ModuleClient* client,
+    const Specification& spec);
   const Specification ModuleSpecification() const;
 
   virtual void Initialize() = 0;
@@ -43,24 +46,6 @@ class LinkModule {
 
   DISAALOW_COPY_AND_ASSIGN(LinkModule)
 };
-
-// class ModulePtr {
-//  public:
-//   ModulePtr(Module* module);
-//   virtual ~ModulePtr() = default;
-
-//   ModulePtr(const ModulePtr& module_ptr);
-//   ModulePtr(ModulePtr&& module_ptr);
-
-//   ModulePtr& operator=(const ModulePtr& module_ptr);
-//   ModulePtr& operator=(ModulePtr&& module_ptr);
-
-//  private:
-//   void ModuleDeleter(Module* module);
-
-//   std::function<void(Module*)> deleter_;
-//   std::unique_ptr<Module, std::function<void(Module*)>> module_;
-// };
 
 }  // namespace module
 }  // namespace nlink

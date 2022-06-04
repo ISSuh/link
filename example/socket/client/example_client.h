@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <link/base/buffer.h>
+#include <link/base/task/task_runner.h>
 #include <link/handle/link_handle.h>
 #include <link/component/ipc/socket/tcp_client_component.h>
 
@@ -19,7 +20,9 @@ class ExampleClient {
   ExampleClient();
   ~ExampleClient();
 
-  void RegistComponent(nlink::handle::LinkHandle* handle);
+  void CreateAndRegistComponent(
+    nlink::base::TaskRunner* task_runner,
+    nlink::handle::LinkHandle* handle);
   void Connect(const std::string& address, int32_t port);
   void Disconnect();
   void Write(const std::string& message);

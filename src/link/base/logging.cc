@@ -6,12 +6,17 @@
 
 #include "link/base/logging.h"
 
+#include <string>
+
 #include "link/base/time.h"
+#include "link/third_party/spdlog/spdlog.h"
+#include "link/third_party/spdlog/sinks/stdout_color_sinks.h"
+#include "link/third_party/spdlog/sinks/basic_file_sink.h"
 
 namespace nlink {
 
 static bool active_logging = true;
-static LogLevel system_log_level = INFO;
+static LogLevel system_log_level = LogLevel::INFO;
 
 void ActiveLogging() {
   active_logging = true;
@@ -30,16 +35,26 @@ LogLevel GetLogLevel() {
 }
 
 LOG::LOG(LogLevel level) : log_level_(level) {
-  if (CanPrintLog()) {
-    buffer_ << "\033[" << SelectLogColor(level) << "m"
-            << "[" << DateToStr() << "][" << LogLevelToStr(level) << "] : ";
-  }
+  spdlog::set_pattern("[%H:%M:%S:%e:%f][%P:%t][%^%L%$] %v");
 }
 
 LOG::~LOG() {
-  if (CanPrintLog()) {
-    buffer_ << std::endl;
-    std::cerr << buffer_.str();
+  switch (log_level_) {
+    case LogLevel::ERROR:
+      SPDLOG_ERROR("{}", buffer_.str());
+      break;
+    case LogLevel::WARNING:
+      SPDLOG_WARN("{}", buffer_.str());
+      break;
+    case LogLevel::INFO:
+      SPDLOG_INFO("{}", buffer_.str());
+      break;
+    case LogLevel::DEBUG:
+      SPDLOG_DEBUG("{}", buffer_.str());
+      break;
+    case LogLevel::TRACE:
+      SPDLOG_TRACE("{}", buffer_.str());
+      break;
   }
 }
 
@@ -53,10 +68,10 @@ LOG::LogColorCode LOG::SelectLogColor(LogLevel level) {
   case LogLevel::ERROR:
     color = LogColorCode::RED;
     break;
-  case LogLevel::WARN:
+  case LogLevel::WARNING:
     color = LogColorCode::YELLOW;
     break;
-  case INFO:
+  case LogLevel::INFO:
     color = LogColorCode::GREEN;
     break;
   case LogLevel::DEBUG:
@@ -75,10 +90,10 @@ std::string LOG::LogLevelToStr(LogLevel level) {
   case LogLevel::ERROR:
     label = "ERROR";
     break;
-  case LogLevel::WARN:
-    label = "WARN";
+  case LogLevel::WARNING:
+    label = "WARNING";
     break;
-  case INFO:
+  case LogLevel::INFO:
     label = "INFO";
     break;
   case LogLevel::DEBUG:
@@ -95,4 +110,35 @@ std::string LOG::DateToStr() {
   return base::Time::CurrentTimeToDateStr();
 }
 
+namespace base {
+
+class LoggerImpl {
+ public:
+  explicit LoggerImpl(const std::string& name);
+  ~LoggerImpl();
+
+ private:
+  std::string name_;
+
+  std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink_;
+  std::shared_ptr<spdlog::sinks::basic_file_sink_mt> file_sink_;
+
+};
+
+LoggerImpl::LoggerImpl(const std::string& name)
+  : name_(name) {
+
+}
+
+LoggerImpl::~LoggerImpl() {
+}
+
+Logger::Logger(const std::string& name)
+  : logger_impl_(new LoggerImpl(name)) {
+
+}
+
+Logger::~Logger() = default;
+
+}  // namespace base
 }  // namespace nlink

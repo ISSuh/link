@@ -21,7 +21,7 @@ namespace base {
 
 class TaskDispatcher;
 
-class TaskManager {
+class TaskManager : public std::enable_shared_from_this<TaskManager> {
  public:
   TaskManager();
   ~TaskManager();

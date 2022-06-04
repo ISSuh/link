@@ -9,10 +9,10 @@
 
 #include <string>
 
+#include "link/base/macro.h"
+#include "link/base/task/task_runner.h"
 #include "link/module/base/module.h"
 #include "link/module/base/user_module_base.h"
-#include "link/base/task/task_runner.h"
-#include "link/base/macro.h"
 
 namespace nlink {
 namespace module {
@@ -27,7 +27,7 @@ class ModuleExecutor
 
   explicit ModuleExecutor(
     base::TaskRunner* task_runner,
-    ModuleExecutorClient* client);
+    ModuleExecutorClient* excutor_client);
   ~ModuleExecutor();
 
   void RunningModule(LinkModule* module);
@@ -39,7 +39,7 @@ class ModuleExecutor
 
  private:
   base::TaskRunner* task_runner_;
-  ModuleExecutorClient* client_;
+  ModuleExecutorClient* excutor_client_;
 
   LinkModule* module_;
 

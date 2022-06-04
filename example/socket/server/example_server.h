@@ -11,15 +11,18 @@
 #include <memory>
 
 #include <link/base/buffer.h>
+#include <link/base/task/task_runner.h>
 #include <link/handle/link_handle.h>
 #include <link/component/ipc/socket/tcp_server_component.h>
 
 class ExampleServer {
  public:
-  ExampleServer();
+  explicit ExampleServer();
   ~ExampleServer();
 
-  void RegistComponent(nlink::handle::LinkHandle* handle);
+  void CreateAndRegistComponent(
+    nlink::base::TaskRunner* task_runner,
+    nlink::handle::LinkHandle* handle);
   void ServerOpen(const std::string& address, int32_t port);
 
  private:

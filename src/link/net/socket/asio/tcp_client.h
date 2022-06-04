@@ -12,6 +12,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
+#include "link/base/task/task_runner.h"
 #include "link/net/base/ip_endpoint.h"
 #include "link/net/socket/client.h"
 #include "link/net/socket/session.h"
@@ -23,7 +24,7 @@ namespace net {
 class TcpClient
   : public Client {
  public:
-  TcpClient();
+  explicit TcpClient(base::TaskRunner* task_runner);
   virtual ~TcpClient();
 
   // Client
@@ -48,6 +49,8 @@ class TcpClient
   void InternalReadHandler(
     const base::Buffer& buffer, std::shared_ptr<net::Session> session);
   void InternalWriteHandler(size_t length);
+
+  base::TaskRunner* task_runner_;
 
   std::unique_ptr<Connector> connector_;
   std::shared_ptr<Session> session_;

@@ -14,11 +14,12 @@
 namespace nlink {
 namespace net {
 
-const int32_t kMaxPacketSize = 8192;
+const int32_t kDefaultMaxPacketSize = 8192;
 
 TcpSession::TcpSession(asio::ip::tcp::socket socket)
   : socket_(std::move(socket)),
-    read_buffer_(kMaxPacketSize) {
+    max_packet_size_(kDefaultMaxPacketSize),
+    raw_read_buffer(max_packet_size_) {
 }
 
 TcpSession::~TcpSession() {}
@@ -36,13 +37,13 @@ void TcpSession::Open(
 
 void TcpSession::Close() {
   LOG(INFO) << "[TcpSession::Close]";
-  socket_.close();
   close_handler_.Run(shared_from_this());
+  socket_.close();
 }
 
 void TcpSession::Write(const base::Buffer& buffer) {
   socket_.async_write_some(asio::buffer(buffer.Data()),
-    std::bind(&TcpSession::InternalWriteHandler, this,
+    std::bind(&TcpSession::InternalWriteHandler, shared_from_this(),
       std::placeholders::_1, std::placeholders::_2));
 }
 
@@ -60,20 +61,18 @@ void TcpSession::InternalWriteHandler(
 }
 
 void TcpSession::DoRead() {
-  std::vector<uint8_t> buffer(kMaxPacketSize);
-
-  socket_.async_read_some(asio::buffer(buffer),
-    std::bind(&TcpSession::InternalReadHandler, this,
-      std::move(buffer), std::placeholders::_1, std::placeholders::_2));
+  socket_.async_read_some(asio::buffer(raw_read_buffer),
+    std::bind(&TcpSession::InternalReadHandler, shared_from_this(),
+      std::placeholders::_1, std::placeholders::_2));
 }
 
 void TcpSession::InternalReadHandler(
-  const std::vector<uint8_t>& buffer,
   const std::error_code& ec, std::size_t length) {
   if ((asio::error::eof == ec) || (asio::error::connection_reset == ec)) {
-    close_handler_.Run(shared_from_this());
+    Close();
   } else {
-    read_handler_.Run(base::Buffer(buffer.data(), length), shared_from_this());
+    base::Buffer buff(raw_read_buffer);
+    read_handler_.Run(std::move(buff), shared_from_this());
     DoRead();
   }
 }

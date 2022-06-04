@@ -10,7 +10,8 @@ namespace nlink {
 namespace node {
 
 LinkNode::LinkNode()
-  : controller_(nullptr) {
+  : controller_(nullptr),
+    task_manager_(std::make_shared<base::TaskManager>()) {
 }
 
 LinkNode::~LinkNode() {
@@ -29,11 +30,11 @@ bool LinkNode::Init(int32_t argc, char *argv[]) {
 
 void LinkNode::Run() {
   controller_->RunningModule();
-  task_manager_.WaitForTerminateAllTaskRunner();
+  task_manager_->WaitForTerminateAllTaskRunner();
 }
 
 bool LinkNode::CreateModuleControllerAndLoadModules() {
-  controller_.reset(new module::ModuleController(&task_manager_));
+  controller_.reset(new module::ModuleController(task_manager_));
 
   if (!controller_->LoadingModule(args_.module_specs())) {
     return false;

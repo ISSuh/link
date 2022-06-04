@@ -25,7 +25,14 @@ UserModule::UserModule(
 UserModule::~UserModule() {
 }
 
-void UserModule::Initialize(const base::Json& arguments) {
+base::TaskRunner* UserModule::GetTaskRunner() const {
+  return task_runner_;
+}
+
+void UserModule::Initialize(
+  base::TaskRunner* task_runner, const base::Json& arguments) {
+  task_runner_ = task_runner;
+
   arguments_ = arguments;
   running_state_ = true;
   Init();

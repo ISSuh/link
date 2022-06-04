@@ -28,7 +28,7 @@ class LinkNode {
  private:
   bool CreateModuleControllerAndLoadModules();
 
-  base::TaskManager task_manager_;
+  std::shared_ptr<base::TaskManager> task_manager_;
   std::unique_ptr<module::ModuleController> controller_;
   Arguments args_;
 

@@ -39,15 +39,17 @@ class TcpSession
   void InternalWriteHandler(std::error_code ec, std::size_t length);
 
   void DoRead();
-  void InternalReadHandler(
-    const std::vector<uint8_t>& buffer, const std::error_code& ec, std::size_t length);
+  void InternalReadHandler(const std::error_code& ec, std::size_t length);
 
   asio::ip::tcp::socket socket_;
-  base::Buffer read_buffer_;
+
+  int32_t max_packet_size_;
+  std::vector<uint8_t> raw_read_buffer;
 
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;
   handler::CloseHandler close_handler_;
+
 };
 
 }  // namespace net

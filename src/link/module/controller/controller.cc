@@ -15,8 +15,10 @@ namespace module {
 
 const char* kModuleTaskRunnerName = "ModuleTaskRunner";
 
-ModuleController::ModuleController(base::TaskManager* task_manager)
-  : task_manager_(task_manager) {
+ModuleController::ModuleController(
+  std::shared_ptr<base::TaskManager> task_manager)
+  : task_manager_(task_manager),
+    controller_task_runner_(nullptr) {
 }
 
 ModuleController::~ModuleController() {
@@ -44,10 +46,14 @@ bool ModuleController::LoadingModule(const std::vector<Specification>& specs) {
 
     ModuleClient* module_client =
       dynamic_cast<ModuleClient*>(executors_.at(module_name).get());
-    if (!loader_.LoadModule(module_client, spec)) {
+    if (!loader_.LoadModule(task_runner, module_client, spec)) {
       return false;
     }
   }
+
+  controller_task_runner_ = task_manager_->CreateTaskRunner(
+      kModuleTaskRunnerName, base::TaskRunner::Type::CONCURRENT, specs.size());
+
   return true;
 }
 
@@ -60,7 +66,9 @@ void ModuleController::RunningModule() {
 
   for (const std::string& name : module_names) {
     LinkModule* module = loader_.GetModule(name);
-    executors_[name]->RunningModule(module);
+    controller_task_runner_->PostTask(
+      base::Bind(&ModuleExecutor::RunningModule, executors_[name].get(),
+        module));
   }
 }
 
@@ -72,7 +80,7 @@ void ModuleController::Destroy() {
 }
 
 void ModuleController::TerminateModule(const std::string& module_name) {
-  VLOG(2) << __func__;
+  LOG(TRACE) << __func__;
   base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
 
   task_dispatcher->PostTask(module_name,

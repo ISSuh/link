@@ -25,7 +25,7 @@ void ExampleServerModule::Run() {
   handle::LinkHandle handle;
   handle.Initialize();
 
-  server_.RegistComponent(&handle);
+  server_.CreateAndRegistComponent(GetTaskRunner(), &handle);
   server_.ServerOpen(address_, port_);
 
   handle.Run();

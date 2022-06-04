@@ -63,5 +63,17 @@ const uint8_t* Buffer::RawData() const {
   return raw_buffer_.data();
 }
 
+Buffer& Buffer::operator=(const std::vector<uint8_t>& rhs) {
+  this->raw_buffer_ = rhs;
+}
+
+Buffer& Buffer::operator=(const Buffer& rhs) {
+  if (&rhs == this) {
+    return *this;
+  }
+  this->raw_buffer_ = rhs.raw_buffer_;
+}
+
+
 }  // namespace base
 }  // namespace nlink

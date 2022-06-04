@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "link/base/task/task_runner.h"
 #include "link/module/base/user_module_base.h"
 #include "link/module/loader/module_register_helper.h"
 
@@ -21,18 +22,23 @@ class UserModule : public UserModuleBase {
     const std::string& module_name, ModuleClient* client);
   virtual ~UserModule();
 
-  void Initialize(const base::Json& arguments) override;
+  void Initialize(
+    base::TaskRunner* task_runner,
+    const base::Json& arguments) override;
   void Process() override;
   void Terminate() override;
 
   template<typename T>
   void GetArgument(const std::string& key, T* dest);
 
+  base::TaskRunner* GetTaskRunner() const;
+
  protected:
   virtual void Init() = 0;
   virtual void Run() = 0;
   virtual void Shutdown() = 0;
 
+  base::TaskRunner* task_runner_;
   base::Json arguments_;
 };
 

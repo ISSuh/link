@@ -13,9 +13,10 @@
 #include <memory>
 #include <utility>
 
+#include "link/base/macro.h"
+#include "link/base/task/task_runner.h"
 #include "link/module/base/module.h"
 #include "link/module/base/specification.h"
-#include "link/base/macro.h"
 
 namespace nlink {
 namespace module {
@@ -25,7 +26,10 @@ class ModuleLoader {
   ModuleLoader() = default;
   ~ModuleLoader() = default;
 
-  bool LoadModule(ModuleClient* client, const Specification& spec);
+  bool LoadModule(
+    base::TaskRunner* task_runner,
+    ModuleClient* client,
+    const Specification& spec);
   void UnLoadModule(const std::string& module_name);
 
   LinkModule* GetModule(const std::string& module_name) const;

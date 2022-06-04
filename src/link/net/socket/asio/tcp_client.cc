@@ -13,8 +13,8 @@
 namespace nlink {
 namespace net {
 
-TcpClient::TcpClient()
-  : connector_(nullptr), session_(nullptr) {
+TcpClient::TcpClient(base::TaskRunner* task_runner)
+  : task_runner_(task_runner), connector_(nullptr), session_(nullptr) {
 }
 
 TcpClient::~TcpClient() {

@@ -1,33 +1,23 @@
-# the following code to fetch googletest
-# is inspired by and adapted after https://crascit.com/2015/07/25/cmake-gtest/
-# download and unpack googletest at configure time
+include(${PROJECT_SOURCE_DIR}/cmake/fetching.cmake)
 
-macro(fetch_thridparty _third_party_dir _download_module_path _download_root)
-  set(JSON_DOWNLOAD_ROOT ${_download_root})
-  configure_file(
-    ${_download_module_path}/json-fetch.cmake
-    ${_download_root}/CMakeLists.txt
-    @ONLY
-  )
-  unset(JSON_DOWNLOAD_ROOT)
+macro(fetch_thridparty thirdparty_dir download_module_path download_root)
+  set(THIRD_PARTY_NAME json)
+  set(THIRD_PARTY_DOWNLOAD_ROOT ${download_root})
+  set(THIRD_PARTY_DOWNLOAD_SRC_DIR ${THIRD_PARTY_DOWNLOAD_ROOT}/${THIRD_PARTY_NAME}-src)
+  set(THIRD_PARTY_DOWNLOAD_BUILD_DIR ${THIRD_PARTY_DOWNLOAD_ROOT}/${THIRD_PARTY_NAME}-build)
+  set(THIRD_PARTY_DOWNLOAD_INSTALL_DIR ${THIRD_PARTY_DOWNLOAD_ROOT}/${THIRD_PARTY_NAME}-install)
 
-  execute_process(
-    COMMAND
-      "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-    WORKING_DIRECTORY
-      ${_download_root}
-  )
-
-  execute_process(
-    COMMAND
-      "${CMAKE_COMMAND}" --build .
-    WORKING_DIRECTORY
-      ${_download_root}
-  )
+  if(NOT EXISTS ${THIRD_PARTY_DOWNLOAD_INSTALL_DIR})
+    fetcing(
+      ${THIRD_PARTY_NAME}
+      ${download_module_path}
+      ${download_root}
+    )
+  endif()
 
   file(GLOB JSON_INCLUDES
-    "${_download_root}/json-install/include/nlohmann/*.hpp"
+    "${download_root}/json-install/include/nlohmann/*.hpp"
   )
 
-  file(COPY ${JSON_INCLUDES} DESTINATION ${_third_party_dir}/json)
+  file(COPY ${JSON_INCLUDES} DESTINATION ${thirdparty_dir}/json)
 endmacro()

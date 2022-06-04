@@ -4,7 +4,7 @@
   "modules": [
     {
       "module_name": "Server",
-      "module_path": "/root/workspace/link/build/link/example/socket/libserver_example.so",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libserver_example.so",
       "module": {
         "class_name": "ExampleServerModule",
         "arguments": {
@@ -18,7 +18,7 @@
     },
     {
       "module_name": "Client",
-      "module_path": "/root/workspace/link/build/link/example/socket/libclient_example.so",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libclient_example.so",
       "module": {
         "class_name": "ExampleClientModule",
         "arguments": {

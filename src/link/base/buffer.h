@@ -35,6 +35,9 @@ class Buffer {
   const std::vector<uint8_t>& Data() const;
   const uint8_t* RawData() const;
 
+  Buffer& operator=(const std::vector<uint8_t>& rhs);
+  Buffer& operator=(const Buffer& rhs);
+
  private:
   std::vector<uint8_t> raw_buffer_;
 };

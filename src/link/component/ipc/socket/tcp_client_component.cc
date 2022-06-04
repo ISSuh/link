@@ -12,8 +12,9 @@
 namespace nlink {
 namespace component {
 
-TcpClientComponent::TcpClientComponent(SocketComponent::Handler handlers)
-  : client_(new net::TcpClient()),
+TcpClientComponent::TcpClientComponent(
+  base::TaskRunner* task_runner, SocketComponent::Handler handlers)
+  : client_(new net::TcpClient(task_runner)),
     connect_handler_(handlers.connect_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
@@ -77,8 +78,8 @@ void TcpClientComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpClientComponent* TcpClientComponent::CreateComponent(
-  SocketComponent::Handler handlers) {
-  return new TcpClientComponent(handlers);
+  base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
+  return new TcpClientComponent(task_runner, handlers);
 }
 
 }  // namespace component

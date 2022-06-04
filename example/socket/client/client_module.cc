@@ -32,20 +32,22 @@ void ExampleClientModule::Run() {
   handle::LinkHandle handle;
   handle.Initialize();
 
-  client_.RegistComponent(&handle);
+  client_.CreateAndRegistComponent(GetTaskRunner(), &handle);
   client_.Connect(address_, port_);
 
   int32_t count = 0;
-  while (count < 10) {
+  while (count < 1) {
     handle.RunOnce();
     if (!client_.IsConnected()) {
       LOG(INFO) << "[ExampleClientModule] wait for connect";
       continue;
     }
 
-    std::string message = "test-" + std::to_string(count);
+    // std::string message = "test-" + std::to_string(count);
+    const uint32_t message_size = 10;
+    std::string message(message_size, 'a');
     client_.Write(message);
-    LOG(INFO) << "[ExampleClientModule] write : " << message;
+    LOG(INFO) << "[ExampleClientModule] write : " << message.size();
 
     ++count;
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

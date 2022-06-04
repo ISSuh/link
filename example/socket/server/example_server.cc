@@ -20,12 +20,16 @@ ExampleServer::ExampleServer()
       base::Bind(&ExampleServer::OnRead, this),
       base::Bind(&ExampleServer::OnWrite, this),
     }),
-    server_component_(
-      component::TcpServerComponent::CreateComponent(handlers_)) {}
+    server_component_(nullptr) {}
 
 ExampleServer::~ExampleServer() = default;
 
-void ExampleServer::RegistComponent(nlink::handle::LinkHandle* handle) {
+void ExampleServer::CreateAndRegistComponent(
+  nlink::base::TaskRunner* task_runner,
+  nlink::handle::LinkHandle* handle) {
+  server_component_ =
+      component::TcpServerComponent::CreateComponent(task_runner, handlers_);
+
   handle->RegistComponent(server_component_);
 }
 
@@ -49,9 +53,9 @@ void ExampleServer::OnRead(
   const std::vector<uint8_t>& received_data = buffer.Data();
   std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleServer::OnRead]"
-            << " received : " << received;
+            << " received : " << buffer.Size();
 
-  session->Write(buffer);
+  // session->Write(buffer);
 }
 
 void ExampleServer::OnWrite(size_t lengeh) {

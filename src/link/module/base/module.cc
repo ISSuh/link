@@ -66,10 +66,12 @@ class LinkModuleImpl : public LinkModule {
   LinkModuleImpl(
     LinkModuleHandle* module_handle,
     UserModule* user_module,
+    base::TaskRunner* task_runner,
     const Specification& spec)
     : LinkModule(spec),
       module_handle_(module_handle),
-      module_(user_module) {}
+      module_(user_module),
+      task_runner_(task_runner) {}
 
   virtual ~LinkModuleImpl() = default;
 
@@ -81,11 +83,12 @@ class LinkModuleImpl : public LinkModule {
  private:
   std::unique_ptr<LinkModuleHandle> module_handle_;
   std::unique_ptr<UserModule> module_;
+  base::TaskRunner* task_runner_;
 };
 
 template <typename UserModule>
 void LinkModuleImpl<UserModule>::Initialize() {
-  module_->Initialize(spec_.arguments());
+  module_->Initialize(task_runner_, spec_.arguments());
 }
 
 template <typename UserModule>
@@ -104,7 +107,9 @@ bool LinkModuleImpl<UserModule>::IsRunning() const {
 }
 
 LinkModulePtr LinkModule::CreateModule(
-  ModuleClient* client, const Specification& spec) {
+  base::TaskRunner* task_runner,
+  ModuleClient* client,
+  const Specification& spec) {
   LinkModuleHandle* module_handle = new LinkModuleHandle();
   if (!module_handle->Open(spec.path(), RTLD_LAZY | RTLD_GLOBAL)) {
     LOG(ERROR) << __func__ << " - "
@@ -126,32 +131,11 @@ LinkModulePtr LinkModule::CreateModule(
     new LinkModuleImpl<UserModuleBase>(
       module_handle,
       factory->CreateModuleObject(spec.module_name(), client),
+      task_runner,
       spec),
       &ModuleDeleter);
   return module_impl;
 }
-
-// ModulePtr::ModulePtr(Module* module)
-//  : deleter_(std::bind(&ModulePtr::ModuleDeleter, this, std::placeholders::_1)),
-//    module_(module, deleter_) {
-// }
-
-// ModulePtr::ModulePtr(const ModulePtr& module_ptr) {
-//   deleter_ = std::bind(&ModulePtr::ModuleDeleter, this, std::placeholders::_1);
-//   module_ptr.deleter_.
-//   module_ptr.module_ = std::move(module_ptr.module_);
-// }
-
-// ModulePtr::ModulePtr(ModulePtr&& module_ptr) {
-
-// }
-
-// ModulePtr& ModulePtr::operator=(const ModulePtr& module_ptr);
-// ModulePtr& ModulePtr::operator=(ModulePtr&& module_ptr);
-
-// ModulePtr::ModuleDeleter() {
-//   module_.reset();
-// }
 
 }  // namespace module
 }  // namespace nlink

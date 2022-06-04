@@ -50,23 +50,22 @@ set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
 set(LINK_THIRD_PARTY_LIST
   json
   asio
-  glog
+  spdlog
 )
 
 foreach(third_party ${LINK_THIRD_PARTY_LIST})
-  if (NOT EXISTS ${LINK_THIRDPATRY_PATH}/${third_party})
-    include(${PROJECT_DIR}/cmake/${third_party}.cmake)
-    
-    fetch_thridparty(
-      ${LINK_THIRDPATRY_PATH}
-      ${PROJECT_DIR}/cmake
-      ${BUILD_DIR}/${third_party}
-    )
-  endif()
+  message("Fetching and Build ${third_party}")
+  include(${PROJECT_DIR}/cmake/${third_party}.cmake)
+  
+  fetch_thridparty(
+    ${LINK_THIRDPATRY_PATH}
+    ${PROJECT_DIR}/cmake
+    ${BUILD_DIR}/${third_party}
+  )
 endforeach()
 
 set(LINK_THIRDPARTY_LIBS
-  glog
+  spdlog
 )
 
 #-------------------------------------------------------------------------------
