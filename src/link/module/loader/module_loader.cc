@@ -46,7 +46,7 @@ void ModuleLoader::UnLoadModule(const std::string& module_name) {
 
     modules_[module_name].reset();
     modules_.erase(module_name);
-  
+
     ModuleRegister::GetInstance()->ReleaseModuleFactory(class_name);
   }
 }

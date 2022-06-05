@@ -65,6 +65,7 @@ const uint8_t* Buffer::RawData() const {
 
 Buffer& Buffer::operator=(const std::vector<uint8_t>& rhs) {
   this->raw_buffer_ = rhs;
+  return *this;
 }
 
 Buffer& Buffer::operator=(const Buffer& rhs) {
@@ -72,6 +73,7 @@ Buffer& Buffer::operator=(const Buffer& rhs) {
     return *this;
   }
   this->raw_buffer_ = rhs.raw_buffer_;
+  return *this;
 }
 
 

@@ -36,7 +36,7 @@ void ConcurrentTaskRunner::PostDelayTask(
 }
 
 void ConcurrentTaskRunner::StopRunner() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
     running_ = false;

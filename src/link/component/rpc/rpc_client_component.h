@@ -11,7 +11,7 @@
 
 #include "link/base/macro.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/net/socket/asio/tcp_client.h"
+#include "link/io/socket/asio/tcp_client.h"
 
 namespace nlink {
 namespace component {
@@ -31,7 +31,7 @@ class RpcClientComponent : public RpcComponent {
   RpcClientComponent();
   virtual ~RpcClientComponent();
 
-  std::unique_ptr<net::Client> client_;
+  std::unique_ptr<io::Client> client_;
 
   DISAALOW_COPY_AND_ASSIGN(RpcClientComponent);
 };

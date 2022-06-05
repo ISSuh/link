@@ -26,12 +26,12 @@ class ExampleServer {
   void ServerOpen(const std::string& address, int32_t port);
 
  private:
-  void OnAccept(std::shared_ptr<nlink::net::Session> session);
-  void OnClose(std::shared_ptr<nlink::net::Session> session);
+  void OnAccept(std::shared_ptr<nlink::io::Session> session);
+  void OnClose(std::shared_ptr<nlink::io::Session> session);
   void OnWrite(size_t lengeh);
   void OnRead(
     const nlink::base::Buffer& buffer,
-    std::shared_ptr<nlink::net::Session> session);
+    std::shared_ptr<nlink::io::Session> session);
 
   nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpServerComponent* server_component_;

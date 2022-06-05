@@ -9,13 +9,13 @@
 #include "link/base/macro.h"
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
-#include "link/net/socket/asio/tcp_server.h"
+#include "link/io/socket/asio/tcp_server.h"
 
 namespace nlink {
 namespace component {
 
 RpcServerComponent::RpcServerComponent()
-  : server_(new net::TcpServer()) {
+  : server_(new io::TcpServer()) {
 }
 
 RpcServerComponent::~RpcServerComponent() = default;
@@ -25,7 +25,7 @@ base::EventChannel* RpcServerComponent::GetEventChannel() {
 }
 
 void RpcServerComponent::Open() {
-  server_->Listen(net::IpEndPoint("0.0.0.0", 33455));
+  server_->Listen(io::IpEndPoint("0.0.0.0", 33455));
   server_->Accept(base::Bind([](int32_t a){}));
 }
 

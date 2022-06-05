@@ -19,7 +19,9 @@ namespace module {
 
 UserModule::UserModule(
   const std::string& module_name, ModuleClient* client)
-  : UserModuleBase(module_name, client) {
+  : UserModuleBase(module_name, client),
+    logger_(nullptr) {
+  LOG(INFO) << __func__;
 }
 
 UserModule::~UserModule() {
@@ -31,6 +33,7 @@ base::TaskRunner* UserModule::GetTaskRunner() const {
 
 void UserModule::Initialize(
   base::TaskRunner* task_runner, const base::Json& arguments) {
+  logger_ = base::LoggerManager::Instance()->CreateLogger(module_name_);
   task_runner_ = task_runner;
 
   arguments_ = arguments;

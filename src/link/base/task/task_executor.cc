@@ -8,6 +8,7 @@
 
 #include "link/base/task/task.h"
 #include "link/base/logging.h"
+#include "link/base/thread.h"
 
 namespace nlink {
 namespace base {
@@ -19,7 +20,11 @@ TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
     running_(true) {
 }
 
-TaskExecutor::~TaskExecutor() = default;
+TaskExecutor::~TaskExecutor() {
+  if (worker_.joinable()) {
+    worker_.join();
+  }
+}
 
 void TaskExecutor::Join() {
   LOG(TRACE) << __func__;
@@ -57,6 +62,7 @@ void TaskExecutor::Work() {
 }
 
 void TaskExecutor::TerminateWorker() {
+  LOG(INFO) << __func__;
   delegate_->OnTerminateWorker(id_);
   running_ = false;
 }

@@ -15,7 +15,3 @@ target_link_libraries(${LINK_HANDLE_NAME}
  PRIVATE
   ${LINK_BASE_NAME}
 )
-
-add_dependencies(${LINK_NET_NAME}
-  ${LINK_BASE_NAME}
-)

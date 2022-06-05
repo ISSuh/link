@@ -14,7 +14,7 @@
 #include "link/base/buffer.h"
 #include "link/base/task/task_runner.h"
 #include "link/component/ipc/socket/socket_component.h"
-#include "link/net/socket/server.h"
+#include "link/io/socket/server.h"
 
 namespace nlink {
 namespace component {
@@ -38,13 +38,13 @@ class TcpServerComponent : public SocketComponent {
     base::TaskRunner* task_runner, SocketComponent::Handler handlers);
   virtual ~TcpServerComponent();
 
-  void InternalAcceptHandler(std::shared_ptr<net::Session> session);
-  void InternalCloseHandler(std::shared_ptr<net::Session> session);
+  void InternalAcceptHandler(std::shared_ptr<io::Session> session);
+  void InternalCloseHandler(std::shared_ptr<io::Session> session);
   void InternalReadHandler(
-    const base::Buffer& buffer, std::shared_ptr<net::Session> session);
+    const base::Buffer& buffer, std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  std::unique_ptr<net::Server> server_;
+  std::unique_ptr<io::Server> server_;
   SocketComponent::Handler::AcceptHandler accept_handler_;
   SocketComponent::Handler::CloseHandler close_handler_;
   SocketComponent::Handler::ReadHandler read_handler_;

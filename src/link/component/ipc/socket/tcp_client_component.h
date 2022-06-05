@@ -15,7 +15,7 @@
 #include "link/base/buffer.h"
 #include "link/base/task/task_runner.h"
 #include "link/component/ipc/socket/socket_component.h"
-#include "link/net/socket/client.h"
+#include "link/io/socket/client.h"
 
 namespace nlink {
 namespace component {
@@ -41,13 +41,13 @@ class TcpClientComponent : public SocketComponent {
   // LinkComponent
   base::EventChannel* GetEventChannel() override;
 
-  void InternalConnectHandler(std::shared_ptr<net::Session> session);
-  void InternalCloseHandler(std::shared_ptr<net::Session> session);
+  void InternalConnectHandler(std::shared_ptr<io::Session> session);
+  void InternalCloseHandler(std::shared_ptr<io::Session> session);
   void InternalReadHandler(
-    const base::Buffer& buffer, std::shared_ptr<net::Session> session);
+    const base::Buffer& buffer, std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  std::unique_ptr<net::Client> client_;
+  std::unique_ptr<io::Client> client_;
   SocketComponent::Handler::ConnectHandler connect_handler_;
   SocketComponent::Handler::CloseHandler close_handler_;
   SocketComponent::Handler::ReadHandler read_handler_;

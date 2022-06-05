@@ -13,7 +13,7 @@
 #include "link/base/macro.h"
 #include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
-#include "link/net/socket/session.h"
+#include "link/io/socket/session.h"
 
 namespace nlink {
 namespace component {
@@ -22,11 +22,11 @@ class SocketComponent : public LinkComponent {
  public:
   class Handler {
    public:
-    using AcceptHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
-    using ConnectHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
-    using CloseHandler = base::Callback<void(std::shared_ptr<net::Session>)>;
+    using AcceptHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
+    using ConnectHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
+    using CloseHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
     using ReadHandler =
-      base::Callback<void(const base::Buffer&, std::shared_ptr<net::Session>)>;
+      base::Callback<void(const base::Buffer&, std::shared_ptr<io::Session>)>;
     using WriteHandler = base::Callback<void(size_t)>;
 
     AcceptHandler accept_handler;

@@ -10,7 +10,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <memory>
 
 namespace nlink {
 
@@ -22,9 +21,6 @@ enum LogLevel {
   TRACE = 0X05,
 };
 
-void SetLogLevel(LogLevel level);
-LogLevel GetLogLevel();
-
 class LOG {
  public:
   LOG() = default;
@@ -35,46 +31,16 @@ class LOG {
   LOG& operator<<(const T& message);
 
  private:
-  enum LogColorCode {
-    RED      = 31,
-    GREEN    = 32,
-    YELLOW   = 33,
-    BLUE     = 34,
-    BLACK    = 39,
-  };
-
-  bool CanPrintLog();
-
-  LogColorCode SelectLogColor(LogLevel level);
-  std::string LogLevelToStr(LogLevel level);
-  std::string DateToStr();
-
   LogLevel log_level_;
   std::ostringstream buffer_;
 };
 
 template <typename T>
 LOG& LOG::operator<<(const T& message) {
-  if (CanPrintLog()) {
-    buffer_ << message;
-  }
+  buffer_ << message;
   return *this;
 }
 
-namespace base {
-
-class LoggerImpl;
-
-class Logger {
- public:
-  explicit Logger(const std::string& name);
-  ~Logger();
-
- private:
-  std::unique_ptr<LoggerImpl> logger_impl_;
-};
-
-}  // namespace base
 }  // namespace nlink
 
 #endif  // LINK_BASE_LOGGING_H_

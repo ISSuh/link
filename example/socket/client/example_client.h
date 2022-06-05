@@ -30,12 +30,12 @@ class ExampleClient {
   bool IsConnected();
 
  private:
-  void OnConnect(std::shared_ptr<nlink::net::Session> session);
-  void OnClose(std::shared_ptr<nlink::net::Session> session);
+  void OnConnect(std::shared_ptr<nlink::io::Session> session);
+  void OnClose(std::shared_ptr<nlink::io::Session> session);
   void OnWrite(size_t lengeh);
   void OnRead(
     const nlink::base::Buffer& buffer,
-    std::shared_ptr<nlink::net::Session> session);
+    std::shared_ptr<nlink::io::Session> session);
 
   nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpClientComponent* client_component_;

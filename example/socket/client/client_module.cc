@@ -44,7 +44,7 @@ void ExampleClientModule::Run() {
     }
 
     // std::string message = "test-" + std::to_string(count);
-    const uint32_t message_size = 10;
+    const uint32_t message_size = 10 * 1024 * 1024;
     std::string message(message_size, 'a');
     client_.Write(message);
     LOG(INFO) << "[ExampleClientModule] write : " << message.size();

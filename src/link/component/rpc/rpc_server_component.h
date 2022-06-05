@@ -11,7 +11,7 @@
 
 #include "link/base/macro.h"
 #include "link/component/rpc/rpc_component.h"
-#include "link/net/socket/server.h"
+#include "link/io/socket/server.h"
 
 namespace nlink {
 namespace component {
@@ -32,7 +32,7 @@ class RpcServerComponent : public RpcComponent {
   RpcServerComponent();
   virtual ~RpcServerComponent();
 
-  std::unique_ptr<net::Server> server_;
+  std::unique_ptr<io::Server> server_;
 
   DISAALOW_COPY_AND_ASSIGN(RpcServerComponent);
 };

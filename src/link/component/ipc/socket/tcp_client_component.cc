@@ -7,14 +7,14 @@
 #include "link/component/ipc/socket/tcp_client_component.h"
 
 #include "link/base/logging.h"
-#include "link/net/socket/asio/tcp_client.h"
+#include "link/io/socket/asio/tcp_client.h"
 
 namespace nlink {
 namespace component {
 
 TcpClientComponent::TcpClientComponent(
   base::TaskRunner* task_runner, SocketComponent::Handler handlers)
-  : client_(new net::TcpClient(task_runner)),
+  : client_(new io::TcpClient(task_runner)),
     connect_handler_(handlers.connect_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
@@ -29,7 +29,7 @@ TcpClientComponent::~TcpClientComponent() = default;
 void TcpClientComponent::Connect(
   const std::string& address, int32_t port) {
   client_->Connect(
-    net::IpEndPoint(address, port),
+    io::IpEndPoint(address, port),
     base::Bind(&TcpClientComponent::InternalConnectHandler, this),
     base::Bind(&TcpClientComponent::InternalCloseHandler, this));
 }
@@ -47,7 +47,7 @@ base::EventChannel* TcpClientComponent::GetEventChannel() {
 }
 
 void TcpClientComponent::InternalConnectHandler(
-  std::shared_ptr<net::Session> session) {
+  std::shared_ptr<io::Session> session) {
   if (connect_handler_.is_null()) {
     return;
   }
@@ -55,7 +55,7 @@ void TcpClientComponent::InternalConnectHandler(
 }
 
 void TcpClientComponent::InternalCloseHandler(
-  std::shared_ptr<net::Session> session) {
+  std::shared_ptr<io::Session> session) {
   if (close_handler_.is_null()) {
     return;
   }
@@ -63,7 +63,7 @@ void TcpClientComponent::InternalCloseHandler(
 }
 
 void TcpClientComponent::InternalReadHandler(
-  const base::Buffer& buffer, std::shared_ptr<net::Session> session) {
+  const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
   if (read_handler_.is_null()) {
     return;
   }

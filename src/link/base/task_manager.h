@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <utility> 
 
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_dispatcher.h"
@@ -23,6 +24,7 @@ class TaskDispatcher;
 
 class TaskManager : public std::enable_shared_from_this<TaskManager> {
  public:
+  using TaskThreadIdByLabel = std::vector<std::pair<std::string, uint64_t>>;
   TaskManager();
   ~TaskManager();
 
@@ -38,6 +40,7 @@ class TaskManager : public std::enable_shared_from_this<TaskManager> {
 
   uint32_t NumberOfTaskRunner() const;
   std::vector<std::string> TaskRunnerLabels() const;
+  TaskThreadIdByLabel TaskThreadIds() const;
 
  private:
   friend TaskDispatcher;
@@ -45,6 +48,7 @@ class TaskManager : public std::enable_shared_from_this<TaskManager> {
   TaskRunner* CreateSequencedTaskRunner(const std::string& label);
   TaskRunner* CreateConqurrentTaskRunner(const std::string& label, size_t num);
   TaskRunner* GetTaskRunner(const std::string& label);
+  void CreateLoggerForNewTaskRunner(const std::string& label);
 
   std::map<std::string, std::unique_ptr<TaskRunnerProxy>> runner_map_;
   std::unique_ptr<TaskDispatcher> dispatcher_;

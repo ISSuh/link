@@ -13,6 +13,7 @@
 #include "link/base/task/sequenced_task_runner.h"
 #include "link/base/task/conqurrent_task_runner.h"
 #include "link/base/logging.h"
+#include "link/base/logger.h"
 
 namespace nlink {
 namespace base {
@@ -104,6 +105,20 @@ std::vector<std::string> TaskManager::TaskRunnerLabels() const {
   return labels;
 }
 
+TaskManager::TaskThreadIdByLabel TaskManager::TaskThreadIds() const {
+  TaskThreadIdByLabel thread_ids;
+  for (const auto& runner : runner_map_) {
+    const std::string label = runner.first;
+    std::vector<uint64_t> ids_ = runner.second->WorkersIdLists();
+
+    for (const auto id : ids_) {
+      thread_ids.emplace_back(label, id);
+    }
+  }
+
+  return thread_ids;
+}
+
 TaskRunner* TaskManager::CreateSequencedTaskRunner(const std::string& label) {
   if (runner_map_.find(label) != runner_map_.end()) {
     return dynamic_cast<TaskRunner*>(runner_map_.at(label).get());
@@ -115,6 +130,8 @@ TaskRunner* TaskManager::CreateSequencedTaskRunner(const std::string& label) {
     std::unique_ptr<TaskRunnerProxy>(new SequencedTaskRunner(label));
 
   runner_map_.insert({label, std::move(runner)});
+
+  CreateLoggerForNewTaskRunner(label);
   return dynamic_cast<TaskRunner*>(runner_map_.at(label).get());
 }
 
@@ -130,6 +147,8 @@ TaskRunner* TaskManager::CreateConqurrentTaskRunner(
     std::unique_ptr<TaskRunnerProxy>(new ConcurrentTaskRunner(label, num));
 
   runner_map_.insert({label, std::move(runner)});
+
+  CreateLoggerForNewTaskRunner(label);
   return dynamic_cast<TaskRunner*>(runner_map_.at(label).get());
 }
 
@@ -139,6 +158,10 @@ TaskRunner* TaskManager::GetTaskRunner(const std::string& label) {
     return nullptr;
   }
   return runner_map_.at(label).get();
+}
+
+void TaskManager::CreateLoggerForNewTaskRunner(const std::string& label) {
+  base::LoggerManager::Instance()->CreateLogger(label);
 }
 
 }  // namespace base

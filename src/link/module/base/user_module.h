@@ -8,7 +8,9 @@
 #define LINK_MODULE_BASE_USER_MODULE_H_
 
 #include <string>
+#include <memory>
 
+#include "link/base/logger.h"
 #include "link/base/task/task_runner.h"
 #include "link/module/base/user_module_base.h"
 #include "link/module/loader/module_register_helper.h"
@@ -39,6 +41,8 @@ class UserModule : public UserModuleBase {
   virtual void Shutdown() = 0;
 
   base::TaskRunner* task_runner_;
+  std::shared_ptr<base::Logger> logger_;
+
   base::Json arguments_;
 };
 

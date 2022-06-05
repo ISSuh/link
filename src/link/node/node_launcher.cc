@@ -11,8 +11,6 @@
 using namespace nlink;
 
 int main(int32_t argc, char *argv[]) {
-  LOG(INFO) << "Node Launcher";
-
   node::LinkNode node;
   if (!node.Init(argc, argv)) {
     exit(0);
