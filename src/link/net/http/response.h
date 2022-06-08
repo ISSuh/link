@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_NET_HTTP_REQUEST_H_
-#define LINK_NET_HTTP_REQUEST_H_
+#ifndef LINK_NET_HTTP_RESPONSE_H_
+#define LINK_NET_HTTP_RESPONSE_H_
 
 #include <string>
 
@@ -13,20 +13,14 @@ namespace nlink {
 namespace net {
 namespace http {
 
-class Request {
+class Response {
  public:
-  Request();
-  ~Request();
-
-  bool HasHeader() const;
-  size_t ContentLength() const;
 
  private:
- 
 };
 
 }  // namespace http
 }  // namespace net
 }  // namespace nlink
 
-#endif  // LINK_NET_HTTP_REQUEST_H_
+#endif  // LINK_NET_HTTP_RESPONSE_H_
