@@ -19,6 +19,8 @@ namespace io {
 
 class Server : public base::EventChannel {
  public:
+  virtual ~Server() = default;
+
   virtual bool Listen(const IpEndPoint& address) = 0;
   virtual void Accept(
     handler::AcceptHandler accept_handler,

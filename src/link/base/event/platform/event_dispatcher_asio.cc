@@ -18,6 +18,8 @@ class AsioDispatcherConext : public DispatcherConext {
     : context_(1),
       work_guard_(context_.get_executor()) {}
 
+  virtual ~AsioDispatcherConext() = default;
+
   void* context() const override {
     return (void*)(&context_);
   }

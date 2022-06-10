@@ -28,7 +28,7 @@ class ModuleExecutor
   explicit ModuleExecutor(
     base::TaskRunner* task_runner,
     ModuleExecutorClient* excutor_client);
-  ~ModuleExecutor();
+  virtual ~ModuleExecutor();
 
   void RunningModule(LinkModule* module);
 

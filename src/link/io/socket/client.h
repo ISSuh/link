@@ -21,6 +21,8 @@ namespace io {
 
 class Client : public base::EventChannel {
  public:
+  virtual ~Client() = default;
+
   virtual void Connect(
     IpEndPoint endpoint,
     handler::ConnectHandler connect_handler,

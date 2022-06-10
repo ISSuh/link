@@ -19,6 +19,8 @@ namespace io {
 
 class Connector {
  public:
+  virtual ~Connector() = default;
+
   static Connector* CreateConnector(base::DispatcherConext* dispatcher_context);
 
   virtual void Connect(

@@ -18,6 +18,8 @@ class EventChannel;
 
 class DispatcherConext {
  public:
+  virtual ~DispatcherConext() = default;
+
   virtual void* context() const = 0;
 
   template<typename T>
@@ -26,6 +28,8 @@ class DispatcherConext {
 
 class EventDispatcher  {
  public:
+  virtual ~EventDispatcher() = default;
+
   virtual void Dispatch() = 0;
   virtual void DispatchOnce() = 0;
   virtual DispatcherConext* GetDispatcherConext() = 0;

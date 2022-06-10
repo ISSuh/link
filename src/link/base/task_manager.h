@@ -42,6 +42,9 @@ class TaskManager : public std::enable_shared_from_this<TaskManager> {
   std::vector<std::string> TaskRunnerLabels() const;
   TaskThreadIdByLabel TaskThreadIds() const;
 
+  bool HasTaskRunner(const std::string& label) const;
+  bool CheckRunningByLabel(const std::string& label) const;
+
  private:
   friend TaskDispatcher;
 

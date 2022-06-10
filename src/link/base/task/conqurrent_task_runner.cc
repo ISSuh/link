@@ -103,6 +103,8 @@ Task ConcurrentTaskRunner::NextTask() {
 
 bool ConcurrentTaskRunner::CanWakeUp(uint64_t id) {
   {
+    LOG(TRACE) << "[" << label() << "] " << __func__
+               << IsRunning() << " / " << queue_.empty();
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [&](){
         return !IsRunning() || !queue_.empty();

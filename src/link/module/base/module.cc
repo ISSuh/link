@@ -117,8 +117,9 @@ LinkModulePtr LinkModule::CreateModule(
     return nullptr;
   }
 
+  auto* test = ModuleRegister::GetInstance();
   const AbstractModlueFactory<UserModuleBase>* factory =
-    ModuleRegister::GetInstance()->GetModuleFactory<UserModuleBase>(
+    test->GetModuleFactory<UserModuleBase>(
       spec.class_name());
 
   if (!factory) {

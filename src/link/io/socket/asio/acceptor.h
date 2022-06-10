@@ -19,6 +19,8 @@ namespace io {
 
 class Acceptor {
  public:
+  virtual ~Acceptor() = default;
+
   static Acceptor* CreateAcceptor(base::DispatcherConext* dispatcher_context);
 
   virtual bool Listen(const IpEndPoint& address) = 0;

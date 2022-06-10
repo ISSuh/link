@@ -24,7 +24,7 @@ std::mutex LoggerManager::mutex_;
 class LoggerImpl : public Logger {
  public:
   explicit LoggerImpl(const std::string& name);
-  ~LoggerImpl();
+  virtual ~LoggerImpl();
 
   void PrintLog(LogLevel level, const std::string& log) override;
 

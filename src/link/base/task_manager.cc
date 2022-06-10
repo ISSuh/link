@@ -119,8 +119,16 @@ TaskManager::TaskThreadIdByLabel TaskManager::TaskThreadIds() const {
   return thread_ids;
 }
 
+bool TaskManager::HasTaskRunner(const std::string& label) const {
+  return runner_map_.find(label) != runner_map_.end();
+}
+
+bool TaskManager::CheckRunningByLabel(const std::string& label) const {
+  return HasTaskRunner(label) && runner_map_.at(label)->IsRunning();
+}
+
 TaskRunner* TaskManager::CreateSequencedTaskRunner(const std::string& label) {
-  if (runner_map_.find(label) != runner_map_.end()) {
+  if (HasTaskRunner(label)) {
     return dynamic_cast<TaskRunner*>(runner_map_.at(label).get());
   }
 
@@ -137,7 +145,7 @@ TaskRunner* TaskManager::CreateSequencedTaskRunner(const std::string& label) {
 
 TaskRunner* TaskManager::CreateConqurrentTaskRunner(
   const std::string& label, size_t num) {
-  if (runner_map_.find(label) != runner_map_.end()) {
+  if (HasTaskRunner(label)) {
     return dynamic_cast<TaskRunner*>(runner_map_.at(label).get());
   }
 
@@ -153,7 +161,7 @@ TaskRunner* TaskManager::CreateConqurrentTaskRunner(
 }
 
 TaskRunner* TaskManager::GetTaskRunner(const std::string& label) {
-  if (runner_map_.find(label) == runner_map_.end()) {
+  if (!HasTaskRunner(label)) {
     LOG(ERROR) << __func__ << " - Invalid label : " << label;
     return nullptr;
   }

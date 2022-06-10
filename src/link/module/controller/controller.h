@@ -28,7 +28,7 @@ class ModuleController
   using StatusCallback = base::Callback<void(bool)>;
 
   explicit ModuleController(std::shared_ptr<base::TaskManager> task_manager_);
-  ~ModuleController();
+  virtual ~ModuleController();
 
   void LoadingModule(
     const std::vector<Specification>& specs, StatusCallback status_callback);
@@ -44,9 +44,13 @@ class ModuleController
     size_t will_loaded_module_count,
     StatusCallback status_callback);
   void TerminateModuleInternal(const std::string& module_name);
+
   base::TaskRunner* CreateTaskRunnerForModule(const std::string& module_name);
   bool CreateModuleExecutor(
     const std::string& module_name, base::TaskRunner* task_runner);
+
+  void TerminateModuleTaskRunner(
+    const std::string& task_runner_label);
 
   std::shared_ptr<base::TaskManager> task_manager_;
 

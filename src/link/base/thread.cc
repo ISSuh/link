@@ -15,13 +15,6 @@
 namespace nlink {
 namespace base {
 
-#define SYS_gettid __NR_gettid
-
-uint64_t CurrentThreadId() {
-  size_t tid = static_cast<size_t>(syscall(SYS_gettid));
-  return tid;
-}
-
 uint64_t HashedCurrentThreadId() {
   return std::hash<std::thread::id>{}(std::this_thread::get_id());
 }

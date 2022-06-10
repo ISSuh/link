@@ -22,7 +22,6 @@ namespace module {
 
 class ModuleRegister {
  public:
-
   // TODO(issuh) : should modify referece coutner for AbstractModuleFactoryBase
   struct FactoryWrapper {
     uint32_t ref_count = 0;
@@ -43,7 +42,7 @@ class ModuleRegister {
 
  private:
   static std::atomic<ModuleRegister*> instance_;
-  static std::mutex lock_;
+  static std::mutex mutex_;
 
   using ModuleFactoryMap = std::map<std::string, FactoryWrapper>;
   ModuleFactoryMap factories_;
@@ -52,6 +51,10 @@ class ModuleRegister {
 template<typename UserModuleImpl, typename UserModule>
 void ModuleRegister::CreateModuleFactory(const std::string& class_name,
                                         const std::string& base_class_name) {
+  LOG(INFO) << __func__ << " - "
+              << ", class_name : " << class_name
+              << ", base_class_name : " << base_class_name;
+
   if (factories_.find(class_name) != factories_.end()) {
     ++factories_[class_name].ref_count;
     return;

@@ -9,20 +9,18 @@
 namespace nlink {
 namespace module {
 
-std::atomic<ModuleRegister*> ModuleRegister::instance_;
-std::mutex ModuleRegister::lock_;
+std::atomic<ModuleRegister*> ModuleRegister::instance_{nullptr};
+std::mutex ModuleRegister::mutex_;
 
 ModuleRegister* ModuleRegister::GetInstance() {
-  ModuleRegister* instance = instance_.load(std::memory_order_acquire);
-  if (!instance) {
-      std::lock_guard<std::mutex> myLock(lock_);
-      instance = instance_.load(std::memory_order_relaxed);
-      if (!instance) {
-        instance = new ModuleRegister();
-        instance_.store(instance, std::memory_order_release);
-      }
+  if (nullptr == instance_) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (nullptr == instance_) {
+      instance_ = new ModuleRegister();
+      std::cout << __func__ << " - instance : " << instance_.load() << " / " << &instance_<< std::endl;
+    }
   }
-  return instance;
+  return instance_;
 }
 
 void ModuleRegister::ReleaseModuleFactory(const std::string& class_name) {

@@ -19,6 +19,8 @@ namespace io {
 
 class Session {
  public:
+  virtual ~Session() = default;
+
   // virtual const IpEndPoint LocalEndPoint() = 0;
   // virtual const IpEndPoint RemoteEndPoint() = 0;
   virtual bool IsConnected() const = 0;

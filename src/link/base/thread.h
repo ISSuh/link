@@ -12,8 +12,6 @@
 namespace nlink {
 namespace base {
 
-uint64_t CurrentThreadId();
-
 uint64_t HashedCurrentThreadId();
 
 }  // namespace base

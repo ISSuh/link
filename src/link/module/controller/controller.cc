@@ -74,6 +74,7 @@ void ModuleController::RunningModule(StatusCallback status_callback) {
 void ModuleController::Destroy() {
   std::vector<std::string > module_names = loader_.ModuleNames();
   for (const std::string& name : module_names) {
+    TerminateModule(name);
     loader_.UnLoadModule(name);
   }
 }
@@ -83,12 +84,13 @@ void ModuleController::TerminateModule(const std::string& module_name) {
   const std::string controller_task_runner_name =
     module_name + kControllerTaskRunnerNamePostfix;
 
-  base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
-  task_dispatcher->PostTask(module_name,
-    base::Bind(&base::TaskManager::StopRunner, task_manager_, module_name));
+  TerminateModuleTaskRunner(module_name);
 
-  controller_task_runners_[module_name]->PostTask(
-    base::Bind(&ModuleController::TerminateModuleInternal, this, module_name));
+  if (task_manager_->CheckRunningByLabel(controller_task_runner_name)) {
+    controller_task_runners_[module_name]->PostTask(
+      base::Bind(&ModuleController::TerminateModuleInternal, this,
+      module_name));
+  }
 }
 
 void ModuleController::LodingModuleInternal(
@@ -107,6 +109,7 @@ void ModuleController::LodingModuleInternal(
 
   if (!CreateModuleExecutor(module_name, task_runner)) {
     status_callback.Run(false);
+    TerminateModule(module_name);
     return;
   }
 
@@ -114,6 +117,7 @@ void ModuleController::LodingModuleInternal(
     dynamic_cast<ModuleClient*>(executors_.at(module_name).get());
   if (!loader_.LoadModule(task_runner, module_client, spec)) {
     status_callback.Run(false);
+    TerminateModule(module_name);
     return;
   }
 
@@ -127,8 +131,11 @@ void ModuleController::TerminateModuleInternal(const std::string& module_name) {
   const std::string controller_task_runner_name =
     module_name + kControllerTaskRunnerNamePostfix;
 
-  loader_.UnLoadModule(module_name);
-  task_manager_->StopRunner(controller_task_runner_name);
+  if (loader_.HasModule(module_name)) {
+    loader_.UnLoadModule(module_name);
+  }
+
+  TerminateModuleTaskRunner(controller_task_runner_name);
 }
 
 base::TaskRunner* ModuleController::CreateTaskRunnerForModule(
@@ -148,6 +155,16 @@ bool ModuleController::CreateModuleExecutor(
     new ModuleExecutor(task_runner, this));
   executors_.insert({module_name, std::move(executor)});
   return true;
+}
+
+void ModuleController::TerminateModuleTaskRunner(
+  const std::string& task_runner_label) {
+  if (task_manager_->CheckRunningByLabel(task_runner_label)) {
+    base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
+    task_dispatcher->PostTask(task_runner_label,
+      base::Bind(&base::TaskManager::StopRunner, task_manager_,
+      task_runner_label));
+  }
 }
 
 }  // namespace module
