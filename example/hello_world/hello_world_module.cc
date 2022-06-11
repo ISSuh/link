@@ -8,6 +8,8 @@
 
 #include <link/base/logging.h>
 
+#include <link/net/base/url.h>
+
 using namespace nlink;
 
 void SampleModule::Init() {
@@ -26,6 +28,12 @@ void SampleModule::Run() {
   LOG(INFO) << "float_test_ : " << float_test_;
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
+
+  net::Url url;
+  const std::string http_url =
+    "https://user:password@www.google.com:443/webhp?gws_rd=ssl";
+
+  url.Decode(http_url);
 }
 
 void SampleModule::Shutdown() {

@@ -17,7 +17,6 @@ ModuleRegister* ModuleRegister::GetInstance() {
     std::lock_guard<std::mutex> lock(mutex_);
     if (nullptr == instance_) {
       instance_ = new ModuleRegister();
-      std::cout << __func__ << " - instance : " << instance_.load() << " / " << &instance_<< std::endl;
     }
   }
   return instance_;
