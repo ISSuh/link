@@ -31,7 +31,7 @@ class Url {
   std::string username_;
   std::string password_;
   std::string host_;
-  uint16_t port_;
+  std::string port_;
   std::string path_;
   std::vector<Query> queries_;
   std::string fragment_;

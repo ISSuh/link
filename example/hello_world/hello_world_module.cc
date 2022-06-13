@@ -31,7 +31,8 @@ void SampleModule::Run() {
 
   net::Url url;
   const std::string http_url =
-    "https://user:password@www.google.com:443/webhp?gws_rd=ssl";
+    // "https://user:password@www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
+    "https://www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
 
   url.Decode(http_url);
 }

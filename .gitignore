@@ -37,7 +37,4 @@ build/*
 .vscode*
 
 # Third Party
-src/link/third_party/json
-src/link/third_party/spdlog
-src/link/third_party/asio
-src/link/third_party/httplib
+src/link/third_party/*
