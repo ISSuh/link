@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_NET_BASE_URL_H_
-#define LINK_NET_BASE_URL_H_
+#ifndef LINK_NET_HTTP_URL_H_
+#define LINK_NET_HTTP_URL_H_
 
 #include <string>
 #include <vector>
@@ -24,9 +24,12 @@ class Url {
   std::string Encode();
   void Decode(const std::string& url_string);
 
-  std::string PrintForDebug();
+  void PrintForDebug();
 
  private:
+  void ParseUserInfo(const std::string& user_info_string);
+  void ParseQueries(const std::string& queries_string);
+
   std::string scheme_;
   std::string username_;
   std::string password_;
@@ -40,4 +43,4 @@ class Url {
 }  // namespace net
 }  // namespace nlink
 
-#endif  // LINK_NET_BASE_URL_H_
+#endif  // LINK_NET_HTTP_URL_H_

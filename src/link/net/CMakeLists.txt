@@ -3,7 +3,7 @@ project(link_module)
 message("Build Link net")
 
 set(LINK_NET_SRC
-  ${LINK_NET_PATH}/base/url.cc
+  ${LINK_NET_PATH}/http/url.cc
 )
 
 add_library(${LINK_NET_NAME}

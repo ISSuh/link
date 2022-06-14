@@ -54,7 +54,7 @@ set(LINK_THIRD_PARTY_LIST
   json
   asio
   spdlog
-  uri
+  picohttpparser
 )
 
 foreach(third_party ${LINK_THIRD_PARTY_LIST})
@@ -70,7 +70,7 @@ endforeach()
 
 set(LINK_THIRDPARTY_LIBS
   spdlog
-  network-uri
+  picohttpparser
 )
 
 #-------------------------------------------------------------------------------

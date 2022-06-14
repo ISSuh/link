@@ -27,7 +27,6 @@ class Request {
 
  private:
   Header header_;
-  
 };
 
 }  // namespace http

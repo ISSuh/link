@@ -8,7 +8,7 @@
 
 #include <link/base/logging.h>
 
-#include <link/net/base/url.h>
+#include <link/net/http/url.h>
 
 using namespace nlink;
 
@@ -35,6 +35,7 @@ void SampleModule::Run() {
     "https://www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
 
   url.Decode(http_url);
+  url.PrintForDebug();
 }
 
 void SampleModule::Shutdown() {
