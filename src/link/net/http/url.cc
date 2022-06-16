@@ -12,6 +12,7 @@
 
 namespace nlink {
 namespace net {
+namespace http {
 
 const char* kMatchTarget =
   "(ssh|sftp|ftp|smb|http|https):\\/\\/(?:([^@ ]*)@)?([^:?# ]+)(?::(\\d+))?([^?# ]*)(?:\\?([^# ]*))?(?:#([^ ]*))?";
@@ -58,25 +59,7 @@ std::string Url::Encode() {
   url.append(path_);
 
   if (!queries_.empty()) {
-    url.append("?");
-
-    auto iter = queries_.begin();
-    while (iter != queries_.end()) {
-      url.append(iter->first);
-      url.append("=");
-      url.append(iter->second);
-
-      ++iter;
-      if (iter != queries_.end()) {
-        url.append("&");
-      }
-    }
-
-    for (const auto& item : queries_) {
-      url.append(item.first);
-      url.append("=");
-      url.append(item.second);
-    }
+    url.append(MakeQueryString());
   }
 
   if (!fragment_.empty()) {
@@ -105,6 +88,37 @@ void Url::Decode(const std::string& url_string) {
 
     fragment_ = std::string(match[7].first, match[7].second);
   }
+}
+
+const std::string Url::Scheme() const {
+  return scheme_;
+}
+
+const std::string Url::Host() const {
+  if (port_.empty()) {
+    return host_;
+  }
+  return host_ + ":" + port_;
+}
+
+const std::string Url::Path() const {
+  return path_;
+}
+
+
+const std::string Url::PathWithQueryAndFragment() const {
+  std::string path_with_query_fragmnet(path_);
+
+  if (!queries_.empty()) {
+    path_with_query_fragmnet.append(MakeQueryString());
+  }
+
+  if (!fragment_.empty()) {
+    path_with_query_fragmnet.append("#");
+    path_with_query_fragmnet.append(fragment_);
+  }
+
+  return path_with_query_fragmnet;
 }
 
 void Url::PrintForDebug() {
@@ -161,5 +175,25 @@ void Url::ParseQueries(const std::string& queries_string) {
   }
 }
 
+const std::string Url::MakeQueryString() const {
+  std::string query_str;
+  query_str.append("?");
+
+  auto iter = queries_.begin();
+  while (iter != queries_.end()) {
+    query_str.append(iter->first);
+    query_str.append("=");
+    query_str.append(iter->second);
+
+    ++iter;
+    if (iter != queries_.end()) {
+      query_str.append("&");
+    }
+  }
+
+  return query_str;
+}
+
+}  // namespace http
 }  // namespace net
 }  // namespace nlink

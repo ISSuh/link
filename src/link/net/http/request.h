@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "link/net/http/url.h"
 #include "link/net/http/header.h"
 
 namespace nlink {
@@ -17,16 +18,27 @@ namespace http {
 
 class Request {
  public:
-  Request();
+  Request(const std::string& method, Url url);
+  Request(
+    const std::string& method, Url url, const Header& header);
   ~Request();
+
+  Header GetHeader() const;
+  const std::string GetBody() const;
 
   bool HasHeader() const;
   size_t ContentLength() const;
+  const std::string ContentType() const;
 
-  std::string ToString() const;
+  const std::string Serialize() const;
 
  private:
+  std::string method_;
+  std::string version_;
+  Url url_;
+
   Header header_;
+  std::string body_;
 };
 
 }  // namespace http

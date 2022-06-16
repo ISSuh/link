@@ -9,6 +9,9 @@
 
 #include <string>
 
+#include "link/base/buffer.h"
+#include "link/net/http/request.h"
+
 namespace nlink {
 namespace net {
 namespace http {
@@ -17,7 +20,7 @@ class RequestParser {
  public:
   virtual ~RequestParser() = default;
 
-  static void Parse();
+  static Request Parse();
 };
 
 }  // namespace http

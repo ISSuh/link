@@ -13,6 +13,7 @@
 
 namespace nlink {
 namespace net {
+namespace http {
 
 class Url {
  public:
@@ -24,11 +25,18 @@ class Url {
   std::string Encode();
   void Decode(const std::string& url_string);
 
+  const std::string Scheme() const;
+  const std::string Host() const;
+  const std::string Path() const;
+
+  const std::string PathWithQueryAndFragment() const;
+
   void PrintForDebug();
 
  private:
   void ParseUserInfo(const std::string& user_info_string);
   void ParseQueries(const std::string& queries_string);
+  const std::string MakeQueryString() const;
 
   std::string scheme_;
   std::string username_;
@@ -40,6 +48,7 @@ class Url {
   std::string fragment_;
 };
 
+}  // namespace http
 }  // namespace net
 }  // namespace nlink
 

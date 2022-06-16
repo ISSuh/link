@@ -4,6 +4,9 @@ message("Build Link net")
 
 set(LINK_NET_SRC
   ${LINK_NET_PATH}/http/url.cc
+  ${LINK_NET_PATH}/http/header.cc
+  ${LINK_NET_PATH}/http/request.cc
+  ${LINK_NET_PATH}/http/request_parser.cc
 )
 
 add_library(${LINK_NET_NAME}

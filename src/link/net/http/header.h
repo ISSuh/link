@@ -9,6 +9,7 @@
 
 #include <string>
 #include <map>
+#include <utility>
 
 namespace nlink {
 namespace net {
@@ -19,17 +20,15 @@ class Header {
   Header();
   ~Header();
 
-  void Insert(const std::string& key, const std::string& value);
-  void Insert(const std::string& header);
+  void Set(const std::pair<std::string, std::string>& header);
+  void Set(const std::string& key, const std::string& value);
 
-  std::string Serialize() const;
+  const std::string Serialize() const;
 
-  std::string ToString() const;
+  bool Empty() const;
+  const std::string Find(const std::string& key) const;
 
  private:
-  std::string version_;
-  std::string method_;
-  std::string path_;
   std::map<std::string, std::string> header_fields_;
 };
 
@@ -37,4 +36,4 @@ class Header {
 }  // namespace net
 }  // namespace nlink
 
-#endif LINK_NET_HTTP_HEADER_H_
+#endif  // LINK_NET_HTTP_HEADER_H_

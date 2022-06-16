@@ -8,7 +8,7 @@
 
 #include <link/base/logging.h>
 
-#include <link/net/http/url.h>
+#include <link/net/http/request.h>
 
 using namespace nlink;
 
@@ -29,13 +29,23 @@ void SampleModule::Run() {
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
 
-  net::Url url;
+  net::http::Url url;
   const std::string http_url =
     // "https://user:password@www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
     "https://www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
 
   url.Decode(http_url);
-  url.PrintForDebug();
+  // url.PrintForDebug();
+
+  net::http::Header header;
+  header.Set({"Accept", "text/html"});
+  header.Set({"Accept-Language", "en-us"});
+  header.Set(
+    {"Cookie", "wp_ozh_wsa_visits=2; wp_ozh_wsa_visit_lasttime=xxxxxxxxxx;"});
+
+  net::http::Request request("GET", url, header);
+  // request.SetBody();
+  LOG(INFO) << "\n" << request.Serialize();
 }
 
 void SampleModule::Shutdown() {

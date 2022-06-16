@@ -16,13 +16,11 @@ namespace http {
 
 class RequestParserImpl {
  public:
-
  private:
-  
 };
 
-void RequestParser::Parse() {
-
+Request RequestParser::Parse() {
+  
 }
 
 }  // namespace http
