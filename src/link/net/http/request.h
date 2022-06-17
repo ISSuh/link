@@ -18,9 +18,13 @@ namespace http {
 
 class Request {
  public:
+  Request();
   Request(const std::string& method, Url url);
   Request(
     const std::string& method, Url url, const Header& header);
+  Request(
+    const std::string& method, Url url,
+    const Header& header, const std::string& body);
   ~Request();
 
   Header GetHeader() const;

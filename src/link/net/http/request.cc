@@ -14,18 +14,29 @@ namespace http {
 
 const char* CRLF = "\r\n";
 
+Request::Request()
+  : Request("", Url()) {
+}
+
 Request::Request(const std::string& method, Url url)
   : Request(method, url, Header()) {
 }
 
 Request::Request(
   const std::string& method, Url url, const Header& header)
+  : Request(method, url, header, "") {
+}
+
+Request::Request(
+  const std::string& method, Url url,
+  const Header& header, const std::string& body)
   : version_("HTTP/1.1"),
     method_(method),
     url_(url),
-    header_(header) {
+    header_(header),
+    body_(body) {
 }
-
+  
 Request::~Request() {
 }
 

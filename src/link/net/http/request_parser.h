@@ -20,7 +20,7 @@ class RequestParser {
  public:
   virtual ~RequestParser() = default;
 
-  static Request Parse();
+  static Request Parse(const base::Buffer& buffer);
 };
 
 }  // namespace http

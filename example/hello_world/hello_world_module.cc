@@ -9,6 +9,7 @@
 #include <link/base/logging.h>
 
 #include <link/net/http/request.h>
+#include <link/net/http/request_parser.h>
 
 using namespace nlink;
 
@@ -46,6 +47,11 @@ void SampleModule::Run() {
   net::http::Request request("GET", url, header);
   // request.SetBody();
   LOG(INFO) << "\n" << request.Serialize();
+
+  base::Buffer buffer(request.Serialize());
+  net::http::Request parsed_request = net::http::RequestParser::Parse(buffer);
+
+  LOG(INFO) << "\n" << parsed_request.Serialize();
 }
 
 void SampleModule::Shutdown() {

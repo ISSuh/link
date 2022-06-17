@@ -29,6 +29,8 @@ class Header {
   const std::string Find(const std::string& key) const;
 
  private:
+  std::string method_;
+  std::string version_;
   std::map<std::string, std::string> header_fields_;
 };
 
