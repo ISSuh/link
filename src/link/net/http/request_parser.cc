@@ -64,7 +64,7 @@ Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
       }
       default: {
         LOG(ERROR) << "[RequestParser::Parse] invalid parse state";
-        state = Parser::ParseState::PARSE_ERROR;
+        parsing = false;
         break;
       }
     }
@@ -74,8 +74,9 @@ Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
   if (host.empty()) {
     return Request(method, Url(), version, header, body);
   }
-  Url url();
-  return Request(method, Url(), version, header, body);
+
+  Url url(host + path);
+  return Request(method, url, version, header, body);
 }
 
 }  // namespace http

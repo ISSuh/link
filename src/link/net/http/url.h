@@ -20,6 +20,10 @@ class Url {
   using Query = std::pair<std::string, std::string>;
 
   Url();
+  Url(const std::string& scheme,
+      const std::string& host,
+      const std::string& path,
+      const std::string& user_info);
   explicit Url(const std::string& url_string);
 
   std::string Encode();
