@@ -10,7 +10,7 @@ namespace nlink {
 namespace net {
 namespace http {
 
-std::string HttpStatusCodeToStr(HttpStatusCode status) {
+std::string HttpStatusCodeToString(HttpStatusCode status) {
   switch (status) {
     case HttpStatusCode::CONTINUE:
       return "Continue";

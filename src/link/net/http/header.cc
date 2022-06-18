@@ -8,9 +8,13 @@
 
 #include <sstream>
 
+#include "link/base/logging.h"
+
 namespace nlink {
 namespace net {
 namespace http {
+
+constexpr const char kHeaderDelm = ':';
 
 Header::Header() {
 }
@@ -24,6 +28,30 @@ void Header::Set(const std::pair<std::string, std::string>& header) {
 
 void Header::Set(const std::string& key, const std::string& value) {
   header_fields_.insert({key, value});
+}
+
+bool Header::ParseAndSet(const std::string& header_str) {
+  if (header_str.empty()) {
+    return false;
+  }
+
+  size_t pos = 0;
+  while (pos < header_str.size() &&
+         header_str[pos] != kHeaderDelm) {
+    ++pos;
+  }
+
+  if (pos >= header_str.size()) {
+    return false;
+  }
+
+  const size_t space_size = 1;
+  const std::string key = header_str.substr(0, pos);
+  const std::string value =
+    header_str.substr(pos + 1 + space_size, header_str.size());
+
+  Set(key, value);
+  return true;
 }
 
 const std::string Header::Serialize() const {

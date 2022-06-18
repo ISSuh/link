@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include "link/net/http/method.h"
+#include "link/net/http/version.h"
 #include "link/net/http/url.h"
 #include "link/net/http/header.h"
 
@@ -19,11 +21,11 @@ namespace http {
 class Request {
  public:
   Request();
-  Request(const std::string& method, Url url);
+  Request(Method method, Url url, Version version = Version::HTTP_1_1);
   Request(
-    const std::string& method, Url url, const Header& header);
+    Method method, Url url, const Header& header);
   Request(
-    const std::string& method, Url url,
+    Method method, Url url, Version version,
     const Header& header, const std::string& body);
   ~Request();
 
@@ -37,8 +39,8 @@ class Request {
   const std::string Serialize() const;
 
  private:
-  std::string method_;
-  std::string version_;
+  Version version_;
+  Method method_;
   Url url_;
 
   Header header_;

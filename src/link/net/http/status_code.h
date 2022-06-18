@@ -61,7 +61,7 @@ enum HttpStatusCode {
   VERSION_NOT_SUPPORTED = 505,
 };
 
-std::string HttpStatusCodeToStr(HttpStatusCode status);
+std::string HttpStatusCodeToString(HttpStatusCode status);
 
 }  // namespace http
 }  // namespace net

@@ -63,6 +63,10 @@ const uint8_t* Buffer::RawData() const {
   return raw_buffer_.data();
 }
 
+const std::string Buffer::ToString() const {
+  return std::string(raw_buffer_.begin(), raw_buffer_.end());
+}
+
 Buffer& Buffer::operator=(const std::vector<uint8_t>& rhs) {
   this->raw_buffer_ = rhs;
   return *this;

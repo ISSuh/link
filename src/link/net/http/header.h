@@ -22,6 +22,7 @@ class Header {
 
   void Set(const std::pair<std::string, std::string>& header);
   void Set(const std::string& key, const std::string& value);
+  bool ParseAndSet(const std::string& header_str);
 
   const std::string Serialize() const;
 
@@ -29,8 +30,6 @@ class Header {
   const std::string Find(const std::string& key) const;
 
  private:
-  std::string method_;
-  std::string version_;
   std::map<std::string, std::string> header_fields_;
 };
 

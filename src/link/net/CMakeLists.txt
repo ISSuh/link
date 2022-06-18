@@ -3,9 +3,12 @@ project(link_module)
 message("Build Link net")
 
 set(LINK_NET_SRC
+  ${LINK_NET_PATH}/http/version.cc
+  ${LINK_NET_PATH}/http/method.cc
   ${LINK_NET_PATH}/http/url.cc
   ${LINK_NET_PATH}/http/header.cc
   ${LINK_NET_PATH}/http/request.cc
+  ${LINK_NET_PATH}/http/parser.cc
   ${LINK_NET_PATH}/http/request_parser.cc
 )
 

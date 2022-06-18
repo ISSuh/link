@@ -34,6 +34,7 @@ class Buffer {
 
   const std::vector<uint8_t>& Data() const;
   const uint8_t* RawData() const;
+  const std::string ToString() const;
 
   Buffer& operator=(const std::vector<uint8_t>& rhs);
   Buffer& operator=(const Buffer& rhs);

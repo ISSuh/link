@@ -15,28 +15,28 @@ namespace http {
 const char* CRLF = "\r\n";
 
 Request::Request()
-  : Request("", Url()) {
+  : Request(Method::INVALID, Url()) {
 }
 
-Request::Request(const std::string& method, Url url)
-  : Request(method, url, Header()) {
-}
-
-Request::Request(
-  const std::string& method, Url url, const Header& header)
-  : Request(method, url, header, "") {
+Request::Request(Method method, Url url, Version version)
+  : Request(method, url, version, Header(), "") {
 }
 
 Request::Request(
-  const std::string& method, Url url,
+  Method method, Url url, const Header& header)
+  : Request(method, url, Version::HTTP_1_1, header, "") {
+}
+
+Request::Request(
+  Method method, Url url, Version version,
   const Header& header, const std::string& body)
-  : version_("HTTP/1.1"),
+  : version_(version),
     method_(method),
     url_(url),
     header_(header),
     body_(body) {
 }
-  
+
 Request::~Request() {
 }
 
@@ -51,7 +51,7 @@ const std::string Request::GetBody() const {
 }
 
 bool Request::HasHeader() const {
-  return header_.Empty();
+  return !header_.Empty();
 }
 
 size_t Request::ContentLength() const {
@@ -65,19 +65,16 @@ const std::string Request::ContentType() const {
 }
 
 const std::string Request::Serialize() const {
-  std::stringstream stream;
-  const std::string header(header_.Serialize());
-
-  if (header.empty()) {
+  if (!HasHeader()) {
     return "";
   }
 
-  stream << method_ << ' '
+  std::stringstream stream;
+  stream << MethodToString(method_) << ' '
          << url_.PathWithQueryAndFragment() << ' '
-         << version_  << CRLF;
+         << VersionToString(version_)  << CRLF;
 
-  stream << "Host:" << url_.Host() << CRLF;
-  stream << header;
+  stream << header_.Serialize();
   stream << CRLF;
   stream << body_;
   return stream.str();
