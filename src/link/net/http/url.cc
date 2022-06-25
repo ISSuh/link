@@ -20,14 +20,42 @@ const char* kMatchTarget =
 const char* kQueryTarget =
   "(\\?(([^?;&#=]+=[^?;&#=]+)([;|&]([^?;&#=]+=[^?;&#=]+))*))?";
 
+const char* kSchemeDelm = "://";
+const char kUsernameDelm = ':';
+const char kPasswordDelm = '@';
+const char kPortDelm = ':';
+const char kHostDelm = '/';
+const char kQueryDelm = '?';
+const char kFragmentDelm = '#';
+
 Url::Url() {
 }
 
-Url::Url(const std::string& url_string) {
+Url::Url(
+  const std::string& scheme,
+  const std::string& host,
+  const std::string& path)
+  : scheme_(scheme),
+    username_(""),
+    password_(""),
+    host_(host),
+    port_(""),
+    path_(path),
+    fragment_("") {
+}
+
+Url::Url(const std::string& url_string)
+  : scheme_(""),
+    username_(""),
+    password_(""),
+    host_(""),
+    port_(""),
+    path_(""),
+    fragment_("") {
   Decode(url_string);
 }
 
-std::string Url::Encode() {
+const std::string Url::Encode() {
   std::string url;
 
   if (scheme_.empty()) {
@@ -59,7 +87,7 @@ std::string Url::Encode() {
   url.append(path_);
 
   if (!queries_.empty()) {
-    url.append(MakeQueryString());
+    url.append(MakeQueryString(queries_));
   }
 
   if (!fragment_.empty()) {
@@ -69,25 +97,103 @@ std::string Url::Encode() {
 
   return url;
 }
-void Url::Decode(const std::string& url_string) {
-  std::regex re(kMatchTarget);
-  std::smatch match;
 
-  if (std::regex_match(url_string, match, re)) {
-    scheme_ = std::string(match[1].first, match[1].second);
+// bool Url::Decode(const std::string& url_string) {
+//   std::regex re(kMatchTarget);
+//   std::smatch match;
 
-    std::string user(std::string(match[2].first, match[2].second));
-    ParseUserInfo(user);
+//   if (std::regex_match(url_string, match, re)) {
+//     scheme_ = std::string(match[1].first, match[1].second);
 
-    host_ = std::string(match[3].first, match[3].second);
-    port_ = std::string(match[4].first, match[4].second);
-    path_ = std::string(match[5].first, match[5].second);
+//     std::string user(std::string(match[2].first, match[2].second));
+//     ParseUserInfo(user);
 
-    std::string queries(std::string(match[6].first, match[6].second));
-    ParseQueries(queries);
+//     host_ = std::string(match[3].first, match[3].second);
+//     port_ = std::string(match[4].first, match[4].second);
+//     path_ = std::string(match[5].first, match[5].second);
 
-    fragment_ = std::string(match[7].first, match[7].second);
+//     std::string queries(std::string(match[6].first, match[6].second));
+//     ParseQueries(queries);
+
+//     fragment_ = std::string(match[7].first, match[7].second);
+//   }
+// }
+
+bool Url::Decode(const std::string& url_string) {
+  size_t pos = url_string.find(kSchemeDelm);
+  if (pos == std::string::npos) {
+    LOG(WARNING) << "[Url::Decode] can not fine scheme";
+    return false;
   }
+
+  scheme_ = url_string.substr(0, pos);
+  pos += sizeof(kSchemeDelm);
+
+  size_t pos = url_string.find();
+  
+}
+
+bool Url::HasScheme() const {
+  return !scheme_.empty();
+}
+
+bool Url::HasUserName() const {
+  return !username_.empty();
+}
+
+bool Url::HasPassword() const {
+  return !password_.empty();
+}
+
+bool Url::HasHost() const {
+  return !host_.empty();
+}
+
+bool Url::HasPort() const {
+  return !port_.empty();
+}
+
+bool Url::HasPath() const {
+  return !path_.empty();
+}
+
+bool Url::HasQuery() const {
+  return queries_string_.empty();
+}
+bool Url::HasFragment() const {
+  return fragment_.empty();
+}
+
+const std::string Url::Scheme() const {
+  return scheme_;
+}
+
+const std::string Url::UserName() const {
+  return username_;
+}
+
+const std::string Url::Password() const {
+  return password_;
+}
+
+const std::string Url::Host() const {
+  return host_;
+}
+
+const std::string Url::Port() const {
+  return port_;
+}
+
+const std::string Url::Path() const {
+  return path_;
+}
+
+const std::string Url::Query() const {
+  return queries_string_;
+}
+
+const std::string Url::Fragment() const {
+  return fragment_;
 }
 
 const std::string Url::Scheme() const {
@@ -105,12 +211,11 @@ const std::string Url::Path() const {
   return path_;
 }
 
-
 const std::string Url::PathWithQueryAndFragment() const {
   std::string path_with_query_fragmnet(path_);
 
   if (!queries_.empty()) {
-    path_with_query_fragmnet.append(MakeQueryString());
+    path_with_query_fragmnet.append(MakeQueryString(queries_));
   }
 
   if (!fragment_.empty()) {
@@ -175,18 +280,19 @@ void Url::ParseQueries(const std::string& queries_string) {
   }
 }
 
-const std::string Url::MakeQueryString() const {
+const std::string Url::MakeQueryString(
+  const std::vector<Url::Query>& queries) const {
   std::string query_str;
   query_str.append("?");
 
-  auto iter = queries_.begin();
-  while (iter != queries_.end()) {
+  auto iter = queries.begin();
+  while (iter != queries.end()) {
     query_str.append(iter->first);
     query_str.append("=");
     query_str.append(iter->second);
 
     ++iter;
-    if (iter != queries_.end()) {
+    if (iter != queries.end()) {
       query_str.append("&");
     }
   }
