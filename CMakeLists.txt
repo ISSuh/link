@@ -54,6 +54,7 @@ set(LINK_THIRD_PARTY_LIST
   json
   asio
   spdlog
+  uri
   picohttpparser
 )
 
@@ -71,6 +72,7 @@ endforeach()
 set(LINK_THIRDPARTY_LIBS
   spdlog
   picohttpparser
+  network-uri
 )
 
 #-------------------------------------------------------------------------------

@@ -72,11 +72,11 @@ Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
 
   const std::string host = header.Find("Host");
   if (host.empty()) {
-    return Request(method, Url(), version, header, body);
+    return Request(method, Uri(), version, header, body);
   }
 
-  Url url(host + path);
-  return Request(method, url, version, header, body);
+  Uri uri(host + path);
+  return Request(method, uri, version, header, body);
 }
 
 }  // namespace http

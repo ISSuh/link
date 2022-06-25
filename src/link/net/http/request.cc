@@ -15,24 +15,24 @@ namespace http {
 const char* CRLF = "\r\n";
 
 Request::Request()
-  : Request(Method::INVALID, Url()) {
+  : Request(Method::INVALID, Uri()) {
 }
 
-Request::Request(Method method, Url url, Version version)
-  : Request(method, url, version, Header(), "") {
-}
-
-Request::Request(
-  Method method, Url url, const Header& header)
-  : Request(method, url, Version::HTTP_1_1, header, "") {
+Request::Request(Method method, Uri uri, Version version)
+  : Request(method, uri, version, Header(), "") {
 }
 
 Request::Request(
-  Method method, Url url, Version version,
+  Method method, Uri uri, const Header& header)
+  : Request(method, uri, Version::HTTP_1_1, header, "") {
+}
+
+Request::Request(
+  Method method, Uri uri, Version version,
   const Header& header, const std::string& body)
   : version_(version),
     method_(method),
-    url_(url),
+    uri_(uri),
     header_(header),
     body_(body) {
 }
@@ -71,7 +71,7 @@ const std::string Request::Serialize() const {
 
   std::stringstream stream;
   stream << MethodToString(method_) << ' '
-         << url_.PathWithQueryAndFragment() << ' '
+         << uri_.PathWithQueryAndFragment() << ' '
          << VersionToString(version_)  << CRLF;
 
   stream << header_.Serialize();

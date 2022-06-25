@@ -49,13 +49,15 @@ void SampleModule::Run() {
   LOG(INFO) << "bool_test_ : " << bool_test_;
   LOG(INFO) << "string_test_ : " << string_test_;
 
-  net::http::Url url;
-  const std::string http_url =
+  net::Uri uri;
+  const std::string http_uri =
     // "https://user:password@www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
-    "https://www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
+    "https://myname:1234@www.google.com:443/webhp/poo?gws_rd=ssl&a=b&s=c#test";
 
-  url.Decode(http_url);
-  // url.PrintForDebug();
+  uri.Decode(http_uri);
+  uri.PrintForDebug();
+
+  LOG(INFO) << uri.Encode();
 
   net::http::Header header;
   header.Set({"Accept", "text/html"});
@@ -64,7 +66,7 @@ void SampleModule::Run() {
     {"Cookie", "wp_ozh_wsa_visits=2; wp_ozh_wsa_visit_lasttime=xxxxxxxxxx;"});
 
   net::http::Request request(
-    net::http::Method::GET, url, net::http::Version::HTTP_1_1,
+    net::http::Method::GET, uri, net::http::Version::HTTP_1_1,
     header, "Hello World");
   // request.SetBody();
   LOG(INFO) << "\n" << request.Serialize();

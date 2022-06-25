@@ -9,9 +9,9 @@
 
 #include <string>
 
+#include "link/net/base/uri.h"
 #include "link/net/http/method.h"
 #include "link/net/http/version.h"
-#include "link/net/http/url.h"
 #include "link/net/http/header.h"
 
 namespace nlink {
@@ -21,11 +21,11 @@ namespace http {
 class Request {
  public:
   Request();
-  Request(Method method, Url url, Version version = Version::HTTP_1_1);
+  Request(Method method, Uri uri, Version version = Version::HTTP_1_1);
   Request(
-    Method method, Url url, const Header& header);
+    Method method, Uri uri, const Header& header);
   Request(
-    Method method, Url url, Version version,
+    Method method, Uri uri, Version version,
     const Header& header, const std::string& body);
   ~Request();
 
@@ -41,7 +41,7 @@ class Request {
  private:
   Version version_;
   Method method_;
-  Url url_;
+  Uri uri_;
 
   Header header_;
   std::string body_;
