@@ -23,16 +23,18 @@ class Request {
   Request();
   Request(Method method, Uri uri, Version version = Version::HTTP_1_1);
   Request(
-    Method method, Uri uri, const Header& header);
+    Method method, Uri uri, const HttpHeader& header);
   Request(
     Method method, Uri uri, Version version,
-    const Header& header, const std::string& body);
+    const HttpHeader& header, const std::string& body);
   ~Request();
 
-  Header GetHeader() const;
-  const std::string GetBody() const;
+  HttpHeader Header() const;
+  const std::string Body() const;
 
   bool HasHeader() const;
+  bool HasBody() const;
+
   size_t ContentLength() const;
   const std::string ContentType() const;
 
@@ -43,7 +45,7 @@ class Request {
   Method method_;
   Uri uri_;
 
-  Header header_;
+  HttpHeader header_;
   std::string body_;
 };
 

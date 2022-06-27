@@ -8,28 +8,28 @@
 
 #include <sstream>
 
+#include "link/net/http/constant.h"
+
 namespace nlink {
 namespace net {
 namespace http {
-
-const char* CRLF = "\r\n";
 
 Request::Request()
   : Request(Method::INVALID, Uri()) {
 }
 
 Request::Request(Method method, Uri uri, Version version)
-  : Request(method, uri, version, Header(), "") {
+  : Request(method, uri, version, HttpHeader(), "") {
 }
 
 Request::Request(
-  Method method, Uri uri, const Header& header)
+  Method method, Uri uri, const HttpHeader& header)
   : Request(method, uri, Version::HTTP_1_1, header, "") {
 }
 
 Request::Request(
   Method method, Uri uri, Version version,
-  const Header& header, const std::string& body)
+  const HttpHeader& header, const std::string& body)
   : version_(version),
     method_(method),
     uri_(uri),
@@ -40,18 +40,26 @@ Request::Request(
 Request::~Request() {
 }
 
-Header Request::GetHeader() const {
+HttpHeader Request::Header() const {
   if (!HasHeader()) {
-    return Header();
+    return HttpHeader();
   }
   return header_;
 }
-const std::string Request::GetBody() const {
+
+const std::string Request::Body() const {
+  if (!HasBody()) {
+    return "";
+  }
   return body_;
 }
 
 bool Request::HasHeader() const {
   return !header_.Empty();
+}
+
+bool Request::HasBody() const {
+  return !body_.empty();
 }
 
 size_t Request::ContentLength() const {
@@ -72,10 +80,10 @@ const std::string Request::Serialize() const {
   std::stringstream stream;
   stream << MethodToString(method_) << ' '
          << uri_.PathWithQueryAndFragment() << ' '
-         << VersionToString(version_)  << CRLF;
+         << VersionToString(version_)  << kCRLF;
 
   stream << header_.Serialize();
-  stream << CRLF;
+  stream << kCRLF;
   stream << body_;
   return stream.str();
 }

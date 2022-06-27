@@ -56,7 +56,7 @@ class Uri {
   const std::string UserName() const;
   const std::string Password() const;
   const std::string Host() const;
-  const uint16_t Port() const;
+  uint16_t Port() const;
   const std::string Path() const;
   const std::string QueryString() const;
   const std::string Fragment() const;

@@ -17,9 +17,10 @@ Uri::UserInfo ParseUserInfo(const std::string& user_info_string) {
     return {};
   }
 
-  std::string user_name;
-  std::string user_password;
-  size_t pos = user_info_string.find(':');
+  const char tocken = ':';
+  std::string user_name("");
+  std::string user_password("");
+  size_t pos = user_info_string.find(tocken);
   if (std::string::npos == pos) {
     user_name = user_info_string;
   } else {
@@ -31,7 +32,28 @@ Uri::UserInfo ParseUserInfo(const std::string& user_info_string) {
 
 std::pair<std::string, uint16_t> SeparateHostAndPort(
   const std::string& host_string) {
-  
+  if (host_string.empty()) {
+    return {};
+  }
+
+  const char tocken = ':';
+  std::string host("");
+  std::string port_string("");
+  size_t pos = host_string.find(tocken);
+  if (std::string::npos == pos) {
+    host = host_string;
+    port_string = "0";
+  } else {
+    host = host_string.substr(0, pos);
+    port_string = host_string.substr(pos+1, host_string.size()-1);
+  }
+
+  uint16_t port = 0;
+  int32_t temp = std::stoi(port_string);
+  if (0 < temp || temp < 65535) {
+    port = temp;
+  }
+  return {host, port};
 }
 
 std::vector<Uri::Query> ParseQueries(const std::string& queries_string) {
@@ -68,14 +90,20 @@ Uri Uri::Parse(const std::string& uri_string) {
   Uri::UserInfo user_info = ParseUserInfo(user_info_string);
 
   const std::string host = parse_uri.host().to_string();
-  const std::string port = parse_uri.port().to_string();
+  const std::string port_string = parse_uri.port().to_string();
+  int32_t port = std::stoi(port_string);
+  if (port <= 0 || 65535 < port) {
+    port = 0;
+  }
+
   const std::string path = parse_uri.path().to_string();
   const std::string queries_string = parse_uri.query().to_string();
   std::vector<Uri::Query> queries = ParseQueries(queries_string);
 
   const std::string fragment = parse_uri.fragment().to_string();
 
-  return Uri();
+  return Uri(scheme, user_info, host, static_cast<uint16_t>(port),
+    path, queries, fragment);
 }
 
 Uri::Uri()
@@ -90,8 +118,15 @@ Uri::Uri()
 
 Uri::Uri(
   const std::string& scheme,
-  const std::string& host) {
-
+  const std::string& host)
+  : scheme_(scheme),
+  user_info_({}),
+  path_(""),
+  queries_(),
+  fragment_("") {
+  auto hostAndPort = SeparateHostAndPort(host);
+  host_ = hostAndPort.first;
+  port_ = hostAndPort.second;
 }
 
 Uri::Uri(
@@ -100,11 +135,12 @@ Uri::Uri(
   const std::string& path)
   : scheme_(scheme),
     user_info_({}),
-    host_(host),
-    port_(0),
     path_(path),
     queries_(),
     fragment_("") {
+  auto hostAndPort = SeparateHostAndPort(host);
+  host_ = hostAndPort.first;
+  port_ = hostAndPort.second;
 }
 
 Uri::Uri(const std::string& scheme,
@@ -115,7 +151,7 @@ Uri::Uri(const std::string& scheme,
   std::vector<Query> queries,
   const std::string& fragment)
   : scheme_(scheme),
-    user_info_({}),
+    user_info_(user_info),
     host_(host),
     port_(port),
     path_(path),
@@ -126,7 +162,7 @@ Uri::Uri(const std::string& scheme,
 const std::string Uri::Serialize() {
   std::string uri;
 
-  if (scheme_.empty()) {
+  if (!HasScheme()) {
     LOG(WARNING) << "[Uri::Serialize] invalid url. scheme empty";
     return "";
   }
@@ -143,7 +179,7 @@ const std::string Uri::Serialize() {
     uri.append("@");
   }
 
-  if (HasHost()) {
+  if (!HasHost()) {
     LOG(WARNING) << "[Uri::Serialize] invalid url. host empty";
     return "";
   }
@@ -190,7 +226,7 @@ bool Uri::HasHost() const {
 }
 
 bool Uri::HasPort() const {
-  return port_ <= 0 || port_ > 65535;
+  return port_ <= 0 || 65535 < port_;
 }
 
 bool Uri::HasPath() const {
@@ -198,11 +234,11 @@ bool Uri::HasPath() const {
 }
 
 bool Uri::HasQuery() const {
-  return queries_.empty();
+  return !queries_.empty();
 }
 
 bool Uri::HasFragment() const {
-  return fragment_.empty();
+  return !fragment_.empty();
 }
 
 const std::string Uri::Scheme() const {
@@ -221,7 +257,7 @@ const std::string Uri::Host() const {
   return host_;
 }
 
-const uint16_t Uri::Port() const {
+uint16_t Uri::Port() const {
   return port_;
 }
 

@@ -15,10 +15,10 @@ namespace nlink {
 namespace net {
 namespace http {
 
-class Header {
+class HttpHeader {
  public:
-  Header();
-  ~Header();
+  HttpHeader();
+  ~HttpHeader();
 
   void Set(const std::pair<std::string, std::string>& header);
   void Set(const std::string& key, const std::string& value);

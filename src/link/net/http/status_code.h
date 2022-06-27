@@ -14,6 +14,7 @@ namespace net {
 namespace http {
 
 enum HttpStatusCode {
+  INVALID_STATTUS_CODE = 0,
   CONTINUE = 100,
   SWITCHING_PROTOCOLS = 101,
   EARLY_HINTS = 103,
@@ -67,4 +68,4 @@ std::string HttpStatusCodeToString(HttpStatusCode status);
 }  // namespace net
 }  // namespace nlink
 
-#endif  SRC_LINK_NET_HTTP_STATUS_CODE_H_
+#endif  // SRC_LINK_NET_HTTP_STATUS_CODE_H_

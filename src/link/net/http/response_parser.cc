@@ -4,7 +4,7 @@
  *
  */
 
-#include "link/net/http/request_parser.h"
+#include "link/net/http/response_parser.h"
 
 #include <string>
 
@@ -15,33 +15,33 @@ namespace nlink {
 namespace net {
 namespace http {
 
-Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
+Response ResponseParser::Parse(const base::Buffer& buffer, bool is_https) {
   std::string request_str(buffer.ToString());
-  size_t request_size = request_str.size();
+  size_t response_size = request_str.size();
 
-  Method method = Method::INVALID;
-  std::string path("");
+  HttpStatusCode status = HttpStatusCode::NOT_FOUND;
+  std::string reason("");
   Version version = Version::INVALID;
 
   HttpHeader header;
   std::string body("");
 
   bool parsing = true;
-  Parser::ParseState state = Parser::ParseState::PARSE_METHOD;
+  Parser::ParseState state = Parser::ParseState::PARSE_HTTP_VERSION;
   size_t current_pos = 0;
   while (parsing) {
     switch (state) {
+      case Parser::ParseState::PARSE_HTTP_VERSION: {
+        version = ParseHttpVersion(
+          Parser::Type::RESPONSE, request_str, &current_pos, &state);
+        break;
+      }
       case Parser::ParseState::PARSE_METHOD: {
-        method = ParseMethod(request_str, &current_pos, &state);
+        status = ParseStatusCode(request_str, &current_pos, &state);
         break;
       }
       case Parser::ParseState::PARSE_REQUEST_URI: {
-        path = ParseRequestPath(request_str, &current_pos, &state);
-        break;
-      }
-      case Parser::ParseState::PARSE_HTTP_VERSION: {
-        version = ParseHttpVersion(
-          Parser::Type::REQUEST, request_str, &current_pos, &state);
+        reason = ParseStatusReason(request_str, &current_pos, &state);
         break;
       }
       case Parser::ParseState::PARSE_HEADER: {
@@ -57,12 +57,12 @@ Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
         break;
       }
       case Parser::ParseState::PARSE_ERROR: {
-        LOG(ERROR) << "[RequestParser::Parse] request parse error";
+        LOG(ERROR) << "[ResponseParser::Parse] request parse error";
         parsing = false;
         break;
       }
       default: {
-        LOG(ERROR) << "[RequestParser::Parse] invalid parse state";
+        LOG(ERROR) << "[ResponseParser::Parse] invalid parse state";
         parsing = false;
         break;
       }
@@ -71,12 +71,9 @@ Request RequestParser::Parse(const base::Buffer& buffer, bool is_https) {
 
   const std::string host = header.Find("Host");
   if (host.empty()) {
-    return Request();
+    return Response();
   }
-
-  std::string scheme = is_https ? "https" : "http";
-  Uri uri(scheme, host, path);
-  return Request(method, uri, version, header, body);
+  return Response(status, version, header, body);
 }
 
 }  // namespace http

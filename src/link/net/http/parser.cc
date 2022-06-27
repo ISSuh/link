@@ -13,20 +13,12 @@
 #include <set>
 
 #include "link/base/logging.h"
+#include "link/net/http/constant.h"
 #include "link/net/http/method.h"
 
 namespace nlink {
 namespace net {
 namespace http {
-
-constexpr const char kCR = '\r';
-constexpr const char kLF = '\n';
-constexpr const char kSpace = ' ';
-constexpr const char* kCRLF = "\r\n";
-constexpr const size_t kSpaceSize = 1;
-constexpr const size_t kCRorLFSize = 1;
-constexpr const size_t kCRLFSize = 2;
-
 
 inline bool CheckEndOfStringByIndex(const std::string& str, size_t pos) {
   return pos == str.size() - 1;
@@ -73,6 +65,50 @@ const std::string ParseRequestPath(
   *current_pos = pos + kSpaceSize;
   *state = Parser::ParseState::PARSE_HTTP_VERSION;
   return path;
+}
+
+HttpStatusCode ParseStatusCode(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state) {
+  size_t pos = *current_pos;
+  while ((!CheckEndOfStringByIndex(message, pos)) &&
+         (message[pos] != kSpace)) {
+    ++pos;
+  }
+
+  size_t size = pos - *current_pos;
+  const std::string status_code_str = message.substr(*current_pos, size);
+  int32_t status_code = std::stoi(status_code_str);
+  if (status_code_str.empty() ||
+      (status_code <= 0 || 505 < status_code)) {
+    LOG(WARNING) << "[ParseStatusCode] invalid status code. ";
+    *state = Parser::ParseState::PARSE_ERROR;
+    return HttpStatusCode::INVALID_STATTUS_CODE;
+  }
+
+  *current_pos = pos + kCRLFSize;
+  *state = Parser::ParseState::PARSE_STATUS_REASON;
+  return static_cast<HttpStatusCode>(status_code);
+}
+
+const std::string ParseStatusReason(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state) {
+  size_t pos = *current_pos;
+  while ((!CheckEndOfStringByIndex(message, pos + 1)) &&
+        !(message[pos] == kCR && message[pos + 1] == kLF)) {
+    ++pos;
+  }
+
+  size_t size = pos - *current_pos;
+  const std::string reason = message.substr(*current_pos, size);
+  if (reason.empty()) {
+    LOG(WARNING) << "[ParseStatusCode] invalid status code. ";
+    *state = Parser::ParseState::PARSE_ERROR;
+    return "";
+  }
+
+  *current_pos = pos + kCRLFSize;
+  *state = Parser::ParseState::PARSE_HEADER;
+  return reason;
 }
 
 Version ParseRequestHttpVersion(
@@ -144,7 +180,7 @@ void ParseHeaders(
   const std::string& message,
   size_t* current_pos,
   Parser::ParseState* state,
-  Header* headers) {
+  HttpHeader* headers) {
   size_t remained_size = message.size() - *current_pos;
   std::stringstream stream(message.substr(*current_pos, remained_size));
   std::string header_str("");

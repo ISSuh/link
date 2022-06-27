@@ -7,7 +7,7 @@
 #ifndef LINK_BASE_PLATFORM_LINUX_DISCRIPTOR_H_
 #define LINK_BASE_PLATFORM_LINUX_DISCRIPTOR_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace nlink {
 namespace base {

@@ -7,7 +7,7 @@
 #ifndef LINK_NET_BASE_ADDRESS_FAMILY_H_
 #define LINK_NET_BASE_ADDRESS_FAMILY_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace nlink {
 namespace io {

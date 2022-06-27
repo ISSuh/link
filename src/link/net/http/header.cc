@@ -16,21 +16,21 @@ namespace http {
 
 constexpr const char kHeaderDelm = ':';
 
-Header::Header() {
+HttpHeader::HttpHeader() {
 }
 
-Header::~Header() {
+HttpHeader::~HttpHeader() {
 }
 
-void Header::Set(const std::pair<std::string, std::string>& header) {
+void HttpHeader::Set(const std::pair<std::string, std::string>& header) {
   header_fields_.insert(header);
 }
 
-void Header::Set(const std::string& key, const std::string& value) {
+void HttpHeader::Set(const std::string& key, const std::string& value) {
   header_fields_.insert({key, value});
 }
 
-bool Header::ParseAndSet(const std::string& header_str) {
+bool HttpHeader::ParseAndSet(const std::string& header_str) {
   if (header_str.empty()) {
     return false;
   }
@@ -54,7 +54,7 @@ bool Header::ParseAndSet(const std::string& header_str) {
   return true;
 }
 
-const std::string Header::Serialize() const {
+const std::string HttpHeader::Serialize() const {
   std::stringstream stream;
   for (const auto& header : header_fields_) {
     const std::string& key = header.first;
@@ -72,11 +72,11 @@ const std::string Header::Serialize() const {
   return stream.str();
 }
 
-bool Header::Empty() const {
+bool HttpHeader::Empty() const {
   return header_fields_.empty();
 }
 
-const std::string Header::Find(const std::string& key) const {
+const std::string HttpHeader::Find(const std::string& key) const {
   if (header_fields_.find(key) == header_fields_.end()) {
     return "";
   }

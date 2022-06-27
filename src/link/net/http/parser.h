@@ -12,6 +12,7 @@
 #include "link/base/buffer.h"
 #include "link/net/http/method.h"
 #include "link/net/http/version.h"
+#include "link/net/http/status_code.h"
 #include "link/net/http/header.h"
 #include "link/net/http/request.h"
 
@@ -47,6 +48,12 @@ Method ParseMethod(
 const std::string ParseRequestPath(
   const std::string& message, size_t* current_pos, Parser::ParseState* state);
 
+HttpStatusCode ParseStatusCode(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state);
+
+const std::string ParseStatusReason(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state);
+
 Version ParseHttpVersion(
   Parser::Type type,
   const std::string& message,
@@ -57,7 +64,7 @@ void ParseHeaders(
   const std::string& message,
   size_t* current_pos,
   Parser::ParseState* state,
-  Header* headers);
+  HttpHeader* headers);
 
 const std::string ParseBody(
   const std::string& message, size_t* current_pos, Parser::ParseState* state);

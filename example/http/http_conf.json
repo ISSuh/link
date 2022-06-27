@@ -1,0 +1,28 @@
+{
+  "node_name": "http_example",
+  "log_level": "debug",
+  "modules": [
+    {
+      "module_name": "Server",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libhttpserver_example.so",
+      "module": {
+        "class_name": "ExampleHttpServerModule",
+        "arguments": {
+          "address": "0.0.0.0",
+          "port": 33669
+        }
+      }
+    },
+    {
+      "module_name": "Client",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/socket/libhttpclient_example.so",
+      "module": {
+        "class_name": "ExampleHttpClientModule",
+        "arguments": {
+          "address": "127.0.0.1",
+          "port": 33669
+        }
+      }
+    }
+  ]
+}

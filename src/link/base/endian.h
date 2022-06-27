@@ -7,7 +7,7 @@
 #ifndef LINK_BASE_ENDIAN_H_
 #define LINK_BASE_ENDIAN_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace nlink {
 namespace base {

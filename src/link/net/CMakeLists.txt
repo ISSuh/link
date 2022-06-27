@@ -5,12 +5,15 @@ message("Build Link net")
 set(LINK_NET_SRC
   ${LINK_NET_PATH}/base/uri.cc
 
+  ${LINK_NET_PATH}/http/constant.cc
   ${LINK_NET_PATH}/http/version.cc
   ${LINK_NET_PATH}/http/method.cc
   ${LINK_NET_PATH}/http/header.cc
   ${LINK_NET_PATH}/http/request.cc
+  ${LINK_NET_PATH}/http/response.cc
   ${LINK_NET_PATH}/http/parser.cc
   ${LINK_NET_PATH}/http/request_parser.cc
+  ${LINK_NET_PATH}/http/response_parser.cc
 )
 
 add_library(${LINK_NET_NAME}

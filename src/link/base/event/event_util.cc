@@ -27,6 +27,8 @@ std::string EventTypeToString(const Event& event) {
       return "Event::Type::TIMEOUT";
     case Event::Type::CLOSE:
       return "Event::Type::CLOSE";
+    default:
+      return "Invalid event type";
   }
 }
 
