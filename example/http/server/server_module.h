@@ -11,8 +11,6 @@
 
 #include <link/module/base/user_module.h>
 
-#include "example_server.h"
-
 class ExampleHttpServerModule final : public nlink::module::UserModule {
  public:
   MODULE_CONSTRUCTOR(ExampleHttpServerModule)
@@ -24,8 +22,6 @@ class ExampleHttpServerModule final : public nlink::module::UserModule {
  private:
   std::string address_;
   int32_t port_;
-
-  ExampleServer server_;
 };
 
 REGIST_MODULE(ExampleHttpServerModule);

@@ -7,6 +7,7 @@ set(LINK_NET_SRC
 
   ${LINK_NET_PATH}/http/constant.cc
   ${LINK_NET_PATH}/http/version.cc
+  ${LINK_NET_PATH}/http/status_code.cc
   ${LINK_NET_PATH}/http/method.cc
   ${LINK_NET_PATH}/http/header.cc
   ${LINK_NET_PATH}/http/request.cc

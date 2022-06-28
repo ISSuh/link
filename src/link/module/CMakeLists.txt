@@ -26,6 +26,11 @@ target_link_libraries(${LINK_MODULE_NAME}
   dl
 )
 
+set_target_properties(${LINK_MODULE_NAME}
+ PROPERTIES
+  LINK_FLAGS "-Wl,-all_load"
+)
+
 add_dependencies(${LINK_MODULE_NAME}
   ${LINK_BASE_NAME}
 )

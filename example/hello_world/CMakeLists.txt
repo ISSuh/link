@@ -45,6 +45,6 @@ target_link_libraries(hello_world
 set_target_properties(hello_world
  PROPERTIES
   LINKER_LANGUAGE CXX 
-  # LINK_FLAGS "-Wl,-all_load"
+  LINK_FLAGS "-Wl,-force_load"
   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/hello_world
 )
