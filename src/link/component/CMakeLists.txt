@@ -2,17 +2,15 @@ project(link_component)
 
 message("Build Link component")
 
-set(LINK_COMPONENT_SRC
-  ${LINK_COMPONENT_PATH}/ipc/socket/tcp_server_component.cc
-  ${LINK_COMPONENT_PATH}/ipc/socket/tcp_client_component.cc
-
-  # ${LINK_COMPONENT_PATH}/rpc/rpc_server_component.cc
-  # ${LINK_COMPONENT_PATH}/rpc/rpc_client_component.cc
-)
+FILE(GLOB component_base base/*.cc)
+FILE(GLOB socket_component ipc/socket/*.cc)
+FILE(GLOB http_component http/*.cc)
 
 add_library(${LINK_COMPONENT_NAME}
  OBJECT
-  ${LINK_COMPONENT_SRC}
+  ${component_base}
+  ${socket_component}
+  ${http_component}
 )
 
 target_link_libraries(${LINK_COMPONENT_NAME}
