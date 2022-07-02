@@ -37,7 +37,10 @@ class TcpClient
     handler::ReadHandler read_handler,
     handler::WriteHandler write_handler) override;
   void Write(const base::Buffer& buffer) override;
-
+  void Write(
+    const base::Buffer& buffer,
+    handler::WriteHandler write_handler,
+    handler::ReadHandler read_handler) override;
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
   void CloseChannel() override;

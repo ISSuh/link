@@ -32,11 +32,18 @@ class TcpSession
     handler::CloseHandler close_handler) override;
   void Close() override;
   void Write(const base::Buffer& buffer) override;
+  void Write(
+    const base::Buffer& buffer,
+    handler::WriteHandler write_handler,
+    handler::ReadHandler read_handler) override;
 
   bool IsConnected() const override;
 
  private:
-  void InternalWriteHandler(std::error_code ec, std::size_t length);
+  void InternalWriteHandler(
+    handler::WriteHandler write_handler,
+    std::error_code ec,
+    std::size_t length);
 
   void DoRead();
   void InternalReadHandler(const std::error_code& ec, std::size_t length);

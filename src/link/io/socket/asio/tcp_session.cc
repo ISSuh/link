@@ -44,7 +44,16 @@ void TcpSession::Close() {
 void TcpSession::Write(const base::Buffer& buffer) {
   socket_.async_write_some(asio::buffer(buffer.Data()),
     std::bind(&TcpSession::InternalWriteHandler, shared_from_this(),
-      std::placeholders::_1, std::placeholders::_2));
+      handler::WriteHandler(), std::placeholders::_1, std::placeholders::_2));
+}
+
+void TcpSession::Write(
+  const base::Buffer& buffer,
+  handler::WriteHandler write_handler,
+  handler::ReadHandler read_handler) {
+  socket_.async_write_some(asio::buffer(buffer.Data()),
+    std::bind(&TcpSession::InternalWriteHandler, shared_from_this(),
+      write_handler, std::placeholders::_1, std::placeholders::_2));
 }
 
 bool TcpSession::IsConnected() const {
@@ -52,12 +61,16 @@ bool TcpSession::IsConnected() const {
 }
 
 void TcpSession::InternalWriteHandler(
-  std::error_code ec, std::size_t length) {
+  handler::WriteHandler write_handler,
+  std::error_code ec,
+  std::size_t length) {
   if (ec) {
     return;
   }
 
-  write_handler_.Run(length);
+  if (!write_handler_.is_null()) {
+    write_handler_.Run(length);
+  }
 }
 
 void TcpSession::DoRead() {
@@ -72,7 +85,9 @@ void TcpSession::InternalReadHandler(
     Close();
   } else {
     base::Buffer buff(raw_read_buffer);
-    read_handler_.Run(std::move(buff), shared_from_this());
+    if (!read_handler_.is_null()) {
+      read_handler_.Run(std::move(buff), shared_from_this());
+    }
     DoRead();
   }
 }

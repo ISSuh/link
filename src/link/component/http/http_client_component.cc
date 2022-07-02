@@ -27,8 +27,11 @@ void HttpClientComponent::Get(
   net::Uri uri(scheme, host, path);
   net::http::Request request(net::http::Method::GET, uri);
 
-  request.Serialize();
+  base::Buffer buffer(request.Serialize());
+  int32_t count = 0;
+  count++;
 
+  client_->Write(buffer);
 }
 
 void HttpClientComponent::Get(
