@@ -6,7 +6,10 @@
 
 #include "link/component/http/http_client_component.h"
 
+#include <utility>
+
 #include "link/base/logging.h"
+#include "link/io/socket/asio/tcp_client.h"
 #include "link/net/base/uri.h"
 #include "link/net/http/response_parser.h"
 
@@ -14,35 +17,41 @@ namespace nlink {
 namespace component {
 
 HttpClientComponent::HttpClientComponent(
-  const std::string& host, uint16_t port) {
+  base::TaskRunner* task_runner)
+  : task_runner_(task_runner) {
 }
 
 HttpClientComponent::~HttpClientComponent() {
 }
 
 void HttpClientComponent::Get(
-  const std::string& path, RequestHanelder handler) {
-  const std::string scheme = is_https ? "https" : "http";
-  const std::string host = url_ + std::to_string(port_);
-  net::Uri uri(scheme, host, path);
+  const std::string& url_string, RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(url_string);
+  if (!uri.HasScheme() || !uri.HasHost() || !uri.HasPort()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. " << url_string;
+    return;
+  }
+
   net::http::Request request(net::http::Method::GET, uri);
 
-  base::Buffer buffer(request.Serialize());
-  int32_t count = 0;
-  count++;
+  std::unique_ptr<io::Client> client
+    = CreateIOClientAndConnet(uri.Host(), uri.Port(), handler);
 
-  client_->Write(buffer);
+  base::Buffer buffer(request.Serialize());
+  client->Write(buffer);
+
+  clients_.insert(std::move(client));
 }
 
 void HttpClientComponent::Get(
-  const std::string& path,
+  const std::string& url_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
 
 }
 
 void HttpClientComponent::Post(
-  const std::string& path,
+  const std::string& url_string,
   const std::string& content_type,
   const std::string& body,
   RequestHanelder handler) {
@@ -50,7 +59,7 @@ void HttpClientComponent::Post(
 }
 
 void HttpClientComponent::Post(
-  const std::string& path,
+  const std::string& url_string,
   const net::http::HttpHeader& header,
   const std::string& content_type,
   const std::string& body,
@@ -59,36 +68,36 @@ void HttpClientComponent::Post(
 }
 
 void HttpClientComponent::Put(
-  const std::string& path, RequestHanelder handler) {
+  const std::string& url_string, RequestHanelder handler) {
 
 }
 
 void HttpClientComponent::Put(
-  const std::string& path,
+  const std::string& url_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
 
 }
 
 void HttpClientComponent::Delete(
-  const std::string& path, RequestHanelder handler) {
+  const std::string& url_string, RequestHanelder handler) {
 
 }
 
 void HttpClientComponent::Delete(
-  const std::string& path,
+  const std::string& url_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
 
 }
 
 void HttpClientComponent::Options(
-  const std::string& path, RequestHanelder handler) {
+  const std::string& url_string, RequestHanelder handler) {
   
 }
 
 void HttpClientComponent::Options(
-  const std::string& path,
+  const std::string& url_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
   
@@ -96,23 +105,23 @@ void HttpClientComponent::Options(
 
 void HttpClientComponent::Fetch(
   net::http::Method method,
-  const std::string& path,
+  const std::string& url_string,
   RequestHanelder handler,
   const net::http::HttpHeader& header,
   const std::string& content_type,
   const std::string& body) {
   switch (method) {
   case net::http::Method::GET:
-    Get(path, header, handler);
+    Get(url_string, header, handler);
     break;
   case net::http::Method::POST:
-    Post(path, header, content_type, body, handler);
+    Post(url_string, header, content_type, body, handler);
     break;
   case net::http::Method::PUT:
-    Put(path, header, handler);
+    Put(url_string, header, handler);
     break;
   case net::http::Method::DELETE:
-    Delete(path, header, handler);
+    Delete(url_string, header, handler);
     break;
   default:
     LOG(WARNING) << "[HttpClientComponent::Fetch] unsupport method. "
@@ -122,6 +131,24 @@ void HttpClientComponent::Fetch(
 }
 
 base::EventChannel* HttpClientComponent::GetEventChannel() {
+}
+
+
+std::unique_ptr<io::Client> HttpClientComponent::CreateIOClientAndConnet(
+  const std::string& address, int32_t port, RequestHanelder request_handler) {
+  std::unique_ptr<io::Client> client(new io::TcpClient(task_runner_));
+
+  client->RegistIOHandler(
+    base::Bind(
+      &HttpClientComponent::InternalReadHandler, this, request_handler),
+    base::Bind(&HttpClientComponent::InternalWriteHandler, this));
+
+  client->Connect(
+    io::IpEndPoint(address, port),
+    base::Bind(&HttpClientComponent::InternalConnectHandler, this),
+    base::Bind(&HttpClientComponent::InternalCloseHandler, this));
+
+  return std::move(client);
 }
 
 void HttpClientComponent::InternalConnectHandler(
@@ -139,10 +166,13 @@ void HttpClientComponent::InternalCloseHandler(
 }
 
 void HttpClientComponent::InternalReadHandler(
-  const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+  RequestHanelder request_handler,
+  const base::Buffer& buffer,
+  std::shared_ptr<io::Session> session) {
   net::http::Response response = net::http::ResponseParser::Parse(buffer);
-
-
+  if (!request_handler.is_null()) {
+    request_handler.Run(response);
+  }
 }
 
 void HttpClientComponent::InternalWriteHandler(size_t length) {
