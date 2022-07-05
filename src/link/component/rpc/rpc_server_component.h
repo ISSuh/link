@@ -27,8 +27,6 @@ class RpcServerComponent : public RpcComponent {
   void RegistService();
 
  private:
-  base::EventChannel* GetEventChannel() override;
-
   RpcServerComponent();
   virtual ~RpcServerComponent();
 

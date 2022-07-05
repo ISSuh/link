@@ -7,6 +7,7 @@
 #ifndef LINK_COMPONENT_HTTP_HTTP_CLIENT_COMPONENT_H_
 #define LINK_COMPONENT_HTTP_HTTP_CLIENT_COMPONENT_H_
 
+#include <vector>
 #include <string>
 #include <set>
 #include <memory>
@@ -28,6 +29,9 @@ class HttpComponent;
 class HttpClientComponent : public HttpComponent {
  public:
   using RequestHanelder = base::Callback<void(const net::http::Response&)>;
+
+  static HttpClientComponent* CreateComponent(
+    base::TaskRunner* task_runner);
 
   void Get(const std::string& path, RequestHanelder handler);
   void Get(
@@ -77,13 +81,13 @@ class HttpClientComponent : public HttpComponent {
   explicit HttpClientComponent(base::TaskRunner* task_runner);
   virtual ~HttpClientComponent();
 
-  // LinkComponent
-  base::EventChannel* GetEventChannel() override;
+  // std::unique_ptr<io::Client> CreateIOClientAndConnet(
+  //   const std::string& address, int32_t port, RequestHanelder request_handler);
 
-  std::unique_ptr<io::Client> CreateIOClientAndConnet(
-    const std::string& address, int32_t port, RequestHanelder request_handler);
-
-  void InternalConnectHandler(std::shared_ptr<io::Session> session);
+  void InternalConnectHandler(
+    const net::http::Request& request,
+    io::Client* client,
+    std::shared_ptr<io::Session> session);
   void InternalCloseHandler(std::shared_ptr<io::Session> session);
   void InternalReadHandler(
     RequestHanelder request_handler,

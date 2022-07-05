@@ -7,6 +7,7 @@
 #ifndef LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_ASIO_H_
 #define LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_ASIO_H_
 
+#include <vector>
 #include <memory>
 
 #include "link/base/macro.h"
@@ -25,9 +26,11 @@ class EventDispatcherAsio : public EventDispatcher {
   void Dispatch() override;
   void DispatchOnce() override;
   DispatcherConext* GetDispatcherConext() override;
-  void AttachChannel(EventChannel* channel) override;
-  void DetatchCahnnel(EventChannel* channel) override;
   void DispatchEvent(const Event& event) override;
+
+  // nlink::base::EventChannelObserver
+  void AttachChannels(base::EventChannel* channel) override;
+  void DetatchCahnnel(EventChannel* channel) override;
 
  private:
   EventDispatcherAsio();

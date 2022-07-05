@@ -51,7 +51,10 @@ void TcpServer::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;
   }
-  acceptor_.reset(Acceptor::CreateAcceptor(context));
+
+  if (nullptr == acceptor_) {
+    acceptor_.reset(Acceptor::CreateAcceptor(context));
+  }
 }
 
 void TcpServer::CloseChannel() {

@@ -6,6 +6,8 @@
 
 #include "link/component/rpc/rpc_server_component.h"
 
+#include <vector>
+
 #include "link/base/macro.h"
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
@@ -19,10 +21,6 @@ RpcServerComponent::RpcServerComponent()
 }
 
 RpcServerComponent::~RpcServerComponent() = default;
-
-base::EventChannel* RpcServerComponent::GetEventChannel() {
-  return dynamic_cast<base::EventChannel*>(server_.get());
-}
 
 void RpcServerComponent::Open() {
   server_->Listen(io::IpEndPoint("0.0.0.0", 33455));

@@ -11,6 +11,8 @@
 
 #include <link/module/base/user_module.h>
 
+#include "example_http_client.h"
+
 class ExampleHttpClientModule final : public nlink::module::UserModule {
  public:
   MODULE_CONSTRUCTOR(ExampleHttpClientModule)
@@ -20,8 +22,12 @@ class ExampleHttpClientModule final : public nlink::module::UserModule {
   void Shutdown() override;
 
  private:
-  std::string address_;
-  int32_t port_;
+  void WaitingForResponse();
+
+  nlink::handle::LinkHandle handle_;
+  ExampleHttpClient http_client_;
+
+  std::string path_for_get_;
 };
 
 REGIST_MODULE(ExampleHttpClientModule);

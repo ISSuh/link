@@ -52,8 +52,11 @@ void LinkHandle::RegistComponent(component::LinkComponent* component) {
     return;
   }
 
-  base::EventChannel* channel = component->GetEventChannel();
-  event_dispatcher_->AttachChannel(channel);
+  component->RegistEventChannelObserver(event_dispatcher_.get());
+}
+
+void LinkHandle::RegistEventChannls(base::EventChannel* channel) {
+  event_dispatcher_->AttachChannels(channel);
 }
 
 }  // namespace handle

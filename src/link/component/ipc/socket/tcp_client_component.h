@@ -38,9 +38,6 @@ class TcpClientComponent : public SocketComponent {
     base::TaskRunner* task_runner, SocketComponent::Handler handlers);
   virtual ~TcpClientComponent();
 
-  // LinkComponent
-  base::EventChannel* GetEventChannel() override;
-
   void InternalConnectHandler(std::shared_ptr<io::Session> session);
   void InternalCloseHandler(std::shared_ptr<io::Session> session);
   void InternalReadHandler(

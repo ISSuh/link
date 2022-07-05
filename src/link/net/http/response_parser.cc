@@ -36,11 +36,11 @@ Response ResponseParser::Parse(const base::Buffer& buffer, bool is_https) {
           Parser::Type::RESPONSE, request_str, &current_pos, &state);
         break;
       }
-      case Parser::ParseState::PARSE_METHOD: {
+      case Parser::ParseState::PARSE_STATUS_CODE: {
         status = ParseStatusCode(request_str, &current_pos, &state);
         break;
       }
-      case Parser::ParseState::PARSE_REQUEST_URI: {
+      case Parser::ParseState::PARSE_STATUS_REASON: {
         reason = ParseStatusReason(request_str, &current_pos, &state);
         break;
       }
@@ -57,7 +57,7 @@ Response ResponseParser::Parse(const base::Buffer& buffer, bool is_https) {
         break;
       }
       case Parser::ParseState::PARSE_ERROR: {
-        LOG(ERROR) << "[ResponseParser::Parse] request parse error";
+        LOG(ERROR) << "[ResponseParser::Parse] response parse error";
         parsing = false;
         break;
       }
@@ -69,10 +69,6 @@ Response ResponseParser::Parse(const base::Buffer& buffer, bool is_https) {
     }
   }
 
-  const std::string host = header.Find("Host");
-  if (host.empty()) {
-    return Response();
-  }
   return Response(status, version, header, body);
 }
 

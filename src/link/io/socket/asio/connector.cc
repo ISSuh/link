@@ -94,9 +94,9 @@ void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
     LOG(WARNING) << "[ConnectorImpl::InternalConnectHnadler]"
               << " connect error : " << error.message();
 
-  if (nullptr != socket_) {
-    socket_.reset();
-  }
+    if (nullptr != socket_) {
+      socket_.reset();
+    }
 
     Connect(address_, connect_handler_);
   } else {
@@ -110,7 +110,7 @@ void ConnectorImpl::InternalConnectHnadler(const asio::error_code& error) {
 }
 
 void ConnectorImpl::CheckingExpired() {
-  LOG(INFO) << "[ConnectorImpl::CheckingExpired]"
+  LOG(DEBUG) << "[ConnectorImpl::CheckingExpired]"
             << " try_connection_count : " << try_connection_count_;
 
   if (nullptr == socket_) {

@@ -27,6 +27,11 @@ void TcpClient::Connect(
   connect_handler_ = connect_handler;
   close_handler_ = close_handler;
 
+  if (nullptr == connector_) {
+    LOG(ERROR) << "[TcpClient::Connect] can not open event channel.";
+    return;
+  }
+
   connector_->Connect(address,
     base::Bind(&TcpClient::InternalConnectHandler, this));
 }
@@ -66,7 +71,10 @@ void TcpClient::OpenChannel(base::DispatcherConext* context) {
   if (!context) {
     return;
   }
-  connector_.reset(Connector::CreateConnector(context));
+
+  if (nullptr == connector_) {
+    connector_.reset(Connector::CreateConnector(context));
+  }
 }
 
 void TcpClient::CloseChannel() {

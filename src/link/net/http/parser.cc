@@ -57,7 +57,7 @@ const std::string ParseRequestPath(
   size_t size = pos - *current_pos;
   const std::string path = message.substr(*current_pos, size);
   if (path.empty()) {
-    LOG(WARNING) << "[ParseMethod] invalid request path. ";
+    LOG(WARNING) << "[ParseRequestPath] invalid request path. ";
     *state = Parser::ParseState::PARSE_ERROR;
     return "";
   }
@@ -85,7 +85,7 @@ HttpStatusCode ParseStatusCode(
     return HttpStatusCode::INVALID_STATTUS_CODE;
   }
 
-  *current_pos = pos + kCRLFSize;
+  *current_pos = pos + kCRorLFSize;
   *state = Parser::ParseState::PARSE_STATUS_REASON;
   return static_cast<HttpStatusCode>(status_code);
 }
@@ -101,7 +101,7 @@ const std::string ParseStatusReason(
   size_t size = pos - *current_pos;
   const std::string reason = message.substr(*current_pos, size);
   if (reason.empty()) {
-    LOG(WARNING) << "[ParseStatusCode] invalid status code. ";
+    LOG(WARNING) << "[ParseStatusReason] invalid status reason. ";
     *state = Parser::ParseState::PARSE_ERROR;
     return "";
   }
@@ -142,7 +142,7 @@ Version ParseResponseHttpVersion(
   Parser::ParseState* state) {
   size_t pos = *current_pos;
   while (!CheckEndOfStringByIndex(message, pos) &&
-         message[pos] == kSpace) {
+         (message[pos] != kSpace)) {
     ++pos;
   }
 

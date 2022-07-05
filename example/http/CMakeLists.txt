@@ -57,6 +57,7 @@ set_target_properties(${SERVER_EXAMPLE}
 add_library(${CLIENT_EXAMPLE}
  MODULE
   client/client_module.cc
+  client/example_http_client.cc
 )
 
 target_include_directories(${CLIENT_EXAMPLE}

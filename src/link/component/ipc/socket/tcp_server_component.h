@@ -31,9 +31,6 @@ class TcpServerComponent : public SocketComponent {
   void Close();
 
  private:
-  base::EventChannel* GetEventChannel() override;
-
-  // LinkComponent
   explicit TcpServerComponent(
     base::TaskRunner* task_runner, SocketComponent::Handler handlers);
   virtual ~TcpServerComponent();

@@ -96,7 +96,11 @@ Uri Uri::Parse(const std::string& uri_string) {
     port = 0;
   }
 
-  const std::string path = parse_uri.path().to_string();
+  std::string path = parse_uri.path().to_string();
+  if (path.empty()) {
+    path = "/";
+  }
+
   const std::string queries_string = parse_uri.query().to_string();
   std::vector<Uri::Query> queries = ParseQueries(queries_string);
 
@@ -226,7 +230,7 @@ bool Uri::HasHost() const {
 }
 
 bool Uri::HasPort() const {
-  return port_ <= 0 || 65535 < port_;
+  return  0 < port_ && port_ <= 65535;
 }
 
 bool Uri::HasPath() const {
@@ -261,6 +265,13 @@ uint16_t Uri::Port() const {
   return port_;
 }
 
+const std::string Uri::HostAndPortIfHasPort() const {
+  if (!HasPort()) {
+    return Host();
+  }
+  return Host() + ":" + std::to_string(Port());
+}
+
 const std::string Uri::Path() const {
   return path_;
 }
@@ -286,21 +297,6 @@ const std::string Uri::PathWithQueryAndFragment() const {
   }
 
   return path_with_query_fragmnet;
-}
-
-void Uri::PrintForDebug() {
-  LOG(INFO) << "[Uri::PrintForDebug] "
-            << " scheme_ : " << scheme_ << " / "
-            << " username_ : " << user_info_.name << " / "
-            << " password_ : " << user_info_.password << " / "
-            << " host_ : " << host_ << " / "
-            << " port_ : " << port_ << " / "
-            << " path_ : " << path_ << " / "
-            << " queries_string_ : " << MakeQueryString() << " / "
-            << " fragment_ : " << fragment_;
-  for (const auto& item : queries_) {
-    LOG(INFO) << item.first << " / " << item.second;
-  }
 }
 
 // bool Uri::ParseScheme(const std::string& uri_string) {

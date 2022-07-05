@@ -26,8 +26,6 @@ class RpcClientComponent : public RpcComponent {
   void DisConnect();
 
  private:
-  base::EventChannel* GetEventChannel() override;
-
   RpcClientComponent();
   virtual ~RpcClientComponent();
 

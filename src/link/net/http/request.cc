@@ -14,12 +14,20 @@ namespace nlink {
 namespace net {
 namespace http {
 
+HttpHeader CreateDefaultHeader() {
+  HttpHeader header;
+  header.Set("User-Agent", "nLink 0.0.1");
+  header.Set("Connection", "Close");
+
+  return header;
+}
+
 Request::Request()
   : Request(Method::INVALID, Uri()) {
 }
 
 Request::Request(Method method, Uri uri, Version version)
-  : Request(method, uri, version, HttpHeader(), "") {
+  : Request(method, uri, version, CreateDefaultHeader(), "") {
 }
 
 Request::Request(
@@ -35,6 +43,8 @@ Request::Request(
     uri_(uri),
     header_(header),
     body_(body) {
+  header_.Set("Host", uri_.HostAndPortIfHasPort());
+  header_.Set("Accept", "*/*");
 }
 
 Request::~Request() {
@@ -73,10 +83,6 @@ const std::string Request::ContentType() const {
 }
 
 const std::string Request::Serialize() const {
-  if (!HasHeader()) {
-    return "";
-  }
-
   std::stringstream stream;
   stream << MethodToString(method_) << ' '
          << uri_.PathWithQueryAndFragment() << ' '

@@ -6,6 +6,8 @@
 
 #include "link/component/http/http_server_component.h"
 
+#include <vector>
+
 #include "link/base/logging.h"
 
 namespace nlink {
@@ -15,9 +17,6 @@ HttpServerComponent::HttpServerComponent() {
 }
 
 HttpServerComponent::~HttpServerComponent() {
-}
-
-base::EventChannel* HttpServerComponent::GetEventChannel() {
 }
 
 }  // namespace component

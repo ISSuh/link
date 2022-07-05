@@ -65,7 +65,7 @@ const std::string HttpHeader::Serialize() const {
     }
 
     stream << key;
-    stream << ":";
+    stream << ": ";
     stream << value;
     stream << "\r\n";
   }

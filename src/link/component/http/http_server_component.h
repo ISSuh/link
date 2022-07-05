@@ -18,9 +18,6 @@ class HttpServerComponent : public HttpComponent {
  public:
 
  private:
-  base::EventChannel* GetEventChannel() override;
-
-  // LinkComponent
   HttpServerComponent();
   virtual ~HttpServerComponent();
 

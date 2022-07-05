@@ -7,6 +7,7 @@
 #ifndef LINK_HANDLE_LINK_HANDLE_H_
 #define LINK_HANDLE_LINK_HANDLE_H_
 
+#include <vector>
 #include <memory>
 
 #include "link/base/event/event_dispatcher.h"
@@ -27,6 +28,7 @@ class LinkHandle {
   void Shutdown();
 
   void RegistComponent(component::LinkComponent* component);
+  void RegistEventChannls(base::EventChannel* channel);
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;

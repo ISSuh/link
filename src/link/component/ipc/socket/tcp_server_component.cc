@@ -6,6 +6,8 @@
 
 #include "link/component/ipc/socket/tcp_server_component.h"
 
+#include <vector>
+
 #include "link/base/macro.h"
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
@@ -21,16 +23,14 @@ TcpServerComponent::TcpServerComponent(
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
     write_handler_(handlers.write_handler) {
+  LinkComponent::AttachChannelsToObserver(server_.get());
+
   server_->RegistIOHandler(
     base::Bind(&TcpServerComponent::InternalReadHandler, this),
     base::Bind(&TcpServerComponent::InternalWriteHandler, this));
 }
 
 TcpServerComponent::~TcpServerComponent() = default;
-
-base::EventChannel* TcpServerComponent::GetEventChannel() {
-  return dynamic_cast<base::EventChannel*>(server_.get());
-}
 
 void TcpServerComponent::Open(
   const std::string& address, int32_t port) {

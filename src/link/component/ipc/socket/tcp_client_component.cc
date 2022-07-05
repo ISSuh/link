@@ -6,6 +6,8 @@
 
 #include "link/component/ipc/socket/tcp_client_component.h"
 
+#include <vector>
+
 #include "link/base/logging.h"
 #include "link/io/socket/asio/tcp_client.h"
 
@@ -19,6 +21,8 @@ TcpClientComponent::TcpClientComponent(
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
     write_handler_(handlers.write_handler) {
+  LinkComponent::AttachChannelsToObserver(client_.get());
+
   client_->RegistIOHandler(
     base::Bind(&TcpClientComponent::InternalReadHandler, this),
     base::Bind(&TcpClientComponent::InternalWriteHandler, this));
@@ -40,10 +44,6 @@ void TcpClientComponent::DisConnect() {
 
 void TcpClientComponent::Write(const base::Buffer& buffer) {
   client_->Write(buffer);
-}
-
-base::EventChannel* TcpClientComponent::GetEventChannel() {
-  return dynamic_cast<base::EventChannel*>(client_.get());
 }
 
 void TcpClientComponent::InternalConnectHandler(

@@ -21,8 +21,5 @@ void RpcClientComponent::Connect() {
 void RpcClientComponent::DisConnect() {
 }
 
-base::EventChannel* RpcClientComponent::GetEventChannel() {
-}
-
 }  // namespace component
 }  // namespace nlink

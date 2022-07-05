@@ -60,7 +60,7 @@ DispatcherConext* EventDispatcherAsio::GetDispatcherConext() {
   return context_.get();
 }
 
-void EventDispatcherAsio::AttachChannel(EventChannel* channel) {
+void EventDispatcherAsio::AttachChannels(base::EventChannel* channel) {
   channel->OpenChannel(context_.get());
 }
 

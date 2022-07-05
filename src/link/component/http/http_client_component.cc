@@ -16,6 +16,11 @@
 namespace nlink {
 namespace component {
 
+HttpClientComponent* HttpClientComponent::CreateComponent(
+  base::TaskRunner* task_runner) {
+  return new HttpClientComponent(task_runner);
+}
+
 HttpClientComponent::HttpClientComponent(
   base::TaskRunner* task_runner)
   : task_runner_(task_runner) {
@@ -28,19 +33,27 @@ void HttpClientComponent::Get(
   const std::string& url_string, RequestHanelder handler) {
   net::Uri uri = net::Uri::Parse(url_string);
   if (!uri.HasScheme() || !uri.HasHost() || !uri.HasPort()) {
-    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. " << url_string;
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
+               << uri.Serialize();
     return;
   }
 
   net::http::Request request(net::http::Method::GET, uri);
 
-  std::unique_ptr<io::Client> client
-    = CreateIOClientAndConnet(uri.Host(), uri.Port(), handler);
+  io::Client* client = new io::TcpClient(task_runner_);
+  LinkComponent::AttachChannelsToObserver(client);
 
-  base::Buffer buffer(request.Serialize());
-  client->Write(buffer);
+  client->RegistIOHandler(
+    base::Bind(
+      &HttpClientComponent::InternalReadHandler, this, handler),
+    base::Bind(&HttpClientComponent::InternalWriteHandler, this));
 
-  clients_.insert(std::move(client));
+  client->Connect(
+    io::IpEndPoint(uri.Host(), uri.Port()),
+    base::Bind(
+      &HttpClientComponent::InternalConnectHandler, this,
+        request, client),
+    base::Bind(&HttpClientComponent::InternalCloseHandler, this));
 }
 
 void HttpClientComponent::Get(
@@ -130,32 +143,39 @@ void HttpClientComponent::Fetch(
   }
 }
 
-base::EventChannel* HttpClientComponent::GetEventChannel() {
-}
+// std::unique_ptr<io::Client> HttpClientComponent::CreateIOClientAndConnet(
+//   const std::string& address, int32_t port, RequestHanelder request_handler) {
+//   std::unique_ptr<io::Client> client(new io::TcpClient(task_runner_));
 
+//   LinkComponent::AttachChannelsToObserver(client.get());
 
-std::unique_ptr<io::Client> HttpClientComponent::CreateIOClientAndConnet(
-  const std::string& address, int32_t port, RequestHanelder request_handler) {
-  std::unique_ptr<io::Client> client(new io::TcpClient(task_runner_));
+//   client->RegistIOHandler(
+//     base::Bind(
+//       &HttpClientComponent::InternalReadHandler, this, request_handler),
+//     base::Bind(&HttpClientComponent::InternalWriteHandler, this));
 
-  client->RegistIOHandler(
-    base::Bind(
-      &HttpClientComponent::InternalReadHandler, this, request_handler),
-    base::Bind(&HttpClientComponent::InternalWriteHandler, this));
+//   client->Connect(
+//     io::IpEndPoint(address, port),
+//     base::Bind(&HttpClientComponent::InternalConnectHandler, this),
+//     base::Bind(&HttpClientComponent::InternalCloseHandler, this));
 
-  client->Connect(
-    io::IpEndPoint(address, port),
-    base::Bind(&HttpClientComponent::InternalConnectHandler, this),
-    base::Bind(&HttpClientComponent::InternalCloseHandler, this));
-
-  return std::move(client);
-}
+//   return std::move(client);
+// }
 
 void HttpClientComponent::InternalConnectHandler(
+  const net::http::Request& request,
+  io::Client* client,
   std::shared_ptr<io::Session> session) {
   if (session == nullptr) {
     return;
   }
+
+  base::Buffer buffer(request.Serialize());
+  client->Write(buffer);
+
+  std::unique_ptr<io::Client> client_ptr;
+  client_ptr.reset(client);
+  clients_.insert(std::move(client_ptr));
 }
 
 void HttpClientComponent::InternalCloseHandler(

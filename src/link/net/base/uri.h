@@ -57,13 +57,12 @@ class Uri {
   const std::string Password() const;
   const std::string Host() const;
   uint16_t Port() const;
+  const std::string HostAndPortIfHasPort() const;
   const std::string Path() const;
   const std::string QueryString() const;
   const std::string Fragment() const;
 
   const std::string PathWithQueryAndFragment() const;
-
-  void PrintForDebug();
 
  private:
   // bool ParseScheme(const std::string& uri_string);
