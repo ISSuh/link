@@ -27,18 +27,19 @@
   - Handle이 꼭 필요한지 검토
 
 ##### Module
-  - module remove 시 memory leak 개선
-
+  - module remove 시 memory leak 개선 
+ 
 ##### IO
   - ASIO 제거
   - IP 대신 Domain Name 으로 접속가능하도록 개선
-  - HTTPS를 위한 Openssl 적용
+  - Openssl 적용
   - Shared Memory 구현
   - Pipe 구현
 
 ##### Net
+  - HTTPS 구현
   - HTTP 개선
-  - URI 개선
+  - URI parse 구현 및 개선
   - ORM 구현
 
 ##### Component
@@ -49,5 +50,5 @@
   - Module Running을 위한 middleware 구현 필요
 
 ### Test
-  - google test를 통한 테스트 적용
+  - google test를 통한 테스트 환경 적용
   - 각 구현별 테스트코드 작성

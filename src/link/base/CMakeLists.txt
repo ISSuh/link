@@ -2,32 +2,17 @@ project(link_base)
 
 message("Build Link base")
 
-set(LINK_BASE_SRC
-  ${LINK_BASE_PATH}/time.cc
-  ${LINK_BASE_PATH}/json_wrapper.cc
-  ${LINK_BASE_PATH}/buffer.cc
-  ${LINK_BASE_PATH}/rand.cc
-  ${LINK_BASE_PATH}/thread.cc
-  ${LINK_BASE_PATH}/logging.cc
-  ${LINK_BASE_PATH}/logger.cc
-
-  ${LINK_BASE_PATH}/task/task_runner.cc
-  ${LINK_BASE_PATH}/task/sequenced_task_runner.cc
-  ${LINK_BASE_PATH}/task/conqurrent_task_runner.cc
-  ${LINK_BASE_PATH}/task/task_executor.cc
-  ${LINK_BASE_PATH}/task/task_dispatcher.cc
-  ${LINK_BASE_PATH}/task_manager.cc
-
-  ${LINK_BASE_PATH}/event/event.cc
-  ${LINK_BASE_PATH}/event/event_util.cc
-  # ${LINK_BASE_PATH}/event/event_channel.cc
-  # ${LINK_BASE_PATH}/event/platform/event_dispatcher_epoll.cc
-  ${LINK_BASE_PATH}/event/platform/event_dispatcher_asio.cc
-)
+FILE(GLOB base ${LINK_BASE_PATH}/*.cc)
+FILE(GLOB base_task ${LINK_BASE_PATH}/task/*.cc)
+FILE(GLOB base_event ${LINK_BASE_PATH}/event/*.cc)
+FILE(GLOB base_event_asio ${LINK_BASE_PATH}/event/*.cc)
 
 add_library(${LINK_BASE_NAME}
  OBJECT
-  ${LINK_BASE_SRC}
+  ${base}
+  ${base_task}
+  ${base_event}
+  ${base_event_asio}
 )
 
 target_link_libraries(${LINK_BASE_NAME}

@@ -2,24 +2,13 @@ project(link_module)
 
 message("Build Link net")
 
-set(LINK_NET_SRC
-  ${LINK_NET_PATH}/base/uri.cc
-
-  ${LINK_NET_PATH}/http/constant.cc
-  ${LINK_NET_PATH}/http/version.cc
-  ${LINK_NET_PATH}/http/status_code.cc
-  ${LINK_NET_PATH}/http/method.cc
-  ${LINK_NET_PATH}/http/header.cc
-  ${LINK_NET_PATH}/http/request.cc
-  ${LINK_NET_PATH}/http/response.cc
-  ${LINK_NET_PATH}/http/parser.cc
-  ${LINK_NET_PATH}/http/request_parser.cc
-  ${LINK_NET_PATH}/http/response_parser.cc
-)
+FILE(GLOB net_base ${LINK_NET_PATH}/base/*.cc)
+FILE(GLOB net_http ${LINK_NET_PATH}/http/*.cc)
 
 add_library(${LINK_NET_NAME}
  OBJECT
-  ${LINK_NET_SRC}
+  ${net_base}
+  ${net_http}
 )
 
 target_link_libraries(${LINK_NET_NAME}

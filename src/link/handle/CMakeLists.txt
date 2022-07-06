@@ -2,13 +2,11 @@ project(link_handle)
 
 message("Build Link handle")
 
-set(LINK_HANDLE_SRC
-  ${LINK_HANDLE_PATH}/link_handle.cc
-)
+FILE(GLOB handle ${LINK_HANDLE_PATH}/*.cc)
 
 add_library(${LINK_HANDLE_NAME}
  OBJECT
-  ${LINK_HANDLE_SRC}
+  ${handle}
 )
 
 target_link_libraries(${LINK_HANDLE_NAME}

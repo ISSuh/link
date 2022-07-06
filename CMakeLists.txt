@@ -76,62 +76,62 @@ set(LINK_THIRDPARTY_LIBS
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
-include_directories(
-  ${PROJECT_SOURCE_DIR}/src
-)
+# include_directories(
+#   ${PROJECT_SOURCE_DIR}/src
+# )
 
-add_subdirectory(${LINK_BASE_PATH})
-add_subdirectory(${LINK_MODULE_PATH})
-add_subdirectory(${LINK_NODE_PATH})
-add_subdirectory(${LINK_IO_PATH})
-add_subdirectory(${LINK_NET_PATH})
-add_subdirectory(${LINK_HANDLE_PATH})
-add_subdirectory(${LINK_COMPONENT_PATH})
+# add_subdirectory(${LINK_BASE_PATH})
+# add_subdirectory(${LINK_MODULE_PATH})
+# add_subdirectory(${LINK_NODE_PATH})
+# add_subdirectory(${LINK_IO_PATH})
+# add_subdirectory(${LINK_NET_PATH})
+# add_subdirectory(${LINK_HANDLE_PATH})
+# add_subdirectory(${LINK_COMPONENT_PATH})
 
-add_library(${LINK_LIBRARY_NAME}
- SHARED
-  $<TARGET_OBJECTS:link_base> 
-  $<TARGET_OBJECTS:link_module>
-  $<TARGET_OBJECTS:link_node>
-  $<TARGET_OBJECTS:link_io>
-  $<TARGET_OBJECTS:link_net>
-  $<TARGET_OBJECTS:link_component>
-  $<TARGET_OBJECTS:link_handle>
-)
+# add_library(${LINK_LIBRARY_NAME}
+#  SHARED
+#   $<TARGET_OBJECTS:link_base> 
+#   $<TARGET_OBJECTS:link_module>
+#   $<TARGET_OBJECTS:link_node>
+#   $<TARGET_OBJECTS:link_io>
+#   $<TARGET_OBJECTS:link_net>
+#   $<TARGET_OBJECTS:link_component>
+#   $<TARGET_OBJECTS:link_handle>
+# )
 
-target_link_libraries(${LINK_LIBRARY_NAME}
- PUBLIC
-  ${LINK_BASE_NAME}
-  ${LINK_MODULE_NAME}
-  ${LINK_NODE_NAME}
-  ${LINK_IO_NAME}
-  ${LINK_NET_NAME}
-  ${LINK_COMPONENT_NAME}
-  ${LINK_HANDLE_NAME}
-  ${LINK_THIRDPARTY_GLOG_NAME}
-)
+# target_link_libraries(${LINK_LIBRARY_NAME}
+#  PUBLIC
+#   ${LINK_BASE_NAME}
+#   ${LINK_MODULE_NAME}
+#   ${LINK_NODE_NAME}
+#   ${LINK_IO_NAME}
+#   ${LINK_NET_NAME}
+#   ${LINK_COMPONENT_NAME}
+#   ${LINK_HANDLE_NAME}
+# )
 
-set_target_properties(${LINK_LIBRARY_NAME}
- PROPERTIES
-  # LINK_FLAGS "-Wl,-all_load"
-  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
-)
+# set_target_properties(${LINK_LIBRARY_NAME}
+#  PROPERTIES
+#   # LINK_FLAGS "-Wl,-all_load"
+#   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
+# )
 
 #-------------------------------------------------------------------------------
 # Build example
 #-------------------------------------------------------------------------------
-add_subdirectory(example)
+# add_subdirectory(example)
 
 #-------------------------------------------------------------------------------
 # Set gTest
 #-------------------------------------------------------------------------------
-# include(cmake/googletest.cmake)
+set(TEST_DIR ${PROJECT_DIR}/tests)
 
-# fetch_googletest(
-#     ${PROJECT_SOURCE_DIR}/cmake
-#     ${PROJECT_BINARY_DIR}/googletest
-# )
+include(${PROJECT_DIR}/cmake/googletest.cmake)
 
-# enable_testing()
+fetch_googletest(
+    ${PROJECT_DIR}/test
+    ${PROJECT_DIR}/cmake
+    ${BUILD_DIR}/googletest
+)
 
-# add_subdirectory(tests)
+add_subdirectory(${TEST_DIR})

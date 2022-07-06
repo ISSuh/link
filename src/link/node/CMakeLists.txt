@@ -11,9 +11,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR_LINK})
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
-set(LINK_NODE_SRC
-  ${LINK_NODE_PATH}/base/arguments.cc
-  ${LINK_NODE_PATH}/base/node.cc
+FILE(GLOB node_base ${LINK_NODE_PATH}/base/*.cc)
+
+add_library(${LINK_NODE_NAME}
+ OBJECT
+  ${node_base}
 )
 
 add_library(${LINK_NODE_NAME}

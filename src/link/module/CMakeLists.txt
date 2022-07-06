@@ -2,22 +2,16 @@ project(link_module)
 
 message("Build Link module")
 
-set(LINK_MODULE_SRC
-  ${LINK_MODULE_PATH}/base/module.cc
-  ${LINK_MODULE_PATH}/base/user_module.cc
-  ${LINK_MODULE_PATH}/base/user_module_base.cc
-  ${LINK_MODULE_PATH}/base/specification.cc
 
-  ${LINK_MODULE_PATH}/loader/module_loader.cc
-  ${LINK_MODULE_PATH}/loader/module_register.cc
-
-  ${LINK_MODULE_PATH}/controller/controller.cc
-  ${LINK_MODULE_PATH}/controller/executor.cc
-)
+FILE(GLOB module_base ${LINK_MODULE_PATH}/base/*.cc)
+FILE(GLOB module_loader ${LINK_MODULE_PATH}/loader/*.cc)
+FILE(GLOB module_controller ${LINK_MODULE_PATH}/controller/*.cc)
 
 add_library(${LINK_MODULE_NAME}
  OBJECT
-  ${LINK_MODULE_SRC}
+  ${module_base}
+  ${module_loader}
+  ${module_controller}
 )
 
 target_link_libraries(${LINK_MODULE_NAME}
