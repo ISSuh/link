@@ -5,14 +5,19 @@ message("Build Link base")
 FILE(GLOB base ${LINK_BASE_PATH}/*.cc)
 FILE(GLOB base_task ${LINK_BASE_PATH}/task/*.cc)
 FILE(GLOB base_event ${LINK_BASE_PATH}/event/*.cc)
-FILE(GLOB base_event_asio ${LINK_BASE_PATH}/event/*.cc)
+
+if(LINK_WITH_ASIO)
+  FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/asio/*.cc)
+else()
+  FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/*.cc)
+endif()
 
 add_library(${LINK_BASE_NAME}
  OBJECT
   ${base}
   ${base_task}
   ${base_event}
-  ${base_event_asio}
+  ${base_event_platform}
 )
 
 target_link_libraries(${LINK_BASE_NAME}

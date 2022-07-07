@@ -4,15 +4,15 @@
  *
  */
 
-#ifndef LINK_NET_BASE_NET_ERROR_H_
-#define LINK_NET_BASE_NET_ERROR_H_
+#ifndef LINK_NET_BASE_IO_ERROR_H_
+#define LINK_NET_BASE_IO_ERROR_H_
 
 #include <cstdint>
 
 namespace nlink {
 namespace io {
 
-enum NetError : int32_t {
+enum IOError : int32_t {
   OK = 0,
   ERR_IO_PENDING = -1,
 
@@ -554,9 +554,9 @@ enum NetError : int32_t {
   ERR_CERT_END = -219
 };
 
-NetError SystemErrorToNetError(int32_t os_error);
+IOError SystemErrorToNetError(int32_t os_error);
 
 }  // namespace io
 }  // namespace nlink
 
-#endif  // LINK_NET_BASE_NET_ERROR_H_
+#endif  // LINK_NET_BASE_IO_ERROR_H_

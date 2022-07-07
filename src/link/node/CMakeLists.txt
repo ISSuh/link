@@ -18,11 +18,6 @@ add_library(${LINK_NODE_NAME}
   ${node_base}
 )
 
-add_library(${LINK_NODE_NAME}
- OBJECT
-  ${LINK_NODE_SRC}
-)
-
 target_link_libraries(${LINK_NODE_NAME}
  PRIVATE
   ${LINK_BASE_NAME}

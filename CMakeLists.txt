@@ -4,11 +4,21 @@ project(link)
 #-------------------------------------------------------------------------------
 # Set Compiler
 #-------------------------------------------------------------------------------
-set(CMAKE_CXX_STANDARD 11)
+option(LINK_DEBUG "Debug Build" ON)
+option(LINK_WITH_ASIO "Use ASIO" ON)
+option(LINK_WITH_OPENSSL "Use Openssl" OFF)
+
+#-------------------------------------------------------------------------------
+# Set Compiler
+#-------------------------------------------------------------------------------
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_MAKE_PROGRAM="make -j 4")
-# set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
-set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -ldl")
+
+if(LINK_DEBUG)
+  set(CMAKE_CXX_FLAGS "-g -gdwarf2 -Wall -Wextra -fPIC -rdynamic -ldl")
+else()
+  set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC -rdynamic -ldl")
+endif()
 
 #-------------------------------------------------------------------------------
 # Set Configure
@@ -52,10 +62,16 @@ set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
 
 set(LINK_THIRD_PARTY_LIST
   json
-  asio
   spdlog
   uri
 )
+
+if(LINK_WITH_ASIO)
+  set(LINK_THIRD_PARTY_LIST
+    ${LINK_THIRD_PARTY_LIST}
+    asio
+  )
+endif()
 
 foreach(third_party ${LINK_THIRD_PARTY_LIST})
   message("Fetching and Build ${third_party}")
@@ -76,50 +92,50 @@ set(LINK_THIRDPARTY_LIBS
 #-------------------------------------------------------------------------------
 # Build Link
 #-------------------------------------------------------------------------------
-# include_directories(
-#   ${PROJECT_SOURCE_DIR}/src
-# )
+include_directories(
+  ${PROJECT_SOURCE_DIR}/src
+)
 
-# add_subdirectory(${LINK_BASE_PATH})
-# add_subdirectory(${LINK_MODULE_PATH})
-# add_subdirectory(${LINK_NODE_PATH})
-# add_subdirectory(${LINK_IO_PATH})
-# add_subdirectory(${LINK_NET_PATH})
-# add_subdirectory(${LINK_HANDLE_PATH})
-# add_subdirectory(${LINK_COMPONENT_PATH})
+add_subdirectory(${LINK_BASE_PATH})
+add_subdirectory(${LINK_MODULE_PATH})
+add_subdirectory(${LINK_NODE_PATH})
+add_subdirectory(${LINK_IO_PATH})
+add_subdirectory(${LINK_NET_PATH})
+add_subdirectory(${LINK_HANDLE_PATH})
+add_subdirectory(${LINK_COMPONENT_PATH})
 
-# add_library(${LINK_LIBRARY_NAME}
-#  SHARED
-#   $<TARGET_OBJECTS:link_base> 
-#   $<TARGET_OBJECTS:link_module>
-#   $<TARGET_OBJECTS:link_node>
-#   $<TARGET_OBJECTS:link_io>
-#   $<TARGET_OBJECTS:link_net>
-#   $<TARGET_OBJECTS:link_component>
-#   $<TARGET_OBJECTS:link_handle>
-# )
+add_library(${LINK_LIBRARY_NAME}
+ SHARED
+  $<TARGET_OBJECTS:link_base> 
+  $<TARGET_OBJECTS:link_module>
+  $<TARGET_OBJECTS:link_node>
+  $<TARGET_OBJECTS:link_io>
+  $<TARGET_OBJECTS:link_net>
+  $<TARGET_OBJECTS:link_component>
+  $<TARGET_OBJECTS:link_handle>
+)
 
-# target_link_libraries(${LINK_LIBRARY_NAME}
-#  PUBLIC
-#   ${LINK_BASE_NAME}
-#   ${LINK_MODULE_NAME}
-#   ${LINK_NODE_NAME}
-#   ${LINK_IO_NAME}
-#   ${LINK_NET_NAME}
-#   ${LINK_COMPONENT_NAME}
-#   ${LINK_HANDLE_NAME}
-# )
+target_link_libraries(${LINK_LIBRARY_NAME}
+ PUBLIC
+  ${LINK_BASE_NAME}
+  ${LINK_MODULE_NAME}
+  ${LINK_NODE_NAME}
+  ${LINK_IO_NAME}
+  ${LINK_NET_NAME}
+  ${LINK_COMPONENT_NAME}
+  ${LINK_HANDLE_NAME}
+)
 
-# set_target_properties(${LINK_LIBRARY_NAME}
-#  PROPERTIES
-#   # LINK_FLAGS "-Wl,-all_load"
-#   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
-# )
+set_target_properties(${LINK_LIBRARY_NAME}
+ PROPERTIES
+  # LINK_FLAGS "-Wl,-all_load"
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_LINK}
+)
 
 #-------------------------------------------------------------------------------
 # Build example
 #-------------------------------------------------------------------------------
-# add_subdirectory(example)
+add_subdirectory(example)
 
 #-------------------------------------------------------------------------------
 # Set gTest

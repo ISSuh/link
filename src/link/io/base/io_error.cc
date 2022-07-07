@@ -4,7 +4,7 @@
  *
  */
 
-#include "link/io/base/net_error.h"
+#include "link/io/base/io_error.h"
 
 #include <errno.h>
 #include <string.h>
@@ -14,7 +14,7 @@
 namespace nlink {
 namespace io {
 
-NetError SystemErrorToNetError(int32_t os_error) {
+IOError SystemErrorToNetError(int32_t os_error) {
   // There are numerous posix error codes, but these are the ones we thus far
   // find interesting.
   switch (os_error) {

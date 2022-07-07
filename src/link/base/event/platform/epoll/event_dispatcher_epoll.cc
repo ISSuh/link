@@ -4,7 +4,7 @@
  *
  */
 
-#include "link/base/event/platform/event_dispatcher_epoll.h"
+#include "link/base/event/platform/epoll/event_dispatcher_epoll.h"
 
 #include <sys/epoll.h>
 namespace {
