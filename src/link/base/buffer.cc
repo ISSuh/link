@@ -80,6 +80,9 @@ Buffer& Buffer::operator=(const Buffer& rhs) {
   return *this;
 }
 
+uint8_t& Buffer::operator[](int32_t index) {
+  return raw_buffer_[index];
+}
 
 }  // namespace base
 }  // namespace nlink

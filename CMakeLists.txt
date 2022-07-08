@@ -5,7 +5,7 @@ project(link)
 # Set Compiler
 #-------------------------------------------------------------------------------
 option(LINK_DEBUG "Debug Build" ON)
-option(LINK_WITH_ASIO "Use ASIO" ON)
+option(LINK_WITH_ASIO "Use ASIO" OFF)
 option(LINK_WITH_OPENSSL "Use Openssl" OFF)
 
 #-------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(LINK_DEBUG)
-  set(CMAKE_CXX_FLAGS "-g -gdwarf2 -Wall -Wextra -fPIC -rdynamic -ldl")
+  set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -ldl")
 else()
   set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC -rdynamic -ldl")
 endif()

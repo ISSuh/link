@@ -21,6 +21,7 @@ class IpAddress {
 
   IpAddress() = default;
   explicit IpAddress(const std::string& address_str);
+  IpAddress(const std::string& address_str, bool is_domain_name);
   IpAddress(const IpAddress& lhs);
   IpAddress(IpAddress&& lhs);
   ~IpAddress();
@@ -29,6 +30,7 @@ class IpAddress {
   bool IsIPv6() const;
   bool IsZero() const;
   bool IsLoopback() const;
+  bool IsDomainName() const;
 
   size_t size() const;
   bool empty() const;
@@ -39,6 +41,7 @@ class IpAddress {
 
  private:
   std::string address_;
+  bool is_domain_name_;
 };
 
 }  // namespace io

@@ -27,7 +27,7 @@ class SocketHandle {
 
  private:
   void Close();
-  
+
   SocketDiscriptor socket_descriptor_;
 };
 

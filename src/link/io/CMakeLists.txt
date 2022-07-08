@@ -7,7 +7,7 @@ FILE(GLOB io_base ${LINK_IO_PATH}/base/*.cc)
 if(LINK_WITH_ASIO)
   FILE(GLOB io_socket_platform ${LINK_IO_PATH}/socket/asio/*.cc)
 else()
-  FILE(GLOB io_socket_platform ${LINK_IO_PATH}/socket/*.cc)
+  FILE(GLOB io_socket_platform ${LINK_IO_PATH}/socket/platform/*.cc)
 endif()
 
 add_library(${LINK_IO_NAME}

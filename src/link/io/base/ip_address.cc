@@ -10,15 +10,15 @@ namespace nlink {
 namespace io {
 
 IpAddress::IpAddress(const std::string& address)
-  : address_(address) {
+  : address_(address), is_domain_name_(false) {
 }
 
 IpAddress::IpAddress(const IpAddress& lhs)
-  : address_(lhs.address_) {
+  : address_(lhs.address_), is_domain_name_(lhs.is_domain_name_) {
 }
 
 IpAddress::IpAddress(IpAddress&& lhs)
-  : address_(lhs.address_) {
+  : address_(lhs.address_), is_domain_name_(lhs.is_domain_name_) {
 }
 
 IpAddress::~IpAddress() = default;
@@ -37,6 +37,10 @@ bool IpAddress::IsZero() const {
 
 bool IpAddress::IsLoopback() const {
   return address_ == "127.0.0.1";
+}
+
+bool IpAddress::IsDomainName() const {
+  return is_domain_name_;
 }
 
 size_t IpAddress::size() const {

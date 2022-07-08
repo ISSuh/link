@@ -38,6 +38,7 @@ class Buffer {
 
   Buffer& operator=(const std::vector<uint8_t>& rhs);
   Buffer& operator=(const Buffer& rhs);
+  uint8_t& operator[](int32_t index);
 
  private:
   std::vector<uint8_t> raw_buffer_;

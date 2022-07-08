@@ -7,7 +7,13 @@
 #ifndef LINK_IO_SOCKET_PLATFORM_TCP_SOCKET_H_
 #define LINK_IO_SOCKET_PLATFORM_TCP_SOCKET_H_
 
-#include "link/io/socket/platform/socket_handle.h"
+#include <vector>
+#include <memory>
+
+#include "link/base/buffer.h"
+#include "link/base/callback/callback.h"
+#include "link/io/base/ip_endpoint.h"
+#include "link/io/socket/platform/socket.h"
 
 namespace nlink {
 namespace io {
@@ -17,22 +23,42 @@ class TcpSocket {
   TcpSocket();
   ~TcpSocket();
 
-  int32_t Open();
+  int32_t Open(AddressFamily address_family);
+  int32_t AdoptConnectedSocket(
+    SocketDiscriptor socket_fd, const IpEndPoint& peer_address);
+  int32_t AdoptUnconnectedSocket(SocketDiscriptor socket_fd);
 
-  int32_t Bind();
-  int32_t Listen();
-  int32_t Accept();
+  int32_t Bind(const IpEndPoint& address);
+  int32_t Listen(int32_t connection);
+  int32_t Accept(
+    std::unique_ptr<TcpSocket>* socket,
+    IpEndPoint* address,
+    base::CompletionCallback callback);
 
-  int32_t Connect();
+  int32_t Connect(const IpEndPoint& address, base::CompletionCallback callback);
   int32_t Close();
 
-  int32_t Read();
-  int32_t Write();
+  // int32_t Read(std::vector<uint8_t>* buffer);
+  // int32_t Write(const std::vector<uint8_t>& buffer);
 
   bool IsConnected();
 
  private:
-  SocketHandle handle_;
+  void AcceptCompleted(
+    std::unique_ptr<TcpSocket>* tcp_socket,
+    IpEndPoint* address,
+    base::CompletionCallback callback,
+    int32_t res);
+  int32_t HandleAcceptCompleted(
+    std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address, int32_t res);
+  int32_t BuildNewTcpSocket(
+    std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address);
+
+  void ConnectCompleted(base::CompletionCallback callback, int32_t res);
+  int32_t HandleConnectCompleted(int32_t res);
+
+  std::unique_ptr<Socket> socket_;
+  std::unique_ptr<Socket> accepted_socket_;
 };
 
 }  // namespace io
