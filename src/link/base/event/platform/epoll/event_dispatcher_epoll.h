@@ -19,9 +19,7 @@
 namespace nlink {
 namespace base {
 
-class EventDispatcherEpoll
-  : public EventDispatcher,
-    public EventChannelController {
+class EventDispatcherEpoll : public EventDispatcher {
  public:
   static EventDispatcherEpoll* CreateEventDispatcher(
     int32_t evnet_size, int32_t timeout);
@@ -29,15 +27,15 @@ class EventDispatcherEpoll
 
   void Dispatch() override;
 
- private:
   EventDispatcherEpoll(Discriptor fd, int32_t event_size, int32_t timeout);
-
-  Event::Type HandlingServerEvent();
-  Event::Type HandlingClientEvent(uint32_t event_flag);
 
   bool AttachChannel(EventChannel* channel) override;
   void DetatchCahnnel(Discriptor fd) override;
   void DispatchEvent(const Event& event) override;
+
+ private:
+  Event::Type HandlingServerEvent();
+  Event::Type HandlingClientEvent(uint32_t event_flag);
 
   std::unordered_map<Discriptor, EventChannel*> channel_map_;
 

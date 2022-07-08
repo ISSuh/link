@@ -16,10 +16,10 @@ namespace io {
 
 class SocketHandle {
  public:
-  explicit SocketHandle(SocketDiscriptor fd);
+  explicit SocketHandle(SocketDescriptor fd);
   ~SocketHandle();
 
-  const SocketDiscriptor Descriptor() const;
+  const SocketDescriptor Descriptor() const;
 
   bool SetNoDelay() const;
   bool SetBlocking() const;
@@ -28,7 +28,7 @@ class SocketHandle {
  private:
   void Close();
 
-  SocketDiscriptor socket_descriptor_;
+  SocketDescriptor socket_descriptor_;
 };
 
 }  // namespace io

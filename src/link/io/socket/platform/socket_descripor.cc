@@ -16,11 +16,11 @@
 namespace nlink {
 namespace io {
 
-const SocketDiscriptor kInvalidSocket = -1;
+const SocketDescriptor kInvalidSocket = -1;
 
-SocketDiscriptor CreatePlatformSocket(int32_t family, int32_t type) {
+SocketDescriptor CreatePlatformSocket(int32_t family, int32_t type) {
   int32_t protocol = family == AF_UNIX ? 0 : IPPROTO_TCP;
-  SocketDiscriptor socket_fd = socket(family, type, protocol);
+  SocketDescriptor socket_fd = socket(family, type, protocol);
   return socket_fd;
 }
 

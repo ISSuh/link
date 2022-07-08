@@ -32,8 +32,8 @@ class Socket {
 
   int32_t Open(AddressFamily address_family, Socket::Type type);
   int32_t AdoptConnectedSocket(
-    SocketDiscriptor socket_fd, const SockaddrStorage& peer_address);
-  int32_t AdoptUnconnectedSocket(SocketDiscriptor socket_fd);
+    SocketDescriptor socket_fd, const SockaddrStorage& peer_address);
+  int32_t AdoptUnconnectedSocket(SocketDescriptor socket_fd);
 
   int32_t Bind(const SockaddrStorage& address);
   int32_t Listen(int32_t connection);
@@ -53,6 +53,8 @@ class Socket {
 
   bool IsConnected();
   int32_t GetPeerAddress(SockaddrStorage* address) const;
+
+  SocketDescriptor Descriptor() const;
 
  private:
   void SetPeerAddress(const SockaddrStorage& address);

@@ -16,7 +16,7 @@
 namespace nlink {
 namespace io {
 
-SocketHandle::SocketHandle(SocketDiscriptor fd)
+SocketHandle::SocketHandle(SocketDescriptor fd)
   : socket_descriptor_(fd) {
 }
 
@@ -24,7 +24,7 @@ SocketHandle::~SocketHandle() {
   Close();
 }
 
-const SocketDiscriptor SocketHandle::Descriptor() const {
+const SocketDescriptor SocketHandle::Descriptor() const {
   return socket_descriptor_;
 }
 

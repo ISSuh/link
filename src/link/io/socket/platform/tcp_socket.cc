@@ -7,6 +7,7 @@
 #include "link/io/socket/platform/tcp_socket.h"
 
 #include <utility>
+#include <cstring>
 
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
@@ -15,7 +16,8 @@
 namespace nlink {
 namespace io {
 
-TcpSocket::TcpSocket() {
+TcpSocket::TcpSocket(SocketOptions options)
+  : options_(options) {
 }
 
 TcpSocket::~TcpSocket() {
@@ -31,7 +33,7 @@ int32_t TcpSocket::Open(AddressFamily address_family) {
 }
 
 int32_t TcpSocket::AdoptConnectedSocket(
-  SocketDiscriptor socket_fd, const IpEndPoint& peer_address) {
+  SocketDescriptor socket_fd, const IpEndPoint& peer_address) {
   SockaddrStorage storage;
   if (!peer_address.ToSockAddr(storage.addr, &storage.addr_len) ||
       peer_address.empty()) {
@@ -46,7 +48,7 @@ int32_t TcpSocket::AdoptConnectedSocket(
   return IOError::OK;
 }
 
-int32_t TcpSocket::AdoptUnconnectedSocket(SocketDiscriptor socket_fd) {
+int32_t TcpSocket::AdoptUnconnectedSocket(SocketDescriptor socket_fd) {
   socket_.reset(new Socket());
   int32_t res = socket_->AdoptUnconnectedSocket(socket_fd);
   if (res != IOError::OK) {
@@ -130,6 +132,75 @@ int32_t TcpSocket::Close() {
   socket_.reset();
 }
 
+int32_t TcpSocket::Read(
+  base::Buffer* buffer, base::CompletionCallback callback) {
+  int32_t res = socket_->Read(
+      buffer,
+      base::Bind(&TcpSocket::ReadCompleted, this, buffer, std::move(callback)));
+  if (res != IOError::ERR_IO_PENDING) {
+    res = HandleReadCompleted(buffer, res);
+  }
+  return res;
+}
+
+int32_t TcpSocket::ReadIfReady(
+  base::Buffer* buffer, base::CompletionCallback callback) {
+  int res = socket_->ReadIfReady(
+      buffer,
+      base::Bind(&TcpSocket::ReadIfReadyCompleted, this, std::move(callback)));
+  if (res != IOError::ERR_IO_PENDING) {
+    res = HandleReadCompleted(buffer, res);
+  }
+  return res;
+}
+
+int32_t TcpSocket::CancelReadIfReady() {
+  return socket_->CancelReadIfReady();
+}
+
+void TcpSocket::ReadCompleted(
+  base::Buffer* buffer, base::CompletionCallback callback, int32_t res) {
+  std::move(callback).Run(HandleReadCompleted(buffer, res));
+}
+
+void TcpSocket::ReadIfReadyCompleted(
+  base::CompletionCallback callback, int32_t res) {
+  std::move(callback).Run(res);
+}
+
+int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
+  if (res < 0) {
+    LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
+               << std::strerror(NLINK_ERRNO);
+    return res;
+  }
+  return res;
+}
+
+int32_t TcpSocket::Write(
+  base::Buffer* buffer, base::CompletionCallback callback) {
+  int32_t res = socket_->Write(
+    buffer,
+    base::Bind(&TcpSocket::WriteCompleted, this, buffer, std::move(callback)));
+  if (res != IOError::ERR_IO_PENDING) {
+    res = HandleWriteCompleted(buffer, res);
+  }
+  return res;
+}
+
+void TcpSocket::WriteCompleted(
+  base::Buffer* buffer, base::CompletionCallback callback, int32_t res) {
+  std::move(callback).Run(HandleWriteCompleted(buffer, res));
+}
+
+int32_t TcpSocket::HandleWriteCompleted(base::Buffer* buffer, int32_t res) {
+  if (res < 0) {
+    LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
+               << std::strerror(NLINK_ERRNO);
+  }
+  return res;
+}
+
 int32_t TcpSocket::BuildNewTcpSocket(
   std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address) {
   SockaddrStorage storage;
@@ -139,11 +210,11 @@ int32_t TcpSocket::BuildNewTcpSocket(
     return IOError::ERR_ADDRESS_INVALID;
   }
 
-  tcp_socket->reset(new TcpSocket());
+  SocketOptions default_options;
+  tcp_socket->reset(new TcpSocket(default_options));
   (*tcp_socket)->socket_ = std::move(accepted_socket_);
   return IOError::OK;
 }
-
 
 }  // namespace io
 }  // namespace nlink

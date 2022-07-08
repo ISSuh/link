@@ -14,13 +14,13 @@ namespace nlink {
 namespace io {
 
 #if defined(__linux__)
-typedef int32_t SocketDiscriptor;
+typedef int32_t SocketDescriptor;
 #define NLINK_ERRNO errno
 #endif
 
-extern const SocketDiscriptor kInvalidSocket;
+extern const SocketDescriptor kInvalidSocket;
 
-SocketDiscriptor CreatePlatformSocket(int32_t family, int32_t type);
+SocketDescriptor CreatePlatformSocket(int32_t family, int32_t type);
 
 }  // namespace io
 }  // namespace nlink

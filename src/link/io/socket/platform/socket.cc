@@ -44,7 +44,7 @@ Socket::~Socket() {
 }
 
 int32_t Socket::Open(AddressFamily address_family, Socket::Type type) {
-  SocketDiscriptor socket_fd = CreatePlatformSocket(
+  SocketDescriptor socket_fd = CreatePlatformSocket(
     address_family, static_cast<int32_t>(type));
 
   if (socket_fd <= kInvalidSocket) {
@@ -66,7 +66,7 @@ int32_t Socket::Open(AddressFamily address_family, Socket::Type type) {
 }
 
 int32_t Socket::AdoptConnectedSocket(
-  SocketDiscriptor socket_fd, const SockaddrStorage& peer_address) {
+  SocketDescriptor socket_fd, const SockaddrStorage& peer_address) {
   int32_t res = AdoptUnconnectedSocket(socket_fd);
   if (res != OK) {
     return res;
@@ -76,7 +76,7 @@ int32_t Socket::AdoptConnectedSocket(
   return IOError::OK;
 }
 
-int32_t Socket::AdoptUnconnectedSocket(SocketDiscriptor socket_fd) {
+int32_t Socket::AdoptUnconnectedSocket(SocketDescriptor socket_fd) {
   handle_.reset(new SocketHandle(socket_fd));
 
   if (!handle_->SetBlocking()) {
@@ -123,7 +123,7 @@ int32_t Socket::Accept(
 
 int32_t Socket::DoAccept(std::unique_ptr<Socket>* socket) {
   SockaddrStorage new_peer_address;
-  SocketDiscriptor new_socket = accept(
+  SocketDescriptor new_socket = accept(
     handle_->Descriptor(), new_peer_address.addr, &new_peer_address.addr_len);
 
   if (new_socket <= kInvalidSocket) {
@@ -336,6 +336,11 @@ int32_t Socket::GetPeerAddress(SockaddrStorage* address) const {
   *address = *peer_address_;
   return IOError::OK;
 }
+
+SocketDescriptor Socket::Descriptor() const {
+  return handle_->Descriptor();
+}
+
 
 }  // namespace io
 }  // namespace nlink
