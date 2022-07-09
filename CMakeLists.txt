@@ -5,7 +5,7 @@ project(link)
 # Set Compiler
 #-------------------------------------------------------------------------------
 option(LINK_DEBUG "Debug Build" ON)
-option(LINK_WITH_ASIO "Use ASIO" OFF)
+option(LINK_WITH_ASIO "Use ASIO" ON)
 option(LINK_WITH_OPENSSL "Use Openssl" OFF)
 
 #-------------------------------------------------------------------------------

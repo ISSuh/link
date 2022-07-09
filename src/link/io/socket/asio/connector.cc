@@ -68,11 +68,24 @@ void ConnectorImpl::Connect(
     socket_.reset(new asio::ip::tcp::socket(*io_context_));
   }
 
-  const std::string address_str = address.address().ToString();
-  int32_t port = address.port();
+  asio::ip::tcp::endpoint endpoint;
+  if (address_.IsAdressDomainName()) {
+    const std::string address_str = address.Address().Origin();
+    const std::string port_str = std::to_string(address.Port());
 
-  asio::ip::tcp::endpoint endpoint(
-    asio::ip::address::from_string(address_str), port);
+    asio::ip::tcp::resolver resolver(*io_context_);
+    asio::ip::tcp::resolver::query query(address_str, port_str);
+    asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+
+    endpoint = iter->endpoint();
+  } else {
+    const std::string address_str = address.Address().Origin();
+    int32_t port = address.Port();
+
+    endpoint = asio::ip::tcp::endpoint(
+      asio::ip::address::from_string(address_str), port);
+  }
+
 
   socket_->async_connect(endpoint,
     std::bind(&ConnectorImpl::InternalConnectHnadler, this,

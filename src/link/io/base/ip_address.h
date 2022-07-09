@@ -14,14 +14,20 @@ namespace io {
 
 class IpAddress {
  public:
+  enum class Type : int32_t {
+    INVALID,
+    IPv4,
+    IPv6,
+    DOMAIN_NAME
+  };
+
   enum : size_t {
     kIPv4AddressSize = 4,
     kIPv6AddressSize = 16
   };
 
-  IpAddress() = default;
-  explicit IpAddress(const std::string& address_str);
-  IpAddress(const std::string& address_str, bool is_domain_name);
+  IpAddress();
+  IpAddress(const std::string& address, IpAddress::Type type);
   IpAddress(const IpAddress& lhs);
   IpAddress(IpAddress&& lhs);
   ~IpAddress();
@@ -30,19 +36,22 @@ class IpAddress {
   bool IsIPv6() const;
   bool IsZero() const;
   bool IsLoopback() const;
+
   bool IsDomainName() const;
 
-  size_t size() const;
-  bool empty() const;
-  const std::string ToString() const;
+  const std::string Origin() const;
+  size_t Size() const;
+  bool Empty() const;
 
   IpAddress& operator=(const IpAddress& lhs);
   bool operator==(const IpAddress& lhs) const;
 
  private:
   std::string address_;
-  bool is_domain_name_;
+  IpAddress::Type type_;
 };
+
+IpAddress ParseAddress(const std::string& address_str);
 
 }  // namespace io
 }  // namespace nlink

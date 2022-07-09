@@ -20,8 +20,9 @@
 namespace nlink {
 namespace io {
 
-IpEndPoint::IpEndPoint(const std::string& address, uint16_t port)
-  : address_(address), port_(port) {
+IpEndPoint::IpEndPoint(const std::string& address_str, uint16_t port)
+  : port_(port) {
+  address_ = ParseAddress(address_str);
 }
 
 IpEndPoint::IpEndPoint(const IpAddress& address, uint16_t port)
@@ -31,11 +32,11 @@ IpEndPoint::IpEndPoint(const IpEndPoint& endpoint) = default;
 
 IpEndPoint::~IpEndPoint() = default;
 
-const IpAddress& IpEndPoint::address() const {
+const IpAddress& IpEndPoint::Address() const {
   return address_;
 }
 
-uint16_t IpEndPoint::port() const {
+uint16_t IpEndPoint::Port() const {
   return port_;
 }
 
@@ -50,7 +51,7 @@ AddressFamily IpEndPoint::GetFamily() const {
 }
 
 int32_t IpEndPoint::GetSockAddrFamily() const {
-  switch (address_.size()) {
+  switch (address_.Size()) {
     case IpAddress::kIPv4AddressSize:
       return AF_INET;
     case IpAddress::kIPv6AddressSize:
@@ -61,6 +62,10 @@ int32_t IpEndPoint::GetSockAddrFamily() const {
   }
 }
 
+bool IpEndPoint::IsAdressDomainName() const {
+  return address_.IsDomainName();
+}
+
 bool IpEndPoint::ToSockAddr(
   sockaddr* address, socklen_t* address_length) const {
   constexpr socklen_t kSockaddrInSize =
@@ -68,7 +73,7 @@ bool IpEndPoint::ToSockAddr(
   constexpr socklen_t kSockaddrIn6Size =
       static_cast<socklen_t>(sizeof(sockaddr_in6));
 
-  switch (address_.size()) {
+  switch (address_.Size()) {
     case IpAddress::kIPv4AddressSize: {
       if (*address_length < kSockaddrInSize) {
         return false;
@@ -81,8 +86,8 @@ bool IpEndPoint::ToSockAddr(
 
       addr->sin_family = AF_INET;
       addr->sin_port = htons(port_);
-      // addr->sin_addr.s_addr = inet_addr(address_.ToString().data());
-      addr->sin_addr.s_addr = inet_addr("127.0.0.1");
+      addr->sin_addr.s_addr = inet_addr(address_.Origin().data());
+      // addr->sin_addr.s_addr = inet_addr("127.0.0.1");
       break;
     }
     case IpAddress::kIPv6AddressSize: {
@@ -98,7 +103,7 @@ bool IpEndPoint::ToSockAddr(
 
       addr6->sin6_family = AF_INET6;
       addr6->sin6_port = base::HostToNet16(port_);
-      memcpy(&addr6->sin6_addr, address_.ToString().data(),
+      memcpy(&addr6->sin6_addr, address_.Origin().data(),
              IpAddress::kIPv6AddressSize);
       break;
     }
@@ -120,7 +125,7 @@ bool IpEndPoint::FromSockAddr(
           reinterpret_cast<const sockaddr_in*>(sock_addr);
 
       *this = IpEndPoint(
-        IpAddress(inet_ntoa(addr->sin_addr)),
+        ParseAddress(inet_ntoa(addr->sin_addr)),
         base::NetToHost16(addr->sin_port));
 
       return true;
@@ -147,12 +152,15 @@ bool IpEndPoint::FromSockAddr(
   return false;  // Unrecognized |sa_family|.
 }
 
-bool IpEndPoint::empty() const {
-  return address_.empty();
+bool IpEndPoint::Empty() const {
+  return address_.Empty();
 }
 
-const std::string IpEndPoint::ToString() const {
-  return address_.ToString() + ":" + std::to_string(port_);
+const std::string IpEndPoint::Origin() const {
+  if (port_ != 0) {
+    return address_.Origin() + ":" + std::to_string(port_);
+  }
+    return address_.Origin();
 }
 
 IpEndPoint& IpEndPoint::operator=(const IpEndPoint& lhs) {

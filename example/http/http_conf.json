@@ -8,7 +8,7 @@
       "module": {
         "class_name": "ExampleHttpClientModule",
         "arguments": {
-          "path_for_get": "http://127.0.0.1:8000"
+          "path_for_get": "http://localhost:8000"
         },
         "configure": {
           "threading": false

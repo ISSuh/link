@@ -40,7 +40,7 @@ AcceptorImpl::AcceptorImpl(asio::io_context* io_context)
 }
 
 bool AcceptorImpl::Listen(const IpEndPoint& address) {
-  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.port());
+  asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), address.Port());
 
   acceptor_.open(endpoint.protocol());
   acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));

@@ -7,7 +7,7 @@ FILE(GLOB base_task ${LINK_BASE_PATH}/task/*.cc)
 FILE(GLOB base_event ${LINK_BASE_PATH}/event/*.cc)
 
 if(LINK_WITH_ASIO)
-  FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/asio/*.cc)
+  FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/platform/asio/*.cc)
 else()
   FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/*.cc)
 endif()

@@ -20,16 +20,18 @@ namespace io {
 class IpEndPoint {
  public:
   IpEndPoint() = default;
-  IpEndPoint(const std::string& address, uint16_t port);
+  IpEndPoint(const std::string& address_str, uint16_t port);
   IpEndPoint(const IpAddress& address, uint16_t port);
   IpEndPoint(const IpEndPoint& endpoint);
   ~IpEndPoint();
 
-  const IpAddress& address() const;
-  uint16_t port() const;
+  const IpAddress& Address() const;
+  uint16_t Port() const;
 
   AddressFamily GetFamily() const;
   int32_t GetSockAddrFamily() const;
+
+  bool IsAdressDomainName() const;
 
   bool ToSockAddr(
     sockaddr* address, socklen_t* address_length) const;
@@ -37,8 +39,8 @@ class IpEndPoint {
   bool FromSockAddr(
     sockaddr* address, socklen_t address_length);
 
-  bool empty() const;
-  const std::string ToString() const;
+  const std::string Origin() const;
+  bool Empty() const;
 
   IpEndPoint& operator=(const IpEndPoint& lhs);
   bool operator==(const IpEndPoint& lhs) const;
