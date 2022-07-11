@@ -26,8 +26,6 @@ void TcpSocketClient::Connect(
   handler::CloseHandler close_handler) {
   connect_handler_ = connect_handler;
   close_handler_ = close_handler;
-
-
 }
 
 void TcpSocketClient::Disconnect() {
@@ -66,9 +64,9 @@ void TcpSocketClient::OpenChannel(base::DispatcherConext* context) {
     return;
   }
 
-  // if (nullptr == connector_) {
-  //   connector_.reset(Connector::CreateConnector(context));
-  // }
+  if (nullptr == connector_) {
+    connector_.reset(Connector::CreateConnector(context));
+  }
 }
 
 void TcpSocketClient::CloseChannel() {

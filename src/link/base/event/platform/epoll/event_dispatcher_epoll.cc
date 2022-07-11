@@ -27,7 +27,7 @@ EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher(
   int32_t evnet_size, int32_t timeout) {
   Discriptor epoll_fd = epoll_create(evnet_size);
   if (epoll_fd < 0) {
-    ::close(epoll_fd);
+    close(epoll_fd);
     return nullptr;
   }
   return new EventDispatcherEpoll(epoll_fd, evnet_size, timeout);
@@ -105,7 +105,7 @@ Event::Type EventDispatcherEpoll::HandlingClientEvent(uint32_t event_flag) {
   return type;
 }
 
-bool EventDispatcherEpoll::AttachChannel(EventChannel* channel) {
+void EventDispatcherEpoll::AttachChannel(EventChannel* channel) {
   Discriptor fd = channel->ChannelDiscriptor();
   if (channel_map_.find(fd) != channel_map_.end()) {
     LOG(ERROR) <<  __func__ << " - decriptor already exist.  " << fd;

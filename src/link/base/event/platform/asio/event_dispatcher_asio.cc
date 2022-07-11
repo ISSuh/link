@@ -6,28 +6,11 @@
 
 #include "link/base/event/platform/asio/event_dispatcher_asio.h"
 
+#include "link/base/event/platform/asio/dispatcher_context_asio.h"
 #include "link/third_party/asio/asio/io_context.hpp"
-#include "link/third_party/asio/asio/executor_work_guard.hpp"
 
 namespace nlink {
 namespace base {
-
-class AsioDispatcherConext : public DispatcherConext {
- public:
-  AsioDispatcherConext()
-    : context_(1),
-      work_guard_(context_.get_executor()) {}
-
-  virtual ~AsioDispatcherConext() = default;
-
-  void* context() const override {
-    return (void*)(&context_);
-  }
-
- private:
-  asio::io_context context_;
-  asio::executor_work_guard<asio::io_context::executor_type> work_guard_;
-};
 
 EventDispatcherAsio* EventDispatcherAsio::CreateEventDispatcher() {
   return new EventDispatcherAsio();

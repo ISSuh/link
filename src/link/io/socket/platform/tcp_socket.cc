@@ -36,7 +36,7 @@ int32_t TcpSocket::AdoptConnectedSocket(
   SocketDescriptor socket_fd, const IpEndPoint& peer_address) {
   SockaddrStorage storage;
   if (!peer_address.ToSockAddr(storage.addr, &storage.addr_len) ||
-      peer_address.empty()) {
+      peer_address.Empty()) {
     return IOError::ERR_ADDRESS_INVALID;
   }
 

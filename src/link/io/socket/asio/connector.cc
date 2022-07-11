@@ -86,7 +86,6 @@ void ConnectorImpl::Connect(
       asio::ip::address::from_string(address_str), port);
   }
 
-
   socket_->async_connect(endpoint,
     std::bind(&ConnectorImpl::InternalConnectHnadler, this,
       std::placeholders::_1));

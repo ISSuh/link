@@ -23,8 +23,8 @@ class DispatcherConext {
 
   virtual void* context() const = 0;
 
-  template<typename T>
-  T* Cast() { return nullptr; }
+  virtual bool Regist(void* target) = 0;
+  virtual bool Unregist(void* target) = 0;
 };
 
 class EventChannelObserver {

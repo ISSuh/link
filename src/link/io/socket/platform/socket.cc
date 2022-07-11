@@ -158,6 +158,9 @@ int32_t Socket::Connect(
 
   int32_t res = DoConnect();
   if (res != IOError::ERR_IO_PENDING) {
+    if (res == IOError::OK) {
+      ConnectCompleted();
+    }
     return res;
   }
 
