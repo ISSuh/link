@@ -11,6 +11,7 @@
 
 #include "link//io/socket/connector.h"
 #include "link/base/task/task_runner.h"
+#include "link/io/socket/platform/tcp_socket.h"
 
 namespace nlink {
 namespace io {
@@ -20,7 +21,7 @@ class PlatormConnector {
   static PlatormConnector* CreateConnector(base::TaskRunner* task_runner);
 
   explicit PlatormConnector(base::TaskRunner* task_runner);
-  virtual ~PlatormConnector() = default;
+  virtual ~PlatormConnector();
 
   virtual void Connect(
     const IpEndPoint& address, handler::ConnectHandler handler);

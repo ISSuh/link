@@ -9,7 +9,6 @@
 #include <memory>
 
 #include "link/base/logging.h"
-#include "link/io/socket/platform/tcp_socket.h"
 #include "link/io/socket/platform/tcp_socket_session.h"
 #include "link/io/base/io_error.h"
 
@@ -26,6 +25,7 @@ PlatormConnector::~PlatormConnector() {
 void PlatormConnector::Connect(
   const IpEndPoint& address, handler::ConnectHandler handler) {
   address_ = address;
+  connect_handler_ = handler;
 
   SocketOptions options;
   std::unique_ptr<TcpSocket> socket = std::make_unique<TcpSocket>(options);

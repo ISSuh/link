@@ -5,8 +5,9 @@ project(link)
 # Set Compiler
 #-------------------------------------------------------------------------------
 option(LINK_DEBUG "Debug Build" ON)
-option(LINK_WITH_ASIO "Use ASIO" ON)
+option(LINK_WITH_ASIO "Use ASIO" OFF)
 option(LINK_WITH_OPENSSL "Use Openssl" OFF)
+option(LINK_WITH_TEST "build test" OFF)
 
 #-------------------------------------------------------------------------------
 # Set Compiler
@@ -140,14 +141,16 @@ add_subdirectory(example)
 #-------------------------------------------------------------------------------
 # Set gTest
 #-------------------------------------------------------------------------------
-set(TEST_DIR ${PROJECT_DIR}/tests)
+if(LINK_WITH_ASIO)
+  set(TEST_DIR ${PROJECT_DIR}/tests)
 
-include(${PROJECT_DIR}/cmake/googletest.cmake)
+  include(${PROJECT_DIR}/cmake/googletest.cmake)
 
-fetch_googletest(
-    ${PROJECT_DIR}/test
-    ${PROJECT_DIR}/cmake
-    ${BUILD_DIR}/googletest
-)
+  fetch_googletest(
+      ${PROJECT_DIR}/test
+      ${PROJECT_DIR}/cmake
+      ${BUILD_DIR}/googletest
+  )
 
-add_subdirectory(${TEST_DIR})
+  add_subdirectory(${TEST_DIR})
+endif()
