@@ -13,8 +13,10 @@
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
 #include "link/base/task/task_runner.h"
+#include "link/base/event/event_dispatcher.h"
 #include "link/io/base/ip_endpoint.h"
 #include "link/io/socket/client.h"
+#include "link//io/socket/connector.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/tcp_socket.h"
 
@@ -47,15 +49,18 @@ class TcpSocketClient : public Client {
   void HandleEvent(const base::Event& event) override;
 
  private:
-  // void InternalConnectHandler(std::shared_ptr<Session> session);
-  void InternalConnectHandler(int32_t error_code);
+  void InternalConnectHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
   void InternalReadHandler(
     const base::Buffer& buffer, std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  base::TaskRunner* task_runner_;
+  void RegistChannel(SocketDescriptor descriptor);
 
+  base::TaskRunner* task_runner_;
+  base::DispatcherConext* dispatcher_context_;
+
+  std::unique_ptr<Connector> connector_;
   std::shared_ptr<Session> session_;
 
   handler::ConnectHandler connect_handler_;

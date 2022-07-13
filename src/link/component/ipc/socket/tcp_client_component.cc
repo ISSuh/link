@@ -9,14 +9,14 @@
 #include <vector>
 
 #include "link/base/logging.h"
-#include "link/io/socket/asio/tcp_client.h"
+#include "link/io/socket/socket_factory.h"
 
 namespace nlink {
 namespace component {
 
 TcpClientComponent::TcpClientComponent(
   base::TaskRunner* task_runner, SocketComponent::Handler handlers)
-  : client_(new io::TcpClient(task_runner)),
+  : client_(io::SocketFactory::CreateTcpClient(task_runner)),
     connect_handler_(handlers.connect_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),

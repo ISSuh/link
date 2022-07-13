@@ -6,8 +6,12 @@ message("link test Example")
 #-------------------------------------------------------------------------------
 # Example Build
 #-------------------------------------------------------------------------------
-set(test
-  test.cc
+include_directories(
+  ${PROJECT_LINK_INCLUDE_DIR}
+)
+
+link_directories(
+  ${BUILD_DIR}
 )
 
 add_executable(test test.cc)
@@ -15,4 +19,9 @@ add_executable(test test.cc)
 target_link_libraries(test
  PRIVATE
   ${LINK_LIBRARY_NAME}
+)
+set_target_properties(test
+ PROPERTIES
+  LINKER_LANGUAGE CXX 
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/test
 )

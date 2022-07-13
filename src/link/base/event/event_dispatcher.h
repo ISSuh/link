@@ -10,6 +10,7 @@
 #include <vector>
 #include <memory>
 
+#include "link/base/event/event_channel.h"
 #include "link/base/event/event_channel_controller.h"
 
 namespace nlink {
@@ -23,8 +24,9 @@ class DispatcherConext {
 
   virtual void* context() const = 0;
 
-  virtual bool Regist(void* target) = 0;
-  virtual bool Unregist(void* target) = 0;
+  // TODO(issuh): redesign regist channel
+  virtual bool Regist(int32_t handle, EventChannel* channel) = 0;
+  virtual bool Unregist(int32_t handle) = 0;
 };
 
 class EventChannelObserver {

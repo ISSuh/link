@@ -9,7 +9,7 @@
 #include <utility>
 
 #include "link/base/logging.h"
-#include "link/io/socket/asio/tcp_client.h"
+#include "link/io/socket/socket_factory.h"
 #include "link/net/base/uri.h"
 #include "link/net/http/response_parser.h"
 
@@ -40,7 +40,7 @@ void HttpClientComponent::Get(
 
   net::http::Request request(net::http::Method::GET, uri);
 
-  io::Client* client = new io::TcpClient(task_runner_);
+  io::Client* client = io::SocketFactory::CreateTcpClient(task_runner_);
   LinkComponent::AttachChannelsToObserver(client);
 
   client->RegistIOHandler(

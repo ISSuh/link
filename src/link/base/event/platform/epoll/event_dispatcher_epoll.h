@@ -8,6 +8,7 @@
 #define LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_
 
 #include <vector>
+#include <memory>
 #include <unordered_map>
 
 #include "link/base/macro.h"
@@ -15,23 +16,30 @@
 #include "link/base/event/event_channel.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/base/event/event_channel_controller.h"
+#include "link/base/event/platform/epoll/dispatcher_context_epoll.h"
 
 namespace nlink {
 namespace base {
 
 class EventDispatcherEpoll : public EventDispatcher {
  public:
-  static EventDispatcherEpoll* CreateEventDispatcher(
-    int32_t evnet_size, int32_t timeout);
-  ~EventDispatcherEpoll();
+  static EventDispatcherEpoll* CreateEventDispatcher();
 
+  EventDispatcherEpoll(
+    std::unique_ptr<EpollDispatcherConext> context,
+    int32_t event_size,
+    int32_t timeout);
+  virtual ~EventDispatcherEpoll();
+
+  // nlink::base::EventDispatcher
   void Dispatch() override;
-
-  EventDispatcherEpoll(Discriptor fd, int32_t event_size, int32_t timeout);
-
-  bool AttachChannel(EventChannel* channel) override;
-  void DetatchCahnnel(Discriptor fd) override;
+  void DispatchOnce() override;
+  DispatcherConext* GetDispatcherConext() override;
   void DispatchEvent(const Event& event) override;
+
+  // nlink::base::EventChannelObserver
+  void AttachChannels(base::EventChannel* channel) override;
+  void DetatchCahnnel(EventChannel* channel) override;
 
  private:
   Event::Type HandlingServerEvent();
@@ -39,9 +47,10 @@ class EventDispatcherEpoll : public EventDispatcher {
 
   std::unordered_map<Discriptor, EventChannel*> channel_map_;
 
-  Discriptor epoll_fd_;
   uint32_t event_size_;
   int32_t timeout_;
+
+  std::unique_ptr<EpollDispatcherConext> context_;
 
   DISAALOW_COPY_AND_ASSIGN(EventDispatcherEpoll);
 };

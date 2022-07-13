@@ -50,7 +50,6 @@ target_link_libraries(${SERVER_EXAMPLE}
 set_target_properties(${SERVER_EXAMPLE}
  PROPERTIES
   LINKER_LANGUAGE CXX 
-  # LINK_FLAGS "-Wl,-all_load"
   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/socket
 )
 
@@ -74,6 +73,5 @@ target_link_libraries(${CLIENT_EXAMPLE}
 set_target_properties(${CLIENT_EXAMPLE}
  PROPERTIES
   LINKER_LANGUAGE CXX 
-  # LINK_FLAGS "-Wl,-all_load"
   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/socket
 )

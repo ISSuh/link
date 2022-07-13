@@ -23,24 +23,29 @@ void* EpollDispatcherConext::context() const {
   return (void*)(&discriptor_);
 }
 
-bool EpollDispatcherConext::Regist(void* target) {
-  int32_t file_discriptor = *reinterpret_cast<int32_t*>(target);
+bool EpollDispatcherConext::Regist(int32_t handle, EventChannel* channel) {
   epoll_event event;
   event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
-  event.data.fd = file_discriptor;
+  event.data.fd = handle;
 
-  if (epoll_ctl(discriptor_, EPOLL_CTL_ADD, file_discriptor, &event) < 0) {
+  if (epoll_ctl(discriptor_, EPOLL_CTL_ADD, handle, &event) < 0) {
     return false;
   }
+
+  channels.emplace(handle, channel);
   return true;
 }
 
-bool EpollDispatcherConext::Unregist(void* target) {
-  int32_t file_discriptor = *reinterpret_cast<int32_t*>(target);
-  if (epoll_ctl(discriptor_, EPOLL_CTL_DEL, file_discriptor, nullptr) < 0) {
+bool EpollDispatcherConext::Unregist(int32_t handle) {
+  if (epoll_ctl(discriptor_, EPOLL_CTL_DEL, handle, nullptr) < 0) {
     return false;
   }
+  channels.erase(handle);
   return true;
+}
+
+void EpollDispatcherConext::Dispatch() {
+
 }
 
 }  // namespace base

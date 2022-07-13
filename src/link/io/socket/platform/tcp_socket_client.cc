@@ -8,13 +8,16 @@
 
 #include <utility>
 
+#include "link/io/socket/platform/tcp_connector.h"
 #include "link/base/logging.h"
 
 namespace nlink {
 namespace io {
 
 TcpSocketClient::TcpSocketClient(base::TaskRunner* task_runner)
-  : task_runner_(task_runner), session_(nullptr) {
+  : task_runner_(task_runner),
+    dispatcher_context_(nullptr),
+    session_(nullptr) {
 }
 
 TcpSocketClient::~TcpSocketClient() {
@@ -26,6 +29,11 @@ void TcpSocketClient::Connect(
   handler::CloseHandler close_handler) {
   connect_handler_ = connect_handler;
   close_handler_ = close_handler;
+
+  if (nullptr == connector_) {
+    connector_->Connect(address,
+      base::Bind(&TcpSocketClient::InternalConnectHandler, this));
+  }
 }
 
 void TcpSocketClient::Disconnect() {
@@ -64,8 +72,12 @@ void TcpSocketClient::OpenChannel(base::DispatcherConext* context) {
     return;
   }
 
+  dispatcher_context_ = context;
+
   if (nullptr == connector_) {
-    connector_.reset(Connector::CreateConnector(context));
+    connector_.reset(new TcpConnector(
+      task_runner_,
+      base::Bind(&TcpSocketClient::RegistChannel, this)));
   }
 }
 
@@ -100,6 +112,11 @@ void TcpSocketClient::InternalWriteHandler(size_t length) {
   write_handler_.Run(length);
 }
 
+void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {
+  if (!dispatcher_context_->Regist(descriptor, this)) {
+    LOG(ERROR) << "[TcpSocketClient::RegistChannel] can not regist channel";
+  }
+}
 
 }  // namespace io
 }  // namespace nlink

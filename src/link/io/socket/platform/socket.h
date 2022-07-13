@@ -51,7 +51,7 @@ class Socket {
   int32_t Write(base::Buffer* buffer, base::CompletionCallback callback);
   int32_t WaitForWrite(base::Buffer* buffer, base::CompletionCallback callback);
 
-  bool IsConnected();
+  bool IsConnected() const;
   int32_t GetPeerAddress(SockaddrStorage* address) const;
 
   SocketDescriptor Descriptor() const;

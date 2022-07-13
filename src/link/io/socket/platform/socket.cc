@@ -305,7 +305,7 @@ void Socket::WriteCompleted() {
   std::move(peding_write_callback_).Run(IOError::OK);
 }
 
-bool Socket::IsConnected() {
+bool Socket::IsConnected() const {
   if (nullptr == handle_ ||
       handle_->Descriptor() == kInvalidSocket ||
       waiting_connect_) {

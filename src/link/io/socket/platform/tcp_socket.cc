@@ -216,5 +216,13 @@ int32_t TcpSocket::BuildNewTcpSocket(
   return IOError::OK;
 }
 
+bool TcpSocket::IsConnected() const {
+  return socket_->IsConnected();
+}
+
+SocketDescriptor TcpSocket::Descriptor() const {
+  return socket_->Descriptor();
+}
+
 }  // namespace io
 }  // namespace nlink

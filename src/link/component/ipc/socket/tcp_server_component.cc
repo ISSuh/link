@@ -11,14 +11,14 @@
 #include "link/base/macro.h"
 #include "link/base/callback/bind.h"
 #include "link/base/logging.h"
-#include "link/io/socket/asio/tcp_server.h"
+#include "link/io/socket/socket_factory.h"
 
 namespace nlink {
 namespace component {
 
 TcpServerComponent::TcpServerComponent(
   base::TaskRunner* task_runner, SocketComponent::Handler handlers)
-  : server_(new io::TcpServer(task_runner)),
+  : server_(io::SocketFactory::CreateTcpServer(task_runner)),
     accept_handler_(handlers.accept_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),

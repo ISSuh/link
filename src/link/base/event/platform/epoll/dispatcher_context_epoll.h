@@ -21,11 +21,14 @@ class EpollDispatcherConext : public DispatcherConext {
 
   void* context() const override;
 
-  bool Regist(void* target) override;
-  bool Unregist(void* target) override;
+  bool Regist(int32_t handle, EventChannel* channel) override;
+  bool Unregist(int32_t handle) override;
+
+  void Dispatch();
 
  private:
   int32_t discriptor_;
+  std::map<int32_t, EventChannel*> channels;
 };
 
 }  // namespace base
