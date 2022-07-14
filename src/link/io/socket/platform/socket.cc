@@ -54,7 +54,7 @@ int32_t Socket::Open(AddressFamily address_family, Socket::Type type) {
   }
 
   handle_.reset(new SocketHandle(socket_fd));
-  if (!handle_->SetBlocking()) {
+  if (!handle_->SetNonBlocking()) {
     LOG(ERROR) << "[Socket::Open] can not setting to nonblocking. "
                << std::strerror(NLINK_ERRNO);
 
@@ -328,7 +328,9 @@ bool Socket::IsConnected() const {
 }
 
 void Socket::SetPeerAddress(const SockaddrStorage& address) {
-  peer_address_.reset(new SockaddrStorage(address));
+  if (nullptr == peer_address_) {
+    peer_address_.reset(new SockaddrStorage(address));
+  }
 }
 
 int32_t Socket::GetPeerAddress(SockaddrStorage* address) const {

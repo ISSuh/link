@@ -10,14 +10,15 @@
 
 #include <regex>
 
+#include "link/base/logging.h"
+
 namespace nlink {
 namespace io {
 
 bool CheckPattern(
-  const std::string& address, const std::string& address_pattern) {
+  const std::string& address, const char* address_pattern) {
   std::regex pattern(address_pattern);
-  std::smatch match;
-  if (std::regex_search(address, match, pattern)) {
+  if (std::regex_match(address, pattern)) {
     return true;
   }
   return false;
@@ -25,7 +26,7 @@ bool CheckPattern(
 
 bool CheckAddressIPv4(const std::string& address) {
   const char* kIPv4Pattern =
-    "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+    "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";;
 
   return CheckPattern(address, kIPv4Pattern);
 }
@@ -121,6 +122,7 @@ IpAddress& IpAddress::operator=(const IpAddress& lhs) {
   }
 
   address_ = lhs.address_;
+  type_ = lhs.type_;
   return *this;
 }
 

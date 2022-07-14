@@ -30,7 +30,7 @@ void TcpSocketClient::Connect(
   connect_handler_ = connect_handler;
   close_handler_ = close_handler;
 
-  if (nullptr == connector_) {
+  if (nullptr != connector_) {
     connector_->Connect(address,
       base::Bind(&TcpSocketClient::InternalConnectHandler, this));
   }
@@ -68,7 +68,7 @@ void TcpSocketClient::RegistIOHandler(
 }
 
 void TcpSocketClient::OpenChannel(base::DispatcherConext* context) {
-  if (!context) {
+  if (nullptr == context) {
     return;
   }
 

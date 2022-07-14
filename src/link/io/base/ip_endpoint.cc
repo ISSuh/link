@@ -21,8 +21,7 @@ namespace nlink {
 namespace io {
 
 IpEndPoint::IpEndPoint(const std::string& address_str, uint16_t port)
-  : port_(port) {
-  address_ = ParseAddress(address_str);
+  : address_(ParseAddress(address_str)), port_(port) {
 }
 
 IpEndPoint::IpEndPoint(const IpAddress& address, uint16_t port)
@@ -108,6 +107,7 @@ bool IpEndPoint::ToSockAddr(
       break;
     }
     default:
+      LOG(ERROR) << __func__ << " - invalid size";
       return false;
   }
   return true;

@@ -103,6 +103,7 @@ int32_t TcpSocket::Connect(
   const IpEndPoint& address, base::CompletionCallback callback) {
   SockaddrStorage storage;
   if (!address.ToSockAddr(storage.addr, &storage.addr_len)) {
+    LOG(INFO) << "TcpSocket::Connect - fail convert addr to sockaddr";
     return IOError::ERR_ADDRESS_INVALID;
   }
 

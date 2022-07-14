@@ -11,6 +11,7 @@
 
 #include <link/base/buffer.h>
 #include <link/base/logging.h>
+#include <link/base/logger.h>
 #include <link/base/callback/callback.h>
 #include <link/base/callback/bind.h>
 #include <link/base/task_manager.h>
@@ -24,25 +25,31 @@
 using namespace nlink;
 
 void TestConnectHandler(std::shared_ptr<io::Session> session) {
-
+  LOG(INFO) << __func__;
 }
 
 void TestCloseHandler(std::shared_ptr<io::Session> session) {
+  LOG(INFO) << __func__;
 
 }
 
 void TestWriteHandler(size_t size) {
+  LOG(INFO) << __func__;
 
 }
 
 void TestReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+  LOG(INFO) << __func__;
 
 }
 
 int main(int argc, char* argv[]) {
-  base::TaskManager task_manager;
-  base::TaskRunner* task_runner = task_manager.CreateTaskRunner(
+  std::shared_ptr<base::TaskManager> task_manager
+    = std::make_shared<base::TaskManager>();
+  base::LoggerManager::Instance()->SetTaskManager(task_manager);
+
+  base::TaskRunner* task_runner = task_manager->CreateTaskRunner(
     "TestWorker", base::TaskRunner::Type::SEQUENCE);
 
   base::EventDispatcher* dispatcher =
@@ -55,6 +62,9 @@ int main(int argc, char* argv[]) {
     dynamic_cast<base::EventChannel*>(client));
 
   io::IpEndPoint endpoint("127.0.0.1", 33669);
+
+  LOG(INFO) << "Connect : " << endpoint.Origin();
+
   client->Connect(endpoint,
     base::Bind(&TestConnectHandler),
     base::Bind(&TestCloseHandler));
@@ -73,6 +83,6 @@ int main(int argc, char* argv[]) {
     // LOG(INFO) << "[ExampleClientModule] write : " << message.size();
 
     ++count;
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }

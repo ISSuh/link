@@ -3,6 +3,9 @@ project(example_test)
 
 message("link test Example")
 
+set(CMAKE_CXX_FLAGS "-g -Wall -fPIC -rdynamic -ldl")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS")
+
 #-------------------------------------------------------------------------------
 # Example Build
 #-------------------------------------------------------------------------------

@@ -29,6 +29,7 @@ class TcpConnector : public Connector {
 
  private:
   void DoConnect(std::shared_ptr<TcpSocket> socket);
+  void HandlePendingConnect(std::shared_ptr<TcpSocket> socket);
   void InternalConnectHnadler(std::shared_ptr<TcpSocket> socket, int32_t err);
 
   base::TaskRunner* task_runner_;

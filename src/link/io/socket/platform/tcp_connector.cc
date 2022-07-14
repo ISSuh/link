@@ -31,15 +31,26 @@ void TcpConnector::Connect(
 
   SocketOptions options;
   std::shared_ptr<TcpSocket> socket = std::make_shared<TcpSocket>(options);
+  socket->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
 
   socket_create_callback_.Run(socket->Descriptor());
   DoConnect(socket);
 }
 
 void TcpConnector::DoConnect(std::shared_ptr<TcpSocket> socket) {
-  socket->Connect(address_,
+  int32_t res = socket->Connect(address_,
     base::Bind(
       &TcpConnector::InternalConnectHnadler, this, socket));
+
+  if (IOError::ERR_IO_PENDING) {
+    HandlePendingConnect(socket);
+    return;
+  }
+}
+
+void TcpConnector::HandlePendingConnect(std::shared_ptr<TcpSocket> socket) {
+  task_runner_->PostTask(
+    base::Bind(&TcpConnector::DoConnect, this, socket));
 }
 
 void TcpConnector::InternalConnectHnadler(

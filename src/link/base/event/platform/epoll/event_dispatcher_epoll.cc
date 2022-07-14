@@ -50,38 +50,39 @@ void EventDispatcherEpoll::Dispatch() {
 }
 
 void EventDispatcherEpoll::DispatchOnce() {
-  // std::vector<EpollEvent> epoll_events(event_size_);
-  // int32_t count =
-  //   epoll_wait(epoll_fd_, &epoll_events[0], event_size_, timeout_);
+  int32_t context = *(int32_t*)context_->context();
+  std::vector<EpollEvent> epoll_events(event_size_);
+  int32_t count =
+    epoll_wait(context, &epoll_events[0], event_size_, timeout_);
 
-  // if (count < 0) {
-  //   LOG(INFO) << __func__ << " - Error";
-  //   return;
-  // } else if (count == 0) {
-  //   LOG(INFO) << __func__ << " - timeout";
-  //   return;
-  // }
+  if (count < 0) {
+    LOG(INFO) << __func__ << " - Error";
+    return;
+  } else if (count == 0) {
+    LOG(INFO) << __func__ << " - timeout";
+    return;
+  }
 
-  // epoll_events.resize(count);
-  // for (const auto& epoll_event : epoll_events) {
-  //   Discriptor fd = epoll_event.data.fd;
-  //   uint32_t event_flag = epoll_event.events;
+  epoll_events.resize(count);
+  for (const auto& epoll_event : epoll_events) {
+    int32_t fd = epoll_event.data.fd;
+    uint32_t event_flag = epoll_event.events;
 
-  //   Event::Type type;
-  //   switch (channel_map_[fd]->ObserverType()) {
-  //     case EventObserver::Type::SERVER: {
-  //       type = HandlingServerEvent();
-  //       break;
-  //     }
-  //     case EventObserver::Type::CLIENT: {
-  //       type = HandlingClientEvent(event_flag);
-  //       break;
-  //     }
-  //   }
+    // Event::Type type;
+    // switch (channel_map_[fd]->ObserverType()) {
+    //   case EventObserver::Type::SERVER: {
+    //     type = HandlingServerEvent();
+    //     break;
+    //   }
+    //   case EventObserver::Type::CLIENT: {
+    //     type = HandlingClientEvent(event_flag);
+    //     break;
+    //   }
+    // }
 
-  //   Event event(fd, type);
-  //   DispatchEvent(event);
-  // }
+    // Event event(fd, type);
+    // DispatchEvent(event);
+  }
 }
 
 DispatcherConext* EventDispatcherEpoll::GetDispatcherConext() {
