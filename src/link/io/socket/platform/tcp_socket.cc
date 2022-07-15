@@ -75,8 +75,9 @@ int32_t TcpSocket::Accept(
   base::CompletionCallback callback) {
   int32_t res = socket_->Accept(
     &accepted_socket_,
-    base::Bind(&TcpSocket::AcceptCompleted, this,
-      tcp_socket, address, std::move(callback)));
+    [this, &tcp_socket, &address, callback](int32_t res) {
+      this->AcceptCompleted(tcp_socket, address, std::move(callback), res);
+    });
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleAcceptCompleted(tcp_socket, address, res);
   }
@@ -88,7 +89,7 @@ void TcpSocket::AcceptCompleted(
   IpEndPoint* address,
   base::CompletionCallback callback,
   int32_t res) {
-  std::move(callback).Run(HandleAcceptCompleted(tcp_socket, address, res));
+  callback(HandleAcceptCompleted(tcp_socket, address, res));
 }
 
 int32_t TcpSocket::HandleAcceptCompleted(
@@ -109,7 +110,9 @@ int32_t TcpSocket::Connect(
 
   int32_t res = socket_->Connect(
     storage,
-    base::Bind(&TcpSocket::ConnectCompleted, this, std::move(callback)));
+    [this, callback](int32_t res) {
+      this->ConnectCompleted(std::move(callback), res);
+    });
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleConnectCompleted(res);
   }
@@ -118,7 +121,8 @@ int32_t TcpSocket::Connect(
 
 void TcpSocket::ConnectCompleted(
   base::CompletionCallback callback, int32_t res) {
-  std::move(callback).Run(HandleConnectCompleted(res));
+  LOG(INFO) << __func__ << " - " << this;
+  callback(HandleConnectCompleted(res));
 }
 
 int32_t TcpSocket::HandleConnectCompleted(int32_t res) {
@@ -136,8 +140,10 @@ int32_t TcpSocket::Close() {
 int32_t TcpSocket::Read(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = socket_->Read(
-      buffer,
-      base::Bind(&TcpSocket::ReadCompleted, this, buffer, std::move(callback)));
+    buffer,
+    [this, &buffer, callback](int32_t res) {
+      this->ReadCompleted(buffer, std::move(callback), res);
+    });
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleReadCompleted(buffer, res);
   }
@@ -147,8 +153,10 @@ int32_t TcpSocket::Read(
 int32_t TcpSocket::ReadIfReady(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int res = socket_->ReadIfReady(
-      buffer,
-      base::Bind(&TcpSocket::ReadIfReadyCompleted, this, std::move(callback)));
+    buffer,
+    [this, callback](int32_t res) {
+      this->ReadIfReadyCompleted(std::move(callback), res);
+    });
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleReadCompleted(buffer, res);
   }
@@ -161,12 +169,12 @@ int32_t TcpSocket::CancelReadIfReady() {
 
 void TcpSocket::ReadCompleted(
   base::Buffer* buffer, base::CompletionCallback callback, int32_t res) {
-  std::move(callback).Run(HandleReadCompleted(buffer, res));
+  callback(HandleReadCompleted(buffer, res));
 }
 
 void TcpSocket::ReadIfReadyCompleted(
   base::CompletionCallback callback, int32_t res) {
-  std::move(callback).Run(res);
+  callback(res);
 }
 
 int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
@@ -182,7 +190,9 @@ int32_t TcpSocket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = socket_->Write(
     buffer,
-    base::Bind(&TcpSocket::WriteCompleted, this, buffer, std::move(callback)));
+    [this, &buffer, callback](int32_t res) {
+      this->WriteCompleted(buffer, std::move(callback), res);
+    });
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleWriteCompleted(buffer, res);
   }
@@ -191,7 +201,7 @@ int32_t TcpSocket::Write(
 
 void TcpSocket::WriteCompleted(
   base::Buffer* buffer, base::CompletionCallback callback, int32_t res) {
-  std::move(callback).Run(HandleWriteCompleted(buffer, res));
+  callback(HandleWriteCompleted(buffer, res));
 }
 
 int32_t TcpSocket::HandleWriteCompleted(base::Buffer* buffer, int32_t res) {

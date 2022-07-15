@@ -38,8 +38,8 @@ void TcpSocketSession::Close() {
 
 void TcpSocketSession::Write(const base::Buffer& buffer) {
   base::Buffer temp =  buffer;
-  socket_->Write(&temp,
-    base::Bind(&TcpSocketSession::InternalWriteHandler, this));
+  // socket_->Write(&temp,
+  //   base::Bind(&TcpSocketSession::InternalWriteHandler, this));
 }
 
 void TcpSocketSession::Write(

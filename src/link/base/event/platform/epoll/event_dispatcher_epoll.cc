@@ -10,6 +10,7 @@
 #include <sys/unistd.h>
 
 #include <vector>
+#include <array>
 #include <utility>
 
 #include "link/base/logging.h"
@@ -19,7 +20,7 @@ namespace nlink {
 namespace base {
 
 using EpollEvent = epoll_event;
-const int32_t kDefaultEvnetSize = 1024;
+constexpr const int32_t kDefaultEvnetSize = 1024;
 const int32_t kDefaultTimeOut = 60;
 
 EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
@@ -51,22 +52,21 @@ void EventDispatcherEpoll::Dispatch() {
 
 void EventDispatcherEpoll::DispatchOnce() {
   int32_t context = *(int32_t*)context_->context();
-  std::vector<EpollEvent> epoll_events(event_size_);
-  int32_t count =
-    epoll_wait(context, &epoll_events[0], event_size_, timeout_);
 
-  if (count < 0) {
+  std::array<EpollEvent, kDefaultEvnetSize> epoll_events;
+  int32_t event_count =
+    epoll_wait(context, &epoll_events[0], event_size_, timeout_);
+  if (event_count < 0) {
     LOG(INFO) << __func__ << " - Error";
     return;
-  } else if (count == 0) {
+  } else if (event_count == 0) {
     LOG(INFO) << __func__ << " - timeout";
     return;
   }
 
-  epoll_events.resize(count);
-  for (const auto& epoll_event : epoll_events) {
-    int32_t fd = epoll_event.data.fd;
-    uint32_t event_flag = epoll_event.events;
+  for (int i = 0 ; i < event_count ; ++i) {
+    int32_t fd = epoll_events[i].data.fd;
+    uint32_t event_flag = epoll_events[i].events;
 
     // Event::Type type;
     // switch (channel_map_[fd]->ObserverType()) {

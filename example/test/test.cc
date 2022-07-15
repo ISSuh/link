@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
   dispatcher->AttachChannels(
     dynamic_cast<base::EventChannel*>(client));
 
-  io::IpEndPoint endpoint("127.0.0.1", 33669);
+  io::IpEndPoint endpoint("127.0.0.1", 3600);
 
   LOG(INFO) << "Connect : " << endpoint.Origin();
 

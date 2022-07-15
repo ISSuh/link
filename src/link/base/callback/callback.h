@@ -7,6 +7,7 @@
 #ifndef LINK_BASE_CALLBACK_CALLBACK_H_
 #define LINK_BASE_CALLBACK_CALLBACK_H_
 
+#include <functional>
 #include <utility>
 
 #include "link/base/callback/bind.h"
@@ -89,7 +90,9 @@ class Callback<R(Args...)> : public CallbackBase {
 };
 
 using TaskCallback = Callback<void()>;
-using CompletionCallback = Callback<void(int32_t)>;
+// using CompletionCallback = Callback<void(int32_t)>;
+
+using CompletionCallback = std::function<void(int32_t)>;
 
 }  // namespace base
 }  // namespace nlink

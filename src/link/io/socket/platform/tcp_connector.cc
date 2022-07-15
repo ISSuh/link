@@ -12,6 +12,8 @@
 #include "link/io/socket/platform/tcp_session.h"
 #include "link/io/base/io_error.h"
 
+#include "link/base/stack_trace.h"
+
 namespace nlink {
 namespace io {
 
@@ -30,39 +32,43 @@ void TcpConnector::Connect(
   connect_handler_ = handler;
 
   SocketOptions options;
-  std::shared_ptr<TcpSocket> socket = std::make_shared<TcpSocket>(options);
+  TcpSocket* socket = new TcpSocket(options);
   socket->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
 
   socket_create_callback_.Run(socket->Descriptor());
   DoConnect(socket);
 }
 
-void TcpConnector::DoConnect(std::shared_ptr<TcpSocket> socket) {
-  int32_t res = socket->Connect(address_,
-    base::Bind(
-      &TcpConnector::InternalConnectHnadler, this, socket));
+void TcpConnector::DoConnect(TcpSocket* socket) {
+  ++try_connection_count_;
 
-  if (IOError::ERR_IO_PENDING) {
+  int32_t res = socket->Connect(
+    address_,
+    [this, &socket](int32_t err) {
+      this->InternalConnectHnadler(socket, err);
+    });
+
+  if (IOError::ERR_IO_PENDING == res) {
     HandlePendingConnect(socket);
     return;
   }
 }
 
-void TcpConnector::HandlePendingConnect(std::shared_ptr<TcpSocket> socket) {
+void TcpConnector::HandlePendingConnect(TcpSocket* socket) {
   task_runner_->PostTask(
     base::Bind(&TcpConnector::DoConnect, this, socket));
 }
 
 void TcpConnector::InternalConnectHnadler(
-  std::shared_ptr<TcpSocket> socket, int32_t err) {
-  if (err != IOError::OK) {
+  TcpSocket* socket, int32_t err) {
+  if (err == IOError::OK) {
+    std::shared_ptr<TcpSocket> tcp_socket(socket);
     std::shared_ptr<Session> session =
-      std::make_shared<TcpSocketSession>(task_runner_, socket);
+      std::make_shared<TcpSocketSession>(task_runner_, tcp_socket);
     if (!connect_handler_.is_null()) {
       connect_handler_.Run(session);
     }
   } else {
-    ++try_connection_count_;
     task_runner_->PostTask(
       base::Bind(&TcpConnector::DoConnect, this, socket));
   }

@@ -28,9 +28,9 @@ class TcpConnector : public Connector {
     const IpEndPoint& address, handler::ConnectHandler handler) override;
 
  private:
-  void DoConnect(std::shared_ptr<TcpSocket> socket);
-  void HandlePendingConnect(std::shared_ptr<TcpSocket> socket);
-  void InternalConnectHnadler(std::shared_ptr<TcpSocket> socket, int32_t err);
+  void DoConnect(TcpSocket* socket);
+  void HandlePendingConnect(TcpSocket* socket);
+  void InternalConnectHnadler(TcpSocket* socket, int32_t err);
 
   base::TaskRunner* task_runner_;
   SocketCreatedCallbak socket_create_callback_;

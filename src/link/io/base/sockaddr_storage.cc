@@ -6,6 +6,7 @@
 
 #include "link/io/base/sockaddr_storage.h"
 
+#include <cstring>
 #include <algorithm>
 
 namespace nlink {
@@ -19,7 +20,7 @@ SockaddrStorage::SockaddrStorage()
 SockaddrStorage::SockaddrStorage(const SockaddrStorage& lhs)
   : addr_len(sizeof(lhs.addr_storage)),
     addr(reinterpret_cast<struct sockaddr*>(&addr_storage)) {
-  std::copy(lhs.addr, lhs.addr + addr_len, addr);
+  std::memcpy(addr, lhs.addr, addr_len);
 }
 
 void SockaddrStorage::operator=(const SockaddrStorage& lhs) {
@@ -28,7 +29,7 @@ void SockaddrStorage::operator=(const SockaddrStorage& lhs) {
   }
 
   addr_len = lhs.addr_len;
-  std::copy(lhs.addr, lhs.addr + addr_len, addr);
+  std::memcpy(addr, lhs.addr, addr_len);
 }
 
 

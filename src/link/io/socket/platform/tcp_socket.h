@@ -36,7 +36,8 @@ class TcpSocket {
     IpEndPoint* address,
     base::CompletionCallback callback);
 
-  int32_t Connect(const IpEndPoint& address, base::CompletionCallback callback);
+  int32_t Connect(
+    const IpEndPoint& address, base::CompletionCallback callback);
   int32_t Close();
 
   int32_t Read(base::Buffer* buffer, base::CompletionCallback callback);
