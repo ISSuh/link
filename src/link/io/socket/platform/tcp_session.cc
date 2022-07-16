@@ -13,10 +13,12 @@
 namespace nlink {
 namespace io {
 
+constexpr const size_t kDefaultBufferSize = 4096;
+
 TcpSocketSession::TcpSocketSession(
-  base::TaskRunner* task_runner,
   std::shared_ptr<TcpSocket> socket)
-  : task_runner_(task_runner), socket_(socket) {
+  : socket_(socket),
+    read_buffer_(kDefaultBufferSize) {
 }
 
 TcpSocketSession::~TcpSocketSession() {}
@@ -36,13 +38,23 @@ void TcpSocketSession::Close() {
   socket_->Close();
 }
 
+void TcpSocketSession::Read(base::Buffer* buffer) {
+  int32_t res = socket_->Read(&read_buffer_,
+    [this](int32_t res) {
+      this->InternalReadHandler(read_buffer_, res);
+    });
+
+  InternalReadHandler(read_buffer_, res);
+}
+
 void TcpSocketSession::Write(const base::Buffer& buffer) {
-  LOG(INFO) << __func__;
   base::Buffer temp =  buffer;
-  socket_->Write(&temp,
+  int32_t res = socket_->Write(&temp,
     [this](int32_t error_code ) {
       this->InternalWriteHandler(error_code);
     });
+
+  InternalWriteHandler(res);
 }
 
 void TcpSocketSession::Write(
@@ -56,10 +68,24 @@ bool TcpSocketSession::IsConnected() const {
   return socket_->IsConnected();
 }
 
-void TcpSocketSession::InternalWriteHandler(int32_t error_code) {
-  LOG(INFO) << __func__ << " - error_code : " << error_code; 
+void TcpSocketSession::InternalWriteHandler(int32_t res) {
+  if (res > 0) {
+    if (!write_handler_) {
+      return;
+    }
+    write_handler_(res);
+  }
 }
 
+void TcpSocketSession::InternalReadHandler(
+  const base::Buffer& buffer, int32_t res) {
+  if (res > 0) {
+    if (!read_handler_) {
+      return;
+    }
+    read_handler_(buffer, shared_from_this());
+  }
+}
 
 }  // namespace io
 }  // namespace nlink

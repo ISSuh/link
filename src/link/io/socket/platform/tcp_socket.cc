@@ -189,21 +189,21 @@ int32_t TcpSocket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = socket_->Write(
     buffer,
-    [this, &buffer, callback](int32_t res) {
-      this->WriteCompleted(buffer, std::move(callback), res);
+    [this, callback](int32_t res) {
+      this->WriteCompleted(std::move(callback), res);
     });
   if (res != IOError::ERR_IO_PENDING) {
-    res = HandleWriteCompleted(buffer, res);
+    res = HandleWriteCompleted(res);
   }
   return res;
 }
 
 void TcpSocket::WriteCompleted(
-  base::Buffer* buffer, base::CompletionCallback callback, int32_t res) {
-  callback(HandleWriteCompleted(buffer, res));
+  base::CompletionCallback callback, int32_t res) {
+  callback(HandleWriteCompleted(res));
 }
 
-int32_t TcpSocket::HandleWriteCompleted(base::Buffer* buffer, int32_t res) {
+int32_t TcpSocket::HandleWriteCompleted(int32_t res) {
   if (res < 0) {
     LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
                << std::strerror(NLINK_ERRNO);

@@ -31,6 +31,8 @@
  
 ##### IO
   - ASIO 제거
+  - Socket pending write, read 처리
+  - Socket 의 callback, buffer 등 copy 되지 않도록 처리
   - IP 대신 Domain Name 으로 접속가능하도록 개선
   - Openssl 적용
   - Shared Memory 구현

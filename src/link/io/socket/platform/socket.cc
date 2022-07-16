@@ -261,9 +261,13 @@ int32_t Socket::CancelReadIfReady() {
   return IOError::OK;
 }
 
+// TODO(issuh) : must change read logic through unuse buffer copy
 int32_t Socket::DoRead(base::Buffer* buffer) {
-  int32_t size =
-    read(descriptor_, &buffer[0], buffer->Size());
+  std::vector<uint8_t> temp(buffer->Size(), 0);
+  int32_t size = read(descriptor_, &temp[0], buffer->Size());
+
+  base::Buffer temp_buffer(temp);
+  *buffer = temp_buffer;
   return size;
 }
 
@@ -312,14 +316,14 @@ int32_t Socket::DoWrite(base::Buffer* buffer) {
 }
 
 // TODO(issuh): should implement pending write process
-void Socket::WriteCompleted() {
+void Socket::WriteIfPending() {
   int32_t res = DoWrite(pending_write_buffer_.get());
   if (res == IOError::ERR_IO_PENDING) {
     return;
   }
 
   pending_write_buffer_.reset();
-  peding_write_callback_(IOError::OK);
+  peding_write_callback_(res);
   peding_write_callback_ = {};
 }
 

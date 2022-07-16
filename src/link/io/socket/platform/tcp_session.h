@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "link/base/callback/callback.h"
-#include "link/base/task/task_runner.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/tcp_socket.h"
 
@@ -23,9 +22,7 @@ class TcpSocketSession
   : public Session,
     public std::enable_shared_from_this<TcpSocketSession> {
  public:
-  TcpSocketSession(
-    base::TaskRunner* task_runner,
-    std::shared_ptr<TcpSocket> socket);
+  explicit TcpSocketSession(std::shared_ptr<TcpSocket> socket);
   ~TcpSocketSession();
 
   // Session
@@ -34,6 +31,9 @@ class TcpSocketSession
     handler::WriteHandler write_handler,
     handler::CloseHandler close_handler) override;
   void Close() override;
+
+  void Read(base::Buffer* buffer) override;
+
   void Write(const base::Buffer& buffer) override;
   void Write(
     const base::Buffer& buffer,
@@ -43,11 +43,13 @@ class TcpSocketSession
   bool IsConnected() const override;
 
  private:
-  void InternalWriteHandler(int32_t error_code);
-
-  base::TaskRunner* task_runner_;
+  void InternalWriteHandler(int32_t res);
+  void InternalReadHandler(const base::Buffer& buffer, int32_t res);
+  void InternalCloseHandler(int32_t res);
 
   std::shared_ptr<TcpSocket> socket_;
+
+  base::Buffer read_buffer_;
 
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;

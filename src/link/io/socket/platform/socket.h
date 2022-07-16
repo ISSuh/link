@@ -49,8 +49,7 @@ class Socket {
   int32_t CancelReadIfReady();
 
   int32_t Write(base::Buffer* buffer, base::CompletionCallback callback);
-  int32_t WaitForWrite(
-    base::Buffer* buffer, base::CompletionCallback callback);
+  void WriteIfPending();
 
   bool IsConnected() const;
   int32_t GetPeerAddress(SockaddrStorage* address) const;
@@ -70,10 +69,10 @@ class Socket {
   void RetryRead(int32_t res);
   void ReadCompleted();
 
+  int32_t WaitForWrite(
+    base::Buffer* buffer, base::CompletionCallback callback);
   int32_t DoWrite(base::Buffer* buffer);
-  void WriteCompleted();
 
-  // std::unique_ptr<SocketHandle> handle_;
   SocketDescriptor descriptor_;
 
   std::unique_ptr<Socket>* accepted_socket_;

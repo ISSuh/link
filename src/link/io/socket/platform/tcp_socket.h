@@ -70,8 +70,8 @@ class TcpSocket {
   int32_t HandleReadCompleted(base::Buffer* buffer, int32_t res);
 
   void WriteCompleted(
-    base::Buffer* buffer, base::CompletionCallback callback, int32_t res);
-  int32_t HandleWriteCompleted(base::Buffer* buffer, int32_t res);
+    base::CompletionCallback callback, int32_t res);
+  int32_t HandleWriteCompleted(int32_t res);
 
   SocketOptions options_;
   std::unique_ptr<Socket> socket_;

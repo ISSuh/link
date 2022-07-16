@@ -43,14 +43,24 @@ void TcpSocketClient::Disconnect() {
   if (nullptr == session_) {
     return;
   }
-  session_->Close();
+
+  task_runner_->PostTask(
+    [this, session = session_]() {
+      session->Close();
+    });
 }
 
 void TcpSocketClient::Write(const base::Buffer& buffer) {
   if (nullptr == session_ || buffer.IsEmpty()) {
+    LOG(WARNING) << "[TcpSocketClient::Write] cannot write. "
+                 << " session is nullptr or buffer size is empty";
     return;
   }
-  session_->Write(buffer);
+
+  wrtie_task_queue_.emplace(
+    [this, session = session_, &buffer]() {
+      session->Write(buffer);
+    });
 }
 
 void TcpSocketClient::Write(
@@ -99,8 +109,44 @@ void TcpSocketClient::CloseChannel() {
 
 void TcpSocketClient::HandleEvent(const base::Event& event) {
   for (auto& type : event.Types()) {
-    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+    base::TaskCallback callback = {};
+    switch (type) {
+      case base::Event::Type::READ:
+        HandleReadEvent();
+        break;
+      case base::Event::Type::WRITE:
+        HandlerWriteEvent();
+        break;
+      case base::Event::Type::CLOSE:
+        Disconnect();
+        break;
+      case base::Event::Type::ERROR:
+        Disconnect();
+        break;
+      default:
+        LOG(WARNING) << "[TcpSocketClient::ProcessEvent] invalid event type. "
+                    << base::EventTypeToString(type);
+        break;
+    }
   }
+}
+
+void TcpSocketClient::HandleReadEvent() {
+  task_runner_->PostTask(
+    [this, session = session_]() {
+      session->Read(nullptr);
+    });
+}
+
+void TcpSocketClient::HandlerWriteEvent() {
+  if (wrtie_task_queue_.empty()) {
+    return;
+  }
+
+  auto callback = wrtie_task_queue_.front();
+  wrtie_task_queue_.pop();
+
+  task_runner_->PostTask(callback);
 }
 
 void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {
@@ -117,19 +163,30 @@ void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {
       this->InternalCloseHandler(session);
     });
 
-  connect_handler_(session);
+  if (connect_handler_) {
+    connect_handler_(session);
+  }
 }
 
 void TcpSocketClient::InternalCloseHandler(std::shared_ptr<Session> session) {
+  if (!close_handler_) {
+    return;
+  }
   close_handler_(session);
 }
 
 void TcpSocketClient::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+  if (!read_handler_) {
+    return;
+  }
   read_handler_(buffer, session);
 }
 
 void TcpSocketClient::InternalWriteHandler(size_t length) {
+  if (!write_handler_) {
+    return;
+  }
   write_handler_(length);
 }
 

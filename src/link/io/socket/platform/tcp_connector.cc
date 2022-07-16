@@ -66,7 +66,7 @@ void TcpConnector::InternalConnectHnadler(
   std::shared_ptr<TcpSocket> socket, int32_t err) {
   if (err == IOError::OK) {;
     std::shared_ptr<Session> session =
-      std::make_shared<TcpSocketSession>(task_runner_, std::move(socket));
+      std::make_shared<TcpSocketSession>(std::move(socket));
     if (connect_handler_) {
       connect_handler_(session);
     }

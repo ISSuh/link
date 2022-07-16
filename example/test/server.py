@@ -13,7 +13,7 @@ class TCPEchoServerProtocol(asyncio.Protocol):
 
     def data_received(self, data: bytes):
         message = data.decode()
-        print('Data received: [{!r}] {!r}'.format(len(message), message))
+        print('Data received: [{!r}] {!r}'.format(len(message), "a"))
 
         self.transport.write(data)
 

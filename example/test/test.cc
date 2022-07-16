@@ -34,14 +34,14 @@ void TestCloseHandler(std::shared_ptr<io::Session> session) {
 }
 
 void TestWriteHandler(size_t size) {
-  LOG(INFO) << __func__;
+  LOG(INFO) << __func__ << " - size : " << size;
 
 }
 
 void TestReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  LOG(INFO) << __func__;
-
+  std::string message = buffer.ToString();
+  LOG(INFO) << __func__ << " - message : " << message;
 }
 
 int main(int argc, char* argv[]) {
@@ -57,6 +57,11 @@ int main(int argc, char* argv[]) {
 
   io::Client* client =
     io::SocketFactory::CreateTcpClient(task_runner);
+
+  client->RegistIOHandler(
+    [](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+        TestReadHandler(buffer, session); },
+    [](size_t size) { TestWriteHandler(size); });
 
   dispatcher->AttachChannels(
     dynamic_cast<base::EventChannel*>(client));
@@ -85,10 +90,15 @@ int main(int argc, char* argv[]) {
 
     // const uint32_t message_size = 10 * 1024 * 1024;
     // std::string message(message_size, 'a');
-    // client_.Write(message);
+    // base::Buffer buffer(message);
+    // client->Write(buffer);
     // LOG(INFO) << "[ExampleClientModule] write : " << message.size();
 
     ++count;
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
+
+  client->Disconnect();
+  task_manager->StopAllRunner();
+  task_manager->WaitForTerminateAllTaskRunner();
 }

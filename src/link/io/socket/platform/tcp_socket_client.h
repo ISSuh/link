@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
@@ -25,6 +26,8 @@ namespace io {
 
 class TcpSocketClient : public Client {
  public:
+  using EventTaskQueue = std::queue<std::function<void()>>;
+
   explicit TcpSocketClient(base::TaskRunner* task_runner);
   virtual ~TcpSocketClient();
 
@@ -51,6 +54,9 @@ class TcpSocketClient : public Client {
   void HandleEvent(const base::Event& event) override;
 
  private:
+  void HandleReadEvent();
+  void HandlerWriteEvent();
+
   void InternalConnectHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
   void InternalReadHandler(
@@ -64,6 +70,8 @@ class TcpSocketClient : public Client {
 
   std::unique_ptr<Connector> connector_;
   std::shared_ptr<Session> session_;
+
+  EventTaskQueue wrtie_task_queue_;
 
   handler::ConnectHandler connect_handler_;
   handler::CloseHandler close_handler_;
