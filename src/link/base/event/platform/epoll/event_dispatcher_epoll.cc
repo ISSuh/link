@@ -14,14 +14,14 @@
 #include <utility>
 
 #include "link/base/logging.h"
-
+#include "link/base/event/event_util.h"
 
 namespace nlink {
 namespace base {
 
 using EpollEvent = epoll_event;
 constexpr const int32_t kDefaultEvnetSize = 1024;
-const int32_t kDefaultTimeOut = 60;
+const int32_t kDefaultTimeOut = 100;
 
 EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
   Discriptor epoll_fd = epoll_create(kDefaultEvnetSize);
@@ -68,20 +68,20 @@ void EventDispatcherEpoll::DispatchOnce() {
     int32_t fd = epoll_events[i].data.fd;
     uint32_t event_flag = epoll_events[i].events;
 
-    // Event::Type type;
+    std::vector<Event::Type> types;
     // switch (channel_map_[fd]->ObserverType()) {
     //   case EventObserver::Type::SERVER: {
     //     type = HandlingServerEvent();
     //     break;
     //   }
     //   case EventObserver::Type::CLIENT: {
-    //     type = HandlingClientEvent(event_flag);
+        HandlingClientEvent(event_flag, &types);
     //     break;
     //   }
     // }
 
-    // Event event(fd, type);
-    // DispatchEvent(event);
+    Event event(fd, types);
+    DispatchEvent(event);
   }
 }
 
@@ -93,28 +93,23 @@ Event::Type EventDispatcherEpoll::HandlingServerEvent() {
   return Event::Type::ACCEPT;
 }
 
-Event::Type EventDispatcherEpoll::HandlingClientEvent(uint32_t event_flag) {
-  Event::Type type;
+Event::Type EventDispatcherEpoll::HandlingClientEvent(
+  uint32_t event_flag, std::vector<Event::Type>* types) {
   if (event_flag & EPOLLIN) {
-    LOG(INFO) << __func__ << " - Event::Type::READ;";
-    type = Event::Type::READ;
+    types->emplace_back(Event::Type::READ);
   }
 
   if (event_flag & EPOLLOUT) {
-    LOG(INFO) << __func__ << " - Event::Type::WRITE";
-    type = Event::Type::WRITE;
+    types->emplace_back(Event::Type::WRITE);
   }
 
   if (event_flag & EPOLLERR) {
-    LOG(INFO) << __func__ << " - Event::Type::ERROR";
-    type = Event::Type::ERROR;
+    types->emplace_back(Event::Type::ERROR);
   }
 
   if (event_flag & EPOLLRDHUP) {
-    LOG(INFO) << __func__ << " - Event::Type::CLOSE";
-    type = Event::Type::CLOSE;
+    types->emplace_back(Event::Type::CLOSE);
   }
-  return type;
 }
 
 void EventDispatcherEpoll::AttachChannels(EventChannel* channel) {
@@ -125,6 +120,7 @@ void EventDispatcherEpoll::DetatchCahnnel(EventChannel* channel) {
 }
 
 void EventDispatcherEpoll::DispatchEvent(const Event& event) {
+  context_->Dispatch(event);
 }
 
 }  // namespace base

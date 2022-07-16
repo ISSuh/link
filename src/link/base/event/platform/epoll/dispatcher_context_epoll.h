@@ -24,7 +24,7 @@ class EpollDispatcherConext : public DispatcherConext {
   bool Regist(int32_t handle, EventChannel* channel) override;
   bool Unregist(int32_t handle) override;
 
-  void Dispatch();
+  void Dispatch(const Event& event);
 
  private:
   int32_t discriptor_;

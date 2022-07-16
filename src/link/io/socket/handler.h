@@ -4,10 +4,11 @@
  *
  */
 
-#ifndef SRC_LINK_NET_SOCKET_ASIO_HANDLER_H_
-#define SRC_LINK_NET_SOCKET_ASIO_HANDLER_H_
+#ifndef LINK_NET_SOCKET_ASIO_HANDLER_H_
+#define LINK_NET_SOCKET_ASIO_HANDLER_H_
 
 #include <memory>
+#include <functional>
 
 #include "link/base/buffer.h"
 #include "link/base/callback/callback.h"
@@ -20,15 +21,15 @@ class Session;
 
 namespace handler {
 
-using AcceptHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
-using ConnectHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
-using CloseHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
+using AcceptHandler = std::function<void(std::shared_ptr<io::Session>)>;
+using ConnectHandler = std::function<void(std::shared_ptr<io::Session>)>;
+using CloseHandler = std::function<void(std::shared_ptr<io::Session>)>;
 using ReadHandler =
-  base::Callback<void(const base::Buffer&, std::shared_ptr<io::Session>)>;
-using WriteHandler = base::Callback<void(size_t)>;
+  std::function<void(const base::Buffer&, std::shared_ptr<io::Session>)>;
+using WriteHandler = std::function<void(size_t)>;
 
 }  // namespace handler
 }  // namespace io
 }  // namespace nlink
 
-#endif  // SRC_LINK_NET_SOCKET_ASIO_HANDLER_H_
+#endif  // LINK_NET_SOCKET_ASIO_HANDLER_H_

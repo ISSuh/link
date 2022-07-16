@@ -26,8 +26,12 @@ TcpServerComponent::TcpServerComponent(
   LinkComponent::AttachChannelsToObserver(server_.get());
 
   server_->RegistIOHandler(
-    base::Bind(&TcpServerComponent::InternalReadHandler, this),
-    base::Bind(&TcpServerComponent::InternalWriteHandler, this));
+    [this](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+      this->InternalReadHandler(buffer, session);
+    },
+    [this](size_t length) {
+      this->InternalWriteHandler(length);
+    });
 }
 
 TcpServerComponent::~TcpServerComponent() = default;
@@ -36,8 +40,12 @@ void TcpServerComponent::Open(
   const std::string& address, int32_t port) {
   server_->Listen(io::IpEndPoint(address, port));
   server_->Accept(
-    base::Bind(&TcpServerComponent::InternalAcceptHandler, this),
-    base::Bind(&TcpServerComponent::InternalCloseHandler, this));
+    [this](std::shared_ptr<io::Session> session) {
+      this->InternalAcceptHandler(session);
+    },
+    [this](std::shared_ptr<io::Session> session) {
+      this->InternalCloseHandler(session);
+    });
 }
 
 void TcpServerComponent::Close() {
@@ -46,21 +54,33 @@ void TcpServerComponent::Close() {
 
 void TcpServerComponent::InternalAcceptHandler(
   std::shared_ptr<io::Session> session) {
-  accept_handler_.Run(session);
+  if (!accept_handler_) {
+    return;
+  }
+  accept_handler_(session);
 }
 
 void TcpServerComponent::InternalCloseHandler(
   std::shared_ptr<io::Session> session) {
-  close_handler_.Run(session);
+  if (!close_handler_) {
+    return;
+  }
+  close_handler_(session);
 }
 
 void TcpServerComponent::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  read_handler_.Run(buffer, session);
+  if (!read_handler_) {
+    return;
+  }
+  read_handler_(buffer, session);
 }
 
 void TcpServerComponent::InternalWriteHandler(size_t length) {
-  write_handler_.Run(length);
+  if (!write_handler_) {
+    return;
+  }
+  write_handler_(length);
 }
 
 TcpServerComponent* TcpServerComponent::CreateComponent(

@@ -7,6 +7,8 @@
 #ifndef LINK_BASE_EVENT_EVENT_H_
 #define LINK_BASE_EVENT_EVENT_H_
 
+#include <vector>
+
 #include "link/base/platform/discriptor.h"
 
 namespace nlink {
@@ -14,31 +16,31 @@ namespace base {
 
 class Event {
  public:
-  enum class Type : int8_t {
-    ERROR = -1,
+  enum class Type : uint8_t {
     NONE = 0,
-    ACCEPT,
-    CONNECT,
-    READ,
-    WRITE,
-    TIMEOUT,
-    CLOSE,
+    ACCEPT = (1 << 0),
+    CONNECT = (1 << 1),
+    READ = (1 << 2),
+    WRITE = (1 << 3),
+    TIMEOUT = (1 << 4),
+    CLOSE = (1 << 5),
+    ERROR = (1 << 6),
     MAX = ERROR
   };
 
-  Event(int32_t fd, Type type);
+  Event(int32_t fd, const std::vector<Event::Type>& type);
   Event(const Event& rhs);
   Event(Event&& rhs);
   ~Event();
 
-  Discriptor discriptor() const;
-  Event::Type type() const;
+  int32_t Discriptor() const;
+  const std::vector<Event::Type>&  Types() const;
 
   Event& operator=(const Event& rhs);
 
  private:
-  Discriptor fd_;
-  Type type_;
+  int32_t fd_;
+  std::vector<Type> type_;
 };
 
 }  // namespace base

@@ -9,10 +9,8 @@
 namespace nlink {
 namespace base {
 
-std::string EventTypeToString(const Event& event) {
-  switch (event.type()) {
-    case Event::Type::ERROR:
-      return "Event::Type::ERROR";
+std::string EventTypeToString(Event::Type event_type) {
+  switch (event_type) {
     case Event::Type::NONE:
       return "Event::Type::NONE";
     case Event::Type::ACCEPT:
@@ -27,6 +25,8 @@ std::string EventTypeToString(const Event& event) {
       return "Event::Type::TIMEOUT";
     case Event::Type::CLOSE:
       return "Event::Type::CLOSE";
+    case Event::Type::ERROR:
+      return "Event::Type::ERROR";
     default:
       return "Invalid event type";
   }

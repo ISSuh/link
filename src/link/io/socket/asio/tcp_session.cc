@@ -37,7 +37,7 @@ void TcpSession::Open(
 
 void TcpSession::Close() {
   LOG(INFO) << "[TcpSession::Close]";
-  close_handler_.Run(shared_from_this());
+  close_handler_(shared_from_this());
   socket_.close();
 }
 
@@ -68,8 +68,8 @@ void TcpSession::InternalWriteHandler(
     return;
   }
 
-  if (!write_handler_.is_null()) {
-    write_handler_.Run(length);
+  if (write_handler_)) {
+    write_handler_(length);
   }
 }
 
@@ -85,8 +85,8 @@ void TcpSession::InternalReadHandler(
     Close();
   } else {
     base::Buffer buff(raw_read_buffer);
-    if (!read_handler_.is_null()) {
-      read_handler_.Run(std::move(buff), shared_from_this());
+    if (read_handler_)) {
+      read_handler_(std::move(buff), shared_from_this());
     }
     DoRead();
   }

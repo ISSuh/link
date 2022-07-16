@@ -43,7 +43,8 @@ class EventDispatcherEpoll : public EventDispatcher {
 
  private:
   Event::Type HandlingServerEvent();
-  Event::Type HandlingClientEvent(uint32_t event_flag);
+  Event::Type HandlingClientEvent(
+    uint32_t event_flag, std::vector<Event::Type>* types);
 
   std::unordered_map<Discriptor, EventChannel*> channel_map_;
 

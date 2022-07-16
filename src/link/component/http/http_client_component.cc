@@ -44,16 +44,22 @@ void HttpClientComponent::Get(
   LinkComponent::AttachChannelsToObserver(client);
 
   client->RegistIOHandler(
-    base::Bind(
-      &HttpClientComponent::InternalReadHandler, this, handler),
-    base::Bind(&HttpClientComponent::InternalWriteHandler, this));
+    [this, handler](
+      const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+      this->InternalReadHandler(handler, buffer, session);
+    },
+    [this](size_t length) {
+      this->InternalWriteHandler(length);
+    });
 
   client->Connect(
     io::IpEndPoint(uri.Host(), uri.Port()),
-    base::Bind(
-      &HttpClientComponent::InternalConnectHandler, this,
-        request, client),
-    base::Bind(&HttpClientComponent::InternalCloseHandler, this));
+    [this, &request, &client](std::shared_ptr<io::Session> session) {
+      this->InternalConnectHandler(request, client, session);
+    },
+    [this](std::shared_ptr<io::Session> session) {
+      this->InternalCloseHandler(session);
+    });
 }
 
 void HttpClientComponent::Get(
@@ -190,9 +196,10 @@ void HttpClientComponent::InternalReadHandler(
   const base::Buffer& buffer,
   std::shared_ptr<io::Session> session) {
   net::http::Response response = net::http::ResponseParser::Parse(buffer);
-  if (!request_handler.is_null()) {
-    request_handler.Run(response);
+  if (!request_handler) {
+    return;
   }
+  request_handler(response);
 }
 
 void HttpClientComponent::InternalWriteHandler(size_t length) {

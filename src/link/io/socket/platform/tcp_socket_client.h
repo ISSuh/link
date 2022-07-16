@@ -43,6 +43,8 @@ class TcpSocketClient : public Client {
     handler::WriteHandler write_handler,
     handler::ReadHandler read_handler) override;
 
+  bool IsConnected() const override;
+
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
   void CloseChannel() override;

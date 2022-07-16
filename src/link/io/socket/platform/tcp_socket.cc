@@ -121,7 +121,6 @@ int32_t TcpSocket::Connect(
 
 void TcpSocket::ConnectCompleted(
   base::CompletionCallback callback, int32_t res) {
-  LOG(INFO) << __func__ << " - " << this;
   callback(HandleConnectCompleted(res));
 }
 

@@ -14,7 +14,7 @@
 namespace nlink {
 namespace base {
 
-std::string EventTypeToString(const Event& event);
+std::string EventTypeToString(Event::Type event_type);
 
 }  // namespace base
 }  // namespace nlink

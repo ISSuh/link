@@ -56,7 +56,7 @@ void TaskExecutor::Work() {
     }
 
     delegate_->OnStartTask();
-    task.callback.Run();
+    task.callback();
     delegate_->OnDidFinishTask();
   }
 }

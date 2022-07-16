@@ -10,6 +10,7 @@
 
 #include "link/io/socket/platform/tcp_connector.h"
 #include "link/base/logging.h"
+#include "link/base/event/event_util.h"
 
 namespace nlink {
 namespace io {
@@ -32,7 +33,9 @@ void TcpSocketClient::Connect(
 
   if (nullptr != connector_) {
     connector_->Connect(address,
-      base::Bind(&TcpSocketClient::InternalConnectHandler, this));
+      [this](std::shared_ptr<Session> session) {
+        this->InternalConnectHandler(session);
+      });
   }
 }
 
@@ -60,6 +63,13 @@ void TcpSocketClient::Write(
   session_->Write(buffer, write_handler, read_handler);
 }
 
+bool TcpSocketClient::IsConnected() const {
+  if (nullptr == session_) {
+    return false;
+  }
+  return session_->IsConnected();
+}
+
 void TcpSocketClient::RegistIOHandler(
   handler::ReadHandler read_handler,
   handler::WriteHandler write_handler) {
@@ -77,7 +87,9 @@ void TcpSocketClient::OpenChannel(base::DispatcherConext* context) {
   if (nullptr == connector_) {
     connector_.reset(new TcpConnector(
       task_runner_,
-      base::Bind(&TcpSocketClient::RegistChannel, this)));
+      [this](SocketDescriptor descriptor) {
+        this->RegistChannel(descriptor);
+      }));
   }
 }
 
@@ -86,30 +98,39 @@ void TcpSocketClient::CloseChannel() {
 }
 
 void TcpSocketClient::HandleEvent(const base::Event& event) {
+  for (auto& type : event.Types()) {
+    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  }
 }
 
 void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {
   session_ = session;
 
   session_->Open(
-    base::Bind(&TcpSocketClient::InternalReadHandler, this),
-    base::Bind(&TcpSocketClient::InternalWriteHandler, this),
-    base::Bind(&TcpSocketClient::InternalCloseHandler, this));
+    [this](const base::Buffer& buffer, std::shared_ptr<Session> session) {
+      this->InternalReadHandler(buffer, session);
+    },
+    [this](size_t length) {
+      this->InternalWriteHandler(length);
+    },
+    [this](std::shared_ptr<Session> session) {
+      this->InternalCloseHandler(session);
+    });
 
-  connect_handler_.Run(session);
+  connect_handler_(session);
 }
 
 void TcpSocketClient::InternalCloseHandler(std::shared_ptr<Session> session) {
-  close_handler_.Run(session);
+  close_handler_(session);
 }
 
 void TcpSocketClient::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  read_handler_.Run(buffer, session);
+  read_handler_(buffer, session);
 }
 
 void TcpSocketClient::InternalWriteHandler(size_t length) {
-  write_handler_.Run(length);
+  write_handler_(length);
 }
 
 void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {

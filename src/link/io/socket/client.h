@@ -36,6 +36,8 @@ class Client : public base::EventChannel {
     const base::Buffer& buffer,
     handler::WriteHandler write_handler,
     handler::ReadHandler read_handler) = 0;
+
+  virtual bool IsConnected() const = 0;
 };
 
 }  // namespace io

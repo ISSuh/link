@@ -25,7 +25,7 @@ void* EpollDispatcherConext::context() const {
 
 bool EpollDispatcherConext::Regist(int32_t handle, EventChannel* channel) {
   epoll_event event;
-  event.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLRDHUP | EPOLLET;
+  event.events = EPOLLOUT | EPOLLERR | EPOLLRDHUP;
   event.data.fd = handle;
 
   if (epoll_ctl(discriptor_, EPOLL_CTL_ADD, handle, &event) < 0) {
@@ -44,8 +44,9 @@ bool EpollDispatcherConext::Unregist(int32_t handle) {
   return true;
 }
 
-void EpollDispatcherConext::Dispatch() {
-
+void EpollDispatcherConext::Dispatch(const Event& event) {
+  int32_t channel_discriptor = event.Discriptor();
+  channels[channel_discriptor]->HandleEvent(event);
 }
 
 }  // namespace base

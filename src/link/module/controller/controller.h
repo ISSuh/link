@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <atomic>
+#include <functional>
 
 #include "link/module/loader/module_loader.h"
 #include "link/module/controller/executor.h"
@@ -25,7 +26,7 @@ namespace module {
 class ModuleController
   : public ModuleExecutor::ModuleExecutorClient {
  public:
-  using StatusCallback = base::Callback<void(bool)>;
+  using StatusCallback = std::function<void(bool)>;
 
   explicit ModuleController(std::shared_ptr<base::TaskManager> task_manager_);
   virtual ~ModuleController();

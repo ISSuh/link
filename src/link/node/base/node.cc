@@ -34,7 +34,9 @@ bool LinkNode::Init(int32_t argc, char *argv[]) {
 void LinkNode::Run() {
   controller_->LoadingModule(
     args_.module_specs(),
-    base::Bind(&LinkNode::ModuleLoadedStatus, this));
+    [this](bool status) {
+      this->ModuleLoadedStatus(status);
+    });
 
   task_manager_->WaitForTerminateAllTaskRunner();
 }
@@ -49,7 +51,9 @@ void LinkNode::ModuleLoadedStatus(bool status) {
     controller_->Destroy();
   }
   controller_->RunningModule(
-    base::Bind(&LinkNode::ModuleRunningStatus, this));
+      [this](bool status) {
+        this->ModuleRunningStatus(status);
+      });
 }
 
 void LinkNode::ModuleRunningStatus(bool status) {

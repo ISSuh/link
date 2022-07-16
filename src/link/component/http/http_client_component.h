@@ -11,6 +11,7 @@
 #include <string>
 #include <set>
 #include <memory>
+#include <functional>
 
 #include "link/base/task/task_runner.h"
 #include "link/base/callback/callback.h"
@@ -28,7 +29,7 @@ class HttpComponent;
 
 class HttpClientComponent : public HttpComponent {
  public:
-  using RequestHanelder = base::Callback<void(const net::http::Response&)>;
+  using RequestHanelder = std::function<void(const net::http::Response&)>;
 
   static HttpClientComponent* CreateComponent(
     base::TaskRunner* task_runner);

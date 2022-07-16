@@ -32,14 +32,17 @@ void TcpSocketSession::Open(
 
 void TcpSocketSession::Close() {
   LOG(INFO) << "[TcpSocketSession::Close]";
-  close_handler_.Run(shared_from_this());
+  close_handler_(shared_from_this());
   socket_->Close();
 }
 
 void TcpSocketSession::Write(const base::Buffer& buffer) {
+  LOG(INFO) << __func__;
   base::Buffer temp =  buffer;
-  // socket_->Write(&temp,
-  //   base::Bind(&TcpSocketSession::InternalWriteHandler, this));
+  socket_->Write(&temp,
+    [this](int32_t error_code ) {
+      this->InternalWriteHandler(error_code);
+    });
 }
 
 void TcpSocketSession::Write(
@@ -54,7 +57,7 @@ bool TcpSocketSession::IsConnected() const {
 }
 
 void TcpSocketSession::InternalWriteHandler(int32_t error_code) {
-
+  LOG(INFO) << __func__ << " - error_code : " << error_code; 
 }
 
 

@@ -9,7 +9,7 @@
 namespace nlink {
 namespace base {
 
-Event::Event(int32_t fd, Type type)
+Event::Event(int32_t fd, const std::vector<Event::Type>& type)
   : fd_(fd), type_(type) {
 }
 
@@ -24,11 +24,11 @@ Event::Event(Event&& rhs)
 Event::~Event() {
 }
 
-Discriptor Event::discriptor() const {
+int32_t Event::Discriptor() const {
   return fd_;
 }
 
-Event::Type Event::type() const {
+const std::vector<Event::Type>& Event::Types() const {
   return type_;
 }
 

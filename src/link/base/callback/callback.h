@@ -89,9 +89,10 @@ class Callback<R(Args...)> : public CallbackBase {
   }
 };
 
-using TaskCallback = Callback<void()>;
+// using TaskCallback = Callback<void()>;
 // using CompletionCallback = Callback<void(int32_t)>;
 
+using TaskCallback = std::function<void()>;
 using CompletionCallback = std::function<void(int32_t)>;
 
 }  // namespace base

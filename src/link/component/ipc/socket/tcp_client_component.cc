@@ -24,8 +24,12 @@ TcpClientComponent::TcpClientComponent(
   LinkComponent::AttachChannelsToObserver(client_.get());
 
   client_->RegistIOHandler(
-    base::Bind(&TcpClientComponent::InternalReadHandler, this),
-    base::Bind(&TcpClientComponent::InternalWriteHandler, this));
+    [this](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+      this->InternalReadHandler(buffer, session);
+    },
+    [this](size_t length) {
+      this->InternalWriteHandler(length);
+    });
 }
 
 TcpClientComponent::~TcpClientComponent() = default;
@@ -34,8 +38,12 @@ void TcpClientComponent::Connect(
   const std::string& address, int32_t port) {
   client_->Connect(
     io::IpEndPoint(address, port),
-    base::Bind(&TcpClientComponent::InternalConnectHandler, this),
-    base::Bind(&TcpClientComponent::InternalCloseHandler, this));
+    [this](std::shared_ptr<io::Session> session) {
+      this->InternalConnectHandler(session);
+    },
+    [this](std::shared_ptr<io::Session> session) {
+      this->InternalCloseHandler(session);
+    });
 }
 
 void TcpClientComponent::DisConnect() {
@@ -48,33 +56,33 @@ void TcpClientComponent::Write(const base::Buffer& buffer) {
 
 void TcpClientComponent::InternalConnectHandler(
   std::shared_ptr<io::Session> session) {
-  if (connect_handler_.is_null()) {
+  if (!connect_handler_) {
     return;
   }
-  connect_handler_.Run(session);
+  connect_handler_(session);
 }
 
 void TcpClientComponent::InternalCloseHandler(
   std::shared_ptr<io::Session> session) {
-  if (close_handler_.is_null()) {
+  if (!close_handler_) {
     return;
   }
-  close_handler_.Run(session);
+  close_handler_(session);
 }
 
 void TcpClientComponent::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  if (read_handler_.is_null()) {
+  if (!read_handler_) {
     return;
   }
-  read_handler_.Run(buffer, session);
+  read_handler_(buffer, session);
 }
 
 void TcpClientComponent::InternalWriteHandler(size_t length) {
-  if (write_handler_.is_null()) {
+  if (!write_handler_) {
     return;
   }
-  write_handler_.Run(length);
+  write_handler_(length);
 }
 
 TcpClientComponent* TcpClientComponent::CreateComponent(

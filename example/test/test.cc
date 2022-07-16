@@ -66,16 +66,22 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "Connect : " << endpoint.Origin();
 
   client->Connect(endpoint,
-    base::Bind(&TestConnectHandler),
-    base::Bind(&TestCloseHandler));
+    [](std::shared_ptr<io::Session> session) { TestConnectHandler(session); },
+    [](std::shared_ptr<io::Session> session) { TestCloseHandler(session); });
 
   int32_t count = 0;
   while (count < 5) {
     dispatcher->DispatchOnce();
-    // if (!client_.IsConnected()) {
-    //   LOG(INFO) << "[ExampleClientModule] wait for connect";
-    //   continue;
-    // }
+
+    if (!client->IsConnected()) {
+      LOG(INFO) << "[ExampleClientModule] wait for connect";
+      continue;
+    }
+
+    const uint32_t message_size = 10;
+    std::string message(message_size, 'a');
+    base::Buffer buffer(message);
+    client->Write(buffer);
 
     // const uint32_t message_size = 10 * 1024 * 1024;
     // std::string message(message_size, 'a');

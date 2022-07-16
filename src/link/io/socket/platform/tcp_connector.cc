@@ -32,45 +32,46 @@ void TcpConnector::Connect(
   connect_handler_ = handler;
 
   SocketOptions options;
-  TcpSocket* socket = new TcpSocket(options);
+  std::shared_ptr<TcpSocket> socket = std::make_shared<TcpSocket>(options);
   socket->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
 
-  socket_create_callback_.Run(socket->Descriptor());
-  DoConnect(socket);
+  socket_create_callback_(socket->Descriptor());
+
+  PostConnectTask(socket);
 }
 
-void TcpConnector::DoConnect(TcpSocket* socket) {
+void TcpConnector::DoConnect(std::shared_ptr<TcpSocket> socket) {
   ++try_connection_count_;
 
   int32_t res = socket->Connect(
     address_,
-    [this, &socket](int32_t err) {
+    [this, socket](int32_t err) mutable {
       this->InternalConnectHnadler(socket, err);
     });
 
   if (IOError::ERR_IO_PENDING == res) {
-    HandlePendingConnect(socket);
+    PostConnectTask(socket);
     return;
   }
 }
 
-void TcpConnector::HandlePendingConnect(TcpSocket* socket) {
+void TcpConnector::PostConnectTask(std::shared_ptr<TcpSocket> socket) {
   task_runner_->PostTask(
-    base::Bind(&TcpConnector::DoConnect, this, socket));
+    [this, socket]() {
+      this->DoConnect(socket);
+    });
 }
 
 void TcpConnector::InternalConnectHnadler(
-  TcpSocket* socket, int32_t err) {
-  if (err == IOError::OK) {
-    std::shared_ptr<TcpSocket> tcp_socket(socket);
+  std::shared_ptr<TcpSocket> socket, int32_t err) {
+  if (err == IOError::OK) {;
     std::shared_ptr<Session> session =
-      std::make_shared<TcpSocketSession>(task_runner_, tcp_socket);
-    if (!connect_handler_.is_null()) {
-      connect_handler_.Run(session);
+      std::make_shared<TcpSocketSession>(task_runner_, std::move(socket));
+    if (connect_handler_) {
+      connect_handler_(session);
     }
   } else {
-    task_runner_->PostTask(
-      base::Bind(&TcpConnector::DoConnect, this, socket));
+    PostConnectTask(socket);
   }
 }
 
