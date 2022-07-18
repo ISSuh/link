@@ -13,7 +13,9 @@
 namespace nlink {
 namespace component {
 
-HttpServerComponent::HttpServerComponent() {
+HttpServerComponent::HttpServerComponent(
+  base::EventChannelObserver* channel_subject)
+  : HttpComponent(channel_subject) {
 }
 
 HttpServerComponent::~HttpServerComponent() {

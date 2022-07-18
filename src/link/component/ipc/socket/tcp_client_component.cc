@@ -15,8 +15,11 @@ namespace nlink {
 namespace component {
 
 TcpClientComponent::TcpClientComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers)
-  : client_(io::SocketFactory::CreateTcpClient(task_runner)),
+  base::EventChannelObserver* channel_subject,
+  base::TaskRunner* task_runner,
+  SocketComponent::Handler handlers)
+  : SocketComponent(channel_subject),
+    client_(io::SocketFactory::CreateTcpClient(task_runner)),
     connect_handler_(handlers.connect_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
@@ -46,12 +49,16 @@ void TcpClientComponent::Connect(
     });
 }
 
-void TcpClientComponent::DisConnect() {
+void TcpClientComponent::Disconnect() {
   client_->Disconnect();
 }
 
 void TcpClientComponent::Write(const base::Buffer& buffer) {
   client_->Write(buffer);
+}
+
+bool TcpClientComponent::IsConnected() const {
+  return client_->IsConnected();
 }
 
 void TcpClientComponent::InternalConnectHandler(
@@ -86,8 +93,13 @@ void TcpClientComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpClientComponent* TcpClientComponent::CreateComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
-  return new TcpClientComponent(task_runner, handlers);
+  base::EventChannelObserver* channel_subject,
+  base::TaskRunner* task_runner,
+  SocketComponent::Handler handlers) {
+  if (!channel_subject || !task_runner) {
+    return nullptr;
+  }
+  return new TcpClientComponent(channel_subject, task_runner, handlers);
 }
 
 }  // namespace component

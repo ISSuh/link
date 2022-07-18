@@ -38,8 +38,9 @@ class SocketComponent : public LinkComponent {
   };
 
  protected:
-  SocketComponent() = default;
-  virtual ~SocketComponent() = default;
+  explicit SocketComponent(
+    base::EventChannelObserver* channel_subject);
+  virtual ~SocketComponent();
 
   DISAALOW_COPY_AND_ASSIGN(SocketComponent);
 };

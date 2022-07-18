@@ -40,6 +40,7 @@ class TcpConnector : public Connector {
   handler::ConnectHandler connect_handler_;
 
   uint64_t try_connection_count_;
+  bool is_connected_;
 };
 
 }  // namespace io

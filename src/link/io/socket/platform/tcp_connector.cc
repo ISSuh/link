@@ -20,7 +20,9 @@ namespace io {
 TcpConnector::TcpConnector(
   base::TaskRunner* task_runner, SocketCreatedCallbak callback)
   : task_runner_(task_runner),
-    socket_create_callback_(callback) {
+    socket_create_callback_(callback),
+    try_connection_count_(0),
+    is_connected_(false) {
 }
 
 TcpConnector::~TcpConnector() {
@@ -56,6 +58,10 @@ void TcpConnector::DoConnect(std::shared_ptr<TcpSocket> socket) {
 }
 
 void TcpConnector::PostConnectTask(std::shared_ptr<TcpSocket> socket) {
+  if (is_connected_) {
+    return;
+  }
+
   task_runner_->PostTask(
     [this, socket]() {
       this->DoConnect(socket);

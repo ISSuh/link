@@ -32,6 +32,7 @@ class HttpClientComponent : public HttpComponent {
   using RequestHanelder = std::function<void(const net::http::Response&)>;
 
   static HttpClientComponent* CreateComponent(
+    base::EventChannelObserver* channel_subject,
     base::TaskRunner* task_runner);
 
   void Get(const std::string& path, RequestHanelder handler);
@@ -79,7 +80,9 @@ class HttpClientComponent : public HttpComponent {
     const std::string& body = "");
 
  private:
-  explicit HttpClientComponent(base::TaskRunner* task_runner);
+  HttpClientComponent(
+    base::EventChannelObserver* channel_subject,
+    base::TaskRunner* task_runner);
   virtual ~HttpClientComponent();
 
   // std::unique_ptr<io::Client> CreateIOClientAndConnet(

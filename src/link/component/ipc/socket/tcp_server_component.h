@@ -24,6 +24,7 @@ class SocketComponent;
 class TcpServerComponent : public SocketComponent {
  public:
   static TcpServerComponent* CreateComponent(
+    base::EventChannelObserver* channel_subject,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
 
@@ -32,7 +33,9 @@ class TcpServerComponent : public SocketComponent {
 
  private:
   explicit TcpServerComponent(
-    base::TaskRunner* task_runner, SocketComponent::Handler handlers);
+    base::EventChannelObserver* channel_subject,
+    base::TaskRunner* task_runner,
+    SocketComponent::Handler handlers);
   virtual ~TcpServerComponent();
 
   void InternalAcceptHandler(std::shared_ptr<io::Session> session);

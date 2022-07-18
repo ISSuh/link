@@ -25,17 +25,22 @@ class RpcComponent;
 class TcpClientComponent : public SocketComponent {
  public:
   static TcpClientComponent* CreateComponent(
+    base::EventChannelObserver* channel_subject,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
 
   void Connect(const std::string& address, int32_t port);
-  void DisConnect();
+  void Disconnect();
 
   void Write(const base::Buffer& buffer);
 
+  bool IsConnected() const;
+
  private:
-  explicit TcpClientComponent(
-    base::TaskRunner* task_runner, SocketComponent::Handler handlers);
+  TcpClientComponent(
+    base::EventChannelObserver* channel_subject,
+    base::TaskRunner* task_runner,
+    SocketComponent::Handler handlers);
   virtual ~TcpClientComponent();
 
   void InternalConnectHandler(std::shared_ptr<io::Session> session);

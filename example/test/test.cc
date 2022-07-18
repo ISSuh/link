@@ -17,10 +17,8 @@
 #include <link/base/task_manager.h>
 #include <link/base/event/event_dispatcher_factory.h>
 #include <link/base/event/event_channel.h>
-#include <link/io/socket/socket_factory.h>
 #include <link/io/base/ip_endpoint.h>
-#include <link/io/socket/handler.h>
-#include <link/io/socket/session.h>
+#include <link/component/ipc/socket/tcp_client_component.h>
 
 using namespace nlink;
 
@@ -55,24 +53,23 @@ int main(int argc, char* argv[]) {
   base::EventDispatcher* dispatcher =
     base::EventDispatcherFactory::CreateEventDispatcher();
 
-  io::Client* client =
-    io::SocketFactory::CreateTcpClient(task_runner);
-
-  client->RegistIOHandler(
-    [](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-        TestReadHandler(buffer, session); },
-    [](size_t size) { TestWriteHandler(size); });
-
-  dispatcher->AttachChannels(
-    dynamic_cast<base::EventChannel*>(client));
-
-  io::IpEndPoint endpoint("127.0.0.1", 3600);
-
-  LOG(INFO) << "Connect : " << endpoint.Origin();
-
-  client->Connect(endpoint,
+  component::SocketComponent::Handler handler = {
+    component::SocketComponent::Handler::AcceptHandler(),
     [](std::shared_ptr<io::Session> session) { TestConnectHandler(session); },
-    [](std::shared_ptr<io::Session> session) { TestCloseHandler(session); });
+    [](std::shared_ptr<io::Session> session) { TestCloseHandler(session); },
+    [](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+      TestReadHandler(buffer, session); },
+    [](size_t size) { TestWriteHandler(size); }
+  };
+
+  base::EventChannelObserver* channel_subject =
+    dynamic_cast<base::EventChannelObserver*>(dispatcher);
+
+  component::TcpClientComponent* client =
+    component::TcpClientComponent::CreateComponent(
+      channel_subject, task_runner, handler);
+
+  client->Connect("127.0.0.1", 3600);
 
   int32_t count = 0;
   while (count < 5) {

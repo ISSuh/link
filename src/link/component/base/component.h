@@ -18,18 +18,15 @@ namespace nlink {
 namespace component {
 
 class LinkComponent {
- public:
-  void RegistEventChannelObserver(base::EventChannelObserver* channel_observer);
-
  protected:
-  LinkComponent() = default;
-  virtual ~LinkComponent() = default;
+  explicit LinkComponent(base::EventChannelObserver* channel_subject);
+  virtual ~LinkComponent();
 
   void AttachChannelsToObserver(base::EventChannel* event_channel);
   void DetatchCahnnelFromObserver(base::EventChannel* event_channel);
 
  private:
-  base::EventChannelObserver* channel_observer_;
+  base::EventChannelObserver* channel_subject_;
 
   DISAALOW_COPY_AND_ASSIGN(LinkComponent);
 };

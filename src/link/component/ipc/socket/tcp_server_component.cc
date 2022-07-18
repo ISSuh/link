@@ -17,8 +17,11 @@ namespace nlink {
 namespace component {
 
 TcpServerComponent::TcpServerComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers)
-  : server_(io::SocketFactory::CreateTcpServer(task_runner)),
+  base::EventChannelObserver* channel_subject,
+  base::TaskRunner* task_runner,
+  SocketComponent::Handler handlers)
+  : SocketComponent(channel_subject),
+    server_(io::SocketFactory::CreateTcpServer(task_runner)),
     accept_handler_(handlers.accept_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
@@ -84,8 +87,13 @@ void TcpServerComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpServerComponent* TcpServerComponent::CreateComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
-  return new TcpServerComponent(task_runner, handlers);
+  base::EventChannelObserver* channel_subject,
+  base::TaskRunner* task_runner,
+  SocketComponent::Handler handlers) {
+  if (!channel_subject || !task_runner) {
+    return nullptr;
+  }
+  return new TcpServerComponent(channel_subject, task_runner, handlers);
 }
 
 }  // namespace component

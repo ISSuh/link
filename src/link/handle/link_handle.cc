@@ -51,8 +51,6 @@ void LinkHandle::RegistComponent(component::LinkComponent* component) {
   if (!event_dispatcher_) {
     return;
   }
-
-  component->RegistEventChannelObserver(event_dispatcher_.get());
 }
 
 void LinkHandle::RegistEventChannls(base::EventChannel* channel) {

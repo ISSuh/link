@@ -16,8 +16,8 @@ namespace io {
 constexpr const size_t kDefaultBufferSize = 4096;
 
 TcpSocketSession::TcpSocketSession(
-  std::shared_ptr<TcpSocket> socket)
-  : socket_(socket),
+  std::unique_ptr<TcpSocket> socket)
+  : socket_(std::move(socket)),
     read_buffer_(kDefaultBufferSize) {
 }
 
@@ -65,6 +65,9 @@ void TcpSocketSession::Write(
 }
 
 bool TcpSocketSession::IsConnected() const {
+  if (nullptr == socket_) {
+    return false;
+  }
   return socket_->IsConnected();
 }
 

@@ -17,13 +17,19 @@ namespace nlink {
 namespace component {
 
 HttpClientComponent* HttpClientComponent::CreateComponent(
+  base::EventChannelObserver* channel_subject,
   base::TaskRunner* task_runner) {
-  return new HttpClientComponent(task_runner);
+  if (!channel_subject || !task_runner) {
+    return nullptr;
+  }
+  return new HttpClientComponent(channel_subject, task_runner);
 }
 
 HttpClientComponent::HttpClientComponent(
+  base::EventChannelObserver* channel_subject,
   base::TaskRunner* task_runner)
-  : task_runner_(task_runner) {
+  : HttpComponent(channel_subject),
+    task_runner_(task_runner) {
 }
 
 HttpClientComponent::~HttpClientComponent() {

@@ -22,7 +22,7 @@ class TcpSocketSession
   : public Session,
     public std::enable_shared_from_this<TcpSocketSession> {
  public:
-  explicit TcpSocketSession(std::shared_ptr<TcpSocket> socket);
+  explicit TcpSocketSession(std::unique_ptr<TcpSocket> socket);
   ~TcpSocketSession();
 
   // Session
@@ -47,7 +47,7 @@ class TcpSocketSession
   void InternalReadHandler(const base::Buffer& buffer, int32_t res);
   void InternalCloseHandler(int32_t res);
 
-  std::shared_ptr<TcpSocket> socket_;
+  std::unique_ptr<TcpSocket> socket_;
 
   base::Buffer read_buffer_;
 
