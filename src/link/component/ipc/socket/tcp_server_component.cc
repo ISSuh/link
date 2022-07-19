@@ -41,8 +41,7 @@ TcpServerComponent::~TcpServerComponent() = default;
 
 void TcpServerComponent::Open(
   const std::string& address, int32_t port) {
-  server_->Listen(io::IpEndPoint(address, port));
-  server_->Accept(
+  server_->Listen(io::IpEndPoint(address, port),
     [this](std::shared_ptr<io::Session> session) {
       this->InternalAcceptHandler(session);
     },

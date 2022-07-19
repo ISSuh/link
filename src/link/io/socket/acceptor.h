@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_IO_SOCKET_CONNECTOR_H_
-#define LINK_IO_SOCKET_CONNECTOR_H_
+#ifndef LINK_IO_SOCKET_ACCEPTOR_H_
+#define LINK_IO_SOCKET_ACCEPTOR_H_
 
 #include <memory>
 
@@ -29,4 +29,4 @@ class Acceptor {
 }  // namespace io
 }  // namespace nlink
 
-#endif  // LINK_IO_SOCKET_CONNECTOR_H_
+#endif  // LINK_IO_SOCKET_ACCEPTOR_H_

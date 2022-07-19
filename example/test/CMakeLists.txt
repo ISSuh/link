@@ -17,13 +17,25 @@ link_directories(
   ${BUILD_DIR}
 )
 
-add_executable(test test.cc)
+add_executable(client test_client.cc)
 
-target_link_libraries(test
+target_link_libraries(client
  PRIVATE
   ${LINK_LIBRARY_NAME}
 )
-set_target_properties(test
+set_target_properties(client
+ PROPERTIES
+  LINKER_LANGUAGE CXX 
+  LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/test
+)
+
+add_executable(server test_server.cc)
+
+target_link_libraries(server
+ PRIVATE
+  ${LINK_LIBRARY_NAME}
+)
+set_target_properties(server
  PROPERTIES
   LINKER_LANGUAGE CXX 
   LIBRARY_OUTPUT_DIRECTORY ${BUILD_DIR_EXAMPLES}/test

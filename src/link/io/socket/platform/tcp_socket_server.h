@@ -4,49 +4,43 @@
  *
  */
 
-#ifndef LINK_IO_SOCKET_PLATFORM_TCP_SOCKET_CLIENT_H_
-#define LINK_IO_SOCKET_PLATFORM_TCP_SOCKET_CLIENT_H_
+#ifndef LINK_NET_SOCKET_TCP_SERVER_H_
+#define LINK_NET_SOCKET_TCP_SERVER_H_
 
 #include <memory>
+#include <set>
 #include <vector>
-#include <queue>
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
 #include "link/base/task/task_runner.h"
-#include "link/base/event/event_dispatcher.h"
+#include "link/base/callback/callback.h"
 #include "link/io/base/ip_endpoint.h"
-#include "link/io/socket/client.h"
-#include "link//io/socket/connector.h"
+#include "link/io/socket/server.h"
+#include "link/io/socket/acceptor.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/socket_descripor.h"
 
 namespace nlink {
 namespace io {
 
-class TcpSocketClient : public Client {
+class TcpSocketServer : public Server {
  public:
-  using EventTaskQueue = std::queue<std::function<void()>>;
+  explicit TcpSocketServer(base::TaskRunner* task_runner);
+  virtual ~TcpSocketServer();
 
-  explicit TcpSocketClient(base::TaskRunner* task_runner);
-  virtual ~TcpSocketClient();
-
-  // Client
-  void Connect(
-    IpEndPoint endpoint,
-    handler::ConnectHandler connect_handler,
+  // Server
+  bool Listen(
+    const IpEndPoint& address,
+    handler::AcceptHandler accept_handler,
     handler::CloseHandler close_handler) override;
-  void Disconnect() override;
+  void Accept(
+    handler::AcceptHandler accept_handler,
+    handler::CloseHandler close_handler) override;
+  void Close() override;
   void RegistIOHandler(
     handler::ReadHandler read_handler,
     handler::WriteHandler write_handler) override;
-  void Write(const base::Buffer& buffer) override;
-  void Write(
-    const base::Buffer& buffer,
-    handler::WriteHandler write_handler,
-    handler::ReadHandler read_handler) override;
-
-  bool IsConnected() const override;
 
   // EventChannel
   void OpenChannel(base::DispatcherConext* context) override;
@@ -54,10 +48,7 @@ class TcpSocketClient : public Client {
   void HandleEvent(const base::Event& event) override;
 
  private:
-  void HandleReadEvent();
-  void HandlerWriteEvent();
-
-  void InternalConnectHandler(std::shared_ptr<Session> session);
+  void InternalAcceptHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
   void InternalReadHandler(
     const base::Buffer& buffer, std::shared_ptr<io::Session> session);
@@ -65,23 +56,23 @@ class TcpSocketClient : public Client {
 
   void RegistChannel(SocketDescriptor descriptor);
 
+  void CloseAllSessions();
+
   base::TaskRunner* task_runner_;
   base::DispatcherConext* dispatcher_context_;
 
-  std::unique_ptr<Connector> connector_;
-  std::shared_ptr<Session> session_;
+  std::unique_ptr<Acceptor> acceptor_;
+  std::set<std::shared_ptr<Session>> sessions_;
 
-  EventTaskQueue wrtie_task_queue_;
-
-  handler::ConnectHandler connect_handler_;
+  handler::AcceptHandler accept_handler_;
   handler::CloseHandler close_handler_;
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;
 
-  DISAALOW_COPY_AND_ASSIGN(TcpSocketClient)
+  DISAALOW_COPY_AND_ASSIGN(TcpSocketServer)
 };
 
 }  // namespace io
 }  // namespace nlink
 
-#endif  // LINK_IO_SOCKET_PLATFORM_TCP_SOCKET_CLIENT_H_
+#endif  // LINK_NET_SOCKET_TCP_SERVER_H_

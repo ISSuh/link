@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <functional>
+#include <utility> 
 
 namespace nlink {
 namespace base {
@@ -17,7 +18,7 @@ TaskRunner::TaskRunner() = default;
 TaskRunner::~TaskRunner() = default;
 
 void TaskRunner::PostTask(const TaskCallback& callback) {
-  PostDelayTask(callback, TimeTick());
+  PostDelayTask(std::move(callback), TimeTick());
 }
 
 TaskRunnerProxy::TaskRunnerProxy(const std::string& label)

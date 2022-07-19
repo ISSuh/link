@@ -121,15 +121,12 @@ int32_t Socket::Listen(int32_t connection) {
   return IOError::OK;
 }
 
-int32_t Socket::Accept(
-  std::unique_ptr<Socket>* socket, base::CompletionCallback callback) {
+int32_t Socket::Accept(std::unique_ptr<Socket>* socket) {
   int32_t res = DoAccept(socket);
   if (res != IOError::ERR_IO_PENDING) {
     return res;
   }
 
-  accept_callback_ = std::move(callback);
-  accepted_socket_ = socket;
   return IOError::OK;
 }
 
@@ -154,18 +151,7 @@ int32_t Socket::DoAccept(std::unique_ptr<Socket>* socket) {
   return IOError::OK;
 }
 
-void Socket::AcceptCompleted() {
-  int32_t res = DoAccept(accepted_socket_);
-  if (res == IOError::ERR_IO_PENDING) {
-    return;
-  }
-
-  accepted_socket_ = nullptr;
-  accept_callback_(res);
-}
-
-int32_t Socket::Connect(
-  const SockaddrStorage& address, base::CompletionCallback callback) {
+int32_t Socket::Connect(const SockaddrStorage& address) {
   SetPeerAddress(address);
 
   int32_t res = DoConnect();
@@ -193,8 +179,6 @@ int32_t Socket::Connect(
     return res;
   }
 
-  connection_callback_.swap(callback);
-  // connection_callback_ = std::move(callback);
   waiting_connect_ = true;
   return IOError::ERR_IO_PENDING;
 }
@@ -222,7 +206,6 @@ void Socket::ConnectCompleted() {
   }
 
   waiting_connect_ = false;
-  connection_callback_(res);
 }
 
 int32_t Socket::Close() {
@@ -355,7 +338,7 @@ void Socket::SetPeerAddress(const SockaddrStorage& address) {
 }
 
 int32_t Socket::GetPeerAddress(SockaddrStorage* address) const {
-  if (peer_address_ != nullptr) {
+  if (peer_address_ == nullptr) {
     return IOError::ERR_SOCKET_NOT_CONNECTED;
   }
 

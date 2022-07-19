@@ -48,6 +48,9 @@ EventDispatcherEpoll::~EventDispatcherEpoll() {
 }
 
 void EventDispatcherEpoll::Dispatch() {
+  while (1) {
+    DispatchOnce();
+  }
 }
 
 void EventDispatcherEpoll::DispatchOnce() {
@@ -68,17 +71,11 @@ void EventDispatcherEpoll::DispatchOnce() {
     int32_t fd = epoll_events[i].data.fd;
     uint32_t event_flag = epoll_events[i].events;
 
+    LOG(INFO) << __func__ << " - fd : " << fd;
+
     std::vector<Event::Type> types;
-    // switch (channel_map_[fd]->ObserverType()) {
-    //   case EventObserver::Type::SERVER: {
-    //     type = HandlingServerEvent();
-    //     break;
-    //   }
-    //   case EventObserver::Type::CLIENT: {
-        HandlingClientEvent(event_flag, &types);
-    //     break;
-    //   }
-    // }
+
+    HandleEvent(event_flag, &types);
 
     Event event(fd, types);
     DispatchEvent(event);
@@ -89,11 +86,7 @@ DispatcherConext* EventDispatcherEpoll::GetDispatcherConext() {
   return context_.get();
 }
 
-Event::Type EventDispatcherEpoll::HandlingServerEvent() {
-  return Event::Type::ACCEPT;
-}
-
-Event::Type EventDispatcherEpoll::HandlingClientEvent(
+Event::Type EventDispatcherEpoll::HandleEvent(
   uint32_t event_flag, std::vector<Event::Type>* types) {
   if (event_flag & EPOLLIN) {
     types->emplace_back(Event::Type::READ);
@@ -101,6 +94,10 @@ Event::Type EventDispatcherEpoll::HandlingClientEvent(
 
   if (event_flag & EPOLLOUT) {
     types->emplace_back(Event::Type::WRITE);
+  }
+  
+  if (types->empty()) {
+    types->emplace_back(Event::Type::ACCEPT);
   }
 
   if (event_flag & EPOLLERR) {

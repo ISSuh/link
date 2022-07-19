@@ -14,7 +14,7 @@ namespace nlink {
 namespace io {
 
 const int32_t kDefaultTcpKeepAliveSeconds = 45;
-const int32_t kDefaultListenerConnection = 45;
+const int32_t kDefaultListenerConnection = 5;
 
 struct SocketOptions {
   SocketOptions()

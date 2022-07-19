@@ -21,7 +21,11 @@ class Server : public base::EventChannel {
  public:
   virtual ~Server() = default;
 
-  virtual bool Listen(const IpEndPoint& address) = 0;
+  virtual bool Listen(
+    const IpEndPoint& address,
+    handler::AcceptHandler accept_handler,
+    handler::CloseHandler close_handler) = 0;
+
   virtual void Accept(
     handler::AcceptHandler accept_handler,
     handler::CloseHandler close_handler) = 0;

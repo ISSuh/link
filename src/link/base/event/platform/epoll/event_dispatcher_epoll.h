@@ -42,8 +42,7 @@ class EventDispatcherEpoll : public EventDispatcher {
   void DetatchCahnnel(EventChannel* channel) override;
 
  private:
-  Event::Type HandlingServerEvent();
-  Event::Type HandlingClientEvent(
+  Event::Type HandleEvent(
     uint32_t event_flag, std::vector<Event::Type>* types);
 
   std::unordered_map<Discriptor, EventChannel*> channel_map_;

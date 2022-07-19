@@ -29,15 +29,16 @@ class TcpConnector : public Connector {
     const IpEndPoint& address, handler::ConnectHandler handler) override;
 
  private:
-  void DoConnect(std::shared_ptr<TcpSocket> socket);
-  void PostConnectTask(std::shared_ptr<TcpSocket> socket);
-  void InternalConnectHnadler(std::shared_ptr<TcpSocket> socket, int32_t err);
+  void DoConnect(handler::ConnectHandler handler);
+  void PostConnectTask(handler::ConnectHandler handler);
+  void InternalConnectHnadler(handler::AcceptHandler handler, int32_t res);
+  void CreateAndRegistNewSession(handler::AcceptHandler handler);
 
   base::TaskRunner* task_runner_;
   SocketCreatedCallbak socket_create_callback_;
 
+  std::unique_ptr<TcpSocket> socket_;
   IpEndPoint address_;
-  handler::ConnectHandler connect_handler_;
 
   uint64_t try_connection_count_;
   bool is_connected_;

@@ -21,6 +21,7 @@ TcpConnector::TcpConnector(
   base::TaskRunner* task_runner, SocketCreatedCallbak callback)
   : task_runner_(task_runner),
     socket_create_callback_(callback),
+    socket_(nullptr),
     try_connection_count_(0),
     is_connected_(false) {
 }
@@ -31,53 +32,56 @@ TcpConnector::~TcpConnector() {
 void TcpConnector::Connect(
   const IpEndPoint& address, handler::ConnectHandler handler) {
   address_ = address;
-  connect_handler_ = handler;
 
   SocketOptions options;
-  std::shared_ptr<TcpSocket> socket = std::make_shared<TcpSocket>(options);
-  socket->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
+  socket_ = std::make_unique<TcpSocket>(options);
+  socket_->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
 
-  socket_create_callback_(socket->Descriptor());
+  socket_create_callback_(socket_->Descriptor());
 
-  PostConnectTask(socket);
+  DoConnect(std::move(handler));
 }
 
-void TcpConnector::DoConnect(std::shared_ptr<TcpSocket> socket) {
-  ++try_connection_count_;
-
-  int32_t res = socket->Connect(
-    address_,
-    [this, socket](int32_t err) mutable {
-      this->InternalConnectHnadler(socket, err);
-    });
-
-  if (IOError::ERR_IO_PENDING == res) {
-    PostConnectTask(socket);
-    return;
-  }
-}
-
-void TcpConnector::PostConnectTask(std::shared_ptr<TcpSocket> socket) {
+void TcpConnector::DoConnect(handler::ConnectHandler handler) {
   if (is_connected_) {
     return;
   }
 
+  ++try_connection_count_;
+
+  socket_->Connect(address_,
+    [this, handler](int32_t err) mutable {
+      this->InternalConnectHnadler(std::move(handler), err);
+    });
+}
+
+void TcpConnector::PostConnectTask(handler::ConnectHandler handler) {
   task_runner_->PostTask(
-    [this, socket]() {
-      this->DoConnect(socket);
+    [this, handler]() {
+      this->DoConnect(std::move(handler));
     });
 }
 
 void TcpConnector::InternalConnectHnadler(
-  std::shared_ptr<TcpSocket> socket, int32_t err) {
-  if (err == IOError::OK) {;
-    std::shared_ptr<Session> session =
-      std::make_shared<TcpSocketSession>(std::move(socket));
-    if (connect_handler_) {
-      connect_handler_(session);
-    }
-  } else {
-    PostConnectTask(socket);
+  handler::AcceptHandler handler, int32_t res) {
+  switch (res) {
+    case IOError::OK:
+      CreateAndRegistNewSession(std::move(handler));
+      break;
+    default:
+      PostConnectTask(std::move(handler));
+      break;
+  }
+}
+
+void TcpConnector::CreateAndRegistNewSession(
+  handler::AcceptHandler handler) {
+  is_connected_ = true;
+
+  std::shared_ptr<Session> session =
+    std::make_shared<TcpSocketSession>(std::move(socket_));
+  if (handler) {
+    handler(session);
   }
 }
 

@@ -31,13 +31,13 @@ class TcpSocket {
 
   int32_t Bind(const IpEndPoint& address);
   int32_t Listen(int32_t connection);
-  int32_t Accept(
+  void Accept(
     std::unique_ptr<TcpSocket>* socket,
     IpEndPoint* address,
     base::CompletionCallback callback);
 
-  int32_t Connect(
-    const IpEndPoint& address, base::CompletionCallback callback);
+  void Connect(
+    const IpEndPoint& address, base::CompletionCallback&& callback);
   int32_t Close();
 
   int32_t Read(base::Buffer* buffer, base::CompletionCallback callback);
@@ -51,17 +51,9 @@ class TcpSocket {
   SocketDescriptor Descriptor() const;
 
  private:
-  void AcceptCompleted(
-    std::unique_ptr<TcpSocket>* tcp_socket,
-    IpEndPoint* address,
-    base::CompletionCallback callback,
-    int32_t res);
-  int32_t HandleAcceptCompleted(
-    std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address, int32_t res);
   int32_t BuildNewTcpSocket(
     std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address);
 
-  void ConnectCompleted(base::CompletionCallback callback, int32_t res);
   int32_t HandleConnectCompleted(int32_t res);
 
   void ReadCompleted(

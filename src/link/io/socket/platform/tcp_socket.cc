@@ -69,59 +69,33 @@ int32_t TcpSocket::Listen(int32_t connection) {
   return socket_->Listen(connection);
 }
 
-int32_t TcpSocket::Accept(
+void TcpSocket::Accept(
   std::unique_ptr<TcpSocket>* tcp_socket,
   IpEndPoint* address,
   base::CompletionCallback callback) {
-  int32_t res = socket_->Accept(
-    &accepted_socket_,
-    [this, &tcp_socket, &address, callback](int32_t res) {
-      this->AcceptCompleted(tcp_socket, address, std::move(callback), res);
-    });
-  if (res != IOError::ERR_IO_PENDING) {
-    res = HandleAcceptCompleted(tcp_socket, address, res);
-  }
-  return res;
-}
-
-void TcpSocket::AcceptCompleted(
-  std::unique_ptr<TcpSocket>* tcp_socket,
-  IpEndPoint* address,
-  base::CompletionCallback callback,
-  int32_t res) {
-  callback(HandleAcceptCompleted(tcp_socket, address, res));
-}
-
-int32_t TcpSocket::HandleAcceptCompleted(
-  std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address, int32_t res) {
+  int32_t res = socket_->Accept(&accepted_socket_);
   if (res == IOError::OK) {
     res = BuildNewTcpSocket(tcp_socket, address);
   }
-  return res;
+
+  callback(res);
 }
 
-int32_t TcpSocket::Connect(
-  const IpEndPoint& address, base::CompletionCallback callback) {
+void TcpSocket::Connect(
+  const IpEndPoint& address, base::CompletionCallback&& callback) {
   SockaddrStorage storage;
   if (!address.ToSockAddr(storage.addr, &storage.addr_len)) {
     LOG(INFO) << "TcpSocket::Connect - fail convert addr to sockaddr";
-    return IOError::ERR_ADDRESS_INVALID;
+    callback(IOError::ERR_ADDRESS_INVALID);
+    return;
   }
 
-  int32_t res = socket_->Connect(
-    storage,
-    [this, callback](int32_t res) {
-      this->ConnectCompleted(std::move(callback), res);
-    });
+  int32_t res = socket_->Connect(storage);
   if (res != IOError::ERR_IO_PENDING) {
     res = HandleConnectCompleted(res);
   }
-  return res;
-}
 
-void TcpSocket::ConnectCompleted(
-  base::CompletionCallback callback, int32_t res) {
-  callback(HandleConnectCompleted(res));
+  callback(res);
 }
 
 int32_t TcpSocket::HandleConnectCompleted(int32_t res) {
@@ -214,7 +188,9 @@ int32_t TcpSocket::HandleWriteCompleted(int32_t res) {
 int32_t TcpSocket::BuildNewTcpSocket(
   std::unique_ptr<TcpSocket>* tcp_socket, IpEndPoint* address) {
   SockaddrStorage storage;
-  if (accepted_socket_->GetPeerAddress(&storage) != IOError::OK ||
+
+  auto res = accepted_socket_->GetPeerAddress(&storage);
+  if (res != IOError::OK||
       !address->FromSockAddr(storage.addr, storage.addr_len)) {
     accepted_socket_.reset();
     return IOError::ERR_ADDRESS_INVALID;

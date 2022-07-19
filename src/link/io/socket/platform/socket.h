@@ -37,11 +37,9 @@ class Socket {
 
   int32_t Bind(const SockaddrStorage& address);
   int32_t Listen(int32_t connection);
-  int32_t Accept(
-    std::unique_ptr<Socket>* socket, base::CompletionCallback callback);
+  int32_t Accept(std::unique_ptr<Socket>* socket);
 
-  int32_t Connect(
-    const SockaddrStorage& address, base::CompletionCallback callback);
+  int32_t Connect(const SockaddrStorage& address);
   int32_t Close();
 
   int32_t Read(base::Buffer* buffuer, base::CompletionCallback callback);
@@ -60,7 +58,6 @@ class Socket {
   void SetPeerAddress(const SockaddrStorage& address);
 
   int32_t DoAccept(std::unique_ptr<Socket>* socket);
-  void AcceptCompleted();
 
   int32_t DoConnect();
   void ConnectCompleted();
@@ -74,8 +71,6 @@ class Socket {
   int32_t DoWrite(base::Buffer* buffer);
 
   SocketDescriptor descriptor_;
-
-  std::unique_ptr<Socket>* accepted_socket_;
   std::unique_ptr<SockaddrStorage> peer_address_;
 
   bool waiting_connect_ = false;
@@ -86,8 +81,6 @@ class Socket {
   std::unique_ptr<base::Buffer> pending_write_buffer_;
   base::CompletionCallback peding_write_callback_;
 
-  base::CompletionCallback accept_callback_;
-  base::CompletionCallback connection_callback_;
   base::CompletionCallback read_if_ready_callback_;
 
   DISAALOW_COPY_AND_ASSIGN(Socket)
