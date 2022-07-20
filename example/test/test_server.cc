@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     dynamic_cast<base::EventChannelObserver*>(dispatcher);
 
   component::SocketComponent::Handler handler = {
-    [](std::shared_ptr<io::Session> session) { TestConnectHandler(session); },
+    [](std::shared_ptr<io::Session> session) { TestAcceptHandler(session); },
     component::SocketComponent::Handler::ConnectHandler(),
     [](std::shared_ptr<io::Session> session) { TestCloseHandler(session); },
     [](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {

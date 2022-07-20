@@ -31,6 +31,10 @@ TcpConnector::~TcpConnector() {
 
 void TcpConnector::Connect(
   const IpEndPoint& address, handler::ConnectHandler handler) {
+  if (address.Empty()) {
+    return;
+  }
+
   address_ = address;
 
   SocketOptions options;

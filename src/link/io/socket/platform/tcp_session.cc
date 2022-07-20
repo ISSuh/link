@@ -90,5 +90,9 @@ void TcpSocketSession::InternalReadHandler(
   }
 }
 
+void TcpSocketSession::InternalCloseHandler(int32_t) {
+
+}
+
 }  // namespace io
 }  // namespace nlink

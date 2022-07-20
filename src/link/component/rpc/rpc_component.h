@@ -10,7 +10,6 @@
 #include <string>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
 
 namespace nlink {

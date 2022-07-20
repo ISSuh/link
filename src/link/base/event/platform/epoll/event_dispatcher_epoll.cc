@@ -67,11 +67,12 @@ void EventDispatcherEpoll::DispatchOnce() {
     return;
   }
 
+  LOG(INFO) << __func__ << " - event_count : " << event_count;
+
+
   for (int i = 0 ; i < event_count ; ++i) {
     int32_t fd = epoll_events[i].data.fd;
     uint32_t event_flag = epoll_events[i].events;
-
-    LOG(INFO) << __func__ << " - fd : " << fd;
 
     std::vector<Event::Type> types;
 

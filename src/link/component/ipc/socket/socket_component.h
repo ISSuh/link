@@ -12,7 +12,6 @@
 #include <functional>
 
 #include "link/base/macro.h"
-#include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
 #include "link/io/socket/session.h"
 

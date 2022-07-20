@@ -11,7 +11,6 @@
 #include <memory>
 
 #include "link/base/event/event_dispatcher.h"
-#include "link/base/event/event_observer.h"
 #include "link/component/base/component.h"
 
 namespace nlink {

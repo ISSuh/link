@@ -20,6 +20,7 @@
 #include "link/io/socket/acceptor.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/socket_descripor.h"
+#include "link/io/socket/platform/tcp_socket_client.h"
 
 namespace nlink {
 namespace io {
@@ -48,6 +49,7 @@ class TcpSocketServer : public Server {
   void HandleEvent(const base::Event& event) override;
 
  private:
+  void RegistAcceptedClient(std::shared_ptr<Client> client);
   void InternalAcceptHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
   void InternalReadHandler(
@@ -63,6 +65,7 @@ class TcpSocketServer : public Server {
 
   std::unique_ptr<Acceptor> acceptor_;
   std::set<std::shared_ptr<Session>> sessions_;
+  std::set<std::shared_ptr<Client>> clients_;
 
   handler::AcceptHandler accept_handler_;
   handler::CloseHandler close_handler_;

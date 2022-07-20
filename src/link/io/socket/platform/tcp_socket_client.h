@@ -29,6 +29,8 @@ class TcpSocketClient : public Client {
   using EventTaskQueue = std::queue<std::function<void()>>;
 
   explicit TcpSocketClient(base::TaskRunner* task_runner);
+  TcpSocketClient(
+    base::TaskRunner* task_runner, std::shared_ptr<Session> session);
   virtual ~TcpSocketClient();
 
   // Client
@@ -54,6 +56,8 @@ class TcpSocketClient : public Client {
   void HandleEvent(const base::Event& event) override;
 
  private:
+  void AdoptedSession();
+
   void HandleReadEvent();
   void HandlerWriteEvent();
 

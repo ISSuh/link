@@ -10,15 +10,19 @@
 
 #include "link/base/logging.h"
 #include "link/io/base/io_error.h"
+#include "link/io/socket/platform/tcp_socket_client.h"
 #include "link/io/socket/platform/tcp_session.h"
 
 namespace nlink {
 namespace io {
 
 TcpAcceptor::TcpAcceptor(
-  base::TaskRunner* task_runner, SocketCreatedCallbak callback)
+  base::TaskRunner* task_runner,
+  SocketCreatedCallbak socket_create_callback,
+  ClientAcceptedCallback client_accepted_callback)
   : task_runner_(task_runner),
-    socket_create_callback_(callback),
+    socket_create_callback_(socket_create_callback),
+    client_accepted_callback_(client_accepted_callback),
     socket_(nullptr),
     is_connected_(false) {
 }
@@ -88,7 +92,7 @@ void TcpAcceptor::InternalAcceptHandler(
   int32_t res) {
   switch (res) {
     case IOError::OK:
-      CreateAndRegistNewSession(
+      CreateNewClientAndRegistSession(
         std::move(peer_socket), std::move(handler));
       break;
     case 11:
@@ -101,13 +105,19 @@ void TcpAcceptor::InternalAcceptHandler(
   }
 }
 
-void TcpAcceptor::CreateAndRegistNewSession(
+void TcpAcceptor::CreateNewClientAndRegistSession(
   std::unique_ptr<TcpSocket> peer_socket,
   handler::AcceptHandler handler) {
   is_connected_ = true;
 
   std::shared_ptr<Session> session =
     std::make_shared<TcpSocketSession>(std::move(peer_socket));
+
+  std::shared_ptr<Client> client =
+    std::make_shared<TcpSocketClient>(task_runner_, session);
+
+  client_accepted_callback_(client);
+
   if (handler) {
     handler(session);
   }

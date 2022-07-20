@@ -60,7 +60,8 @@ void TcpSocketServer::OpenChannel(base::DispatcherConext* context) {
     acceptor_.reset(new TcpAcceptor(task_runner_,
       [this](SocketDescriptor descriptor) {
         this->RegistChannel(descriptor);
-      }));
+      },
+      [](std::shared_ptr<Client>) {}));
   }
 }
 
@@ -101,9 +102,11 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
   }
 }
 
-void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
-  sessions_.insert(session);
+void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client> client) {
+  clients_.insert(client);
+}
 
+void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
   session->Open(
     [this](const base::Buffer& buffer, std::shared_ptr<Session> session) {
       this->InternalReadHandler(buffer, session);
@@ -158,7 +161,6 @@ void TcpSocketServer::CloseAllSessions() {
   }
   sessions_.clear();
 }
-
 
 }  // namespace io
 }  // namespace nlink

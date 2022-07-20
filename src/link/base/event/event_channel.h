@@ -11,8 +11,6 @@
 
 #include "link/base/platform/discriptor.h"
 #include "link/base/event/event.h"
-#include "link/base/event/event_observer.h"
-#include "link/base/event/event_dispatcher.h"
 
 namespace nlink {
 namespace base {
@@ -21,25 +19,15 @@ class DispatcherConext;
 
 class EventChannel {
  public:
+  class EventChannelDelegate {
+    virtual void OnOpend(EventChannel* channel);
+    virtual void OnClosed(EventChannel* channel);
+  };
+
   virtual void OpenChannel(DispatcherConext* context) = 0;
   virtual void CloseChannel() = 0;
   virtual void HandleEvent(const Event& event) = 0;
 };
-
-// class EventChannel {
-//  public:
-//   explicit EventChannel(EventObserver* observer);
-//   virtual ~EventChannel();
-
-//   void CloseChannel();
-
-//   Discriptor ChannelDiscriptor() const;
-//   EventObserver::Type ObserverType() const;
-//   void HandleEvent(const Event& event);
-
-//  private:
-//   EventObserver* observer_;
-// };
 
 }  // namespace base
 }  // namespace nlink
