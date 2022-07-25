@@ -41,6 +41,7 @@ class TcpSocketSession
     handler::ReadHandler read_handler) override;
 
   bool IsConnected() const override;
+  int32_t SessionId() const override;
 
  private:
   void InternalWriteHandler(int32_t res);

@@ -8,8 +8,9 @@
 #define LINK_NET_SOCKET_TCP_SERVER_H_
 
 #include <memory>
-#include <set>
+#include <map>
 #include <vector>
+#include <queue>
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
@@ -27,6 +28,8 @@ namespace io {
 
 class TcpSocketServer : public Server {
  public:
+  using EventTaskQueue = std::queue<std::function<void()>>;
+
   explicit TcpSocketServer(base::TaskRunner* task_runner);
   virtual ~TcpSocketServer();
 
@@ -49,6 +52,9 @@ class TcpSocketServer : public Server {
   void HandleEvent(const base::Event& event) override;
 
  private:
+  void HandleReadEvent(SocketDescriptor descriptor);
+  void HandlerWriteEvent(SocketDescriptor descriptor);
+
   void RegistAcceptedClient(std::shared_ptr<Client> client);
   void InternalAcceptHandler(std::shared_ptr<Session> session);
   void InternalCloseHandler(std::shared_ptr<Session> session);
@@ -56,16 +62,20 @@ class TcpSocketServer : public Server {
     const base::Buffer& buffer, std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  void RegistChannel(SocketDescriptor descriptor);
+  void RegistChannel(
+    SocketDescriptor descriptor, bool is_accept_socket_descriptor);
 
+  void CloseSession(SocketDescriptor descriptor);
   void CloseAllSessions();
 
   base::TaskRunner* task_runner_;
   base::DispatcherConext* dispatcher_context_;
 
   std::unique_ptr<Acceptor> acceptor_;
-  std::set<std::shared_ptr<Session>> sessions_;
-  std::set<std::shared_ptr<Client>> clients_;
+  SocketDescriptor accept_descriptor_;
+  std::map<SocketDescriptor, std::shared_ptr<Session>> sessions_;
+
+  EventTaskQueue wrtie_task_queue_;
 
   handler::AcceptHandler accept_handler_;
   handler::CloseHandler close_handler_;

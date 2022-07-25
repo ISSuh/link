@@ -71,6 +71,10 @@ bool TcpSocketSession::IsConnected() const {
   return socket_->IsConnected();
 }
 
+SocketDescriptor TcpSocketSession::SessionId() const {
+  return socket_->Descriptor();
+}
+
 void TcpSocketSession::InternalWriteHandler(int32_t res) {
   if (res > 0) {
     if (!write_handler_) {
@@ -82,11 +86,16 @@ void TcpSocketSession::InternalWriteHandler(int32_t res) {
 
 void TcpSocketSession::InternalReadHandler(
   const base::Buffer& buffer, int32_t res) {
+  LOG(INFO) << __func__ << " - res : " << res;
   if (res > 0) {
     if (!read_handler_) {
       return;
     }
     read_handler_(buffer, shared_from_this());
+  }
+
+  if (res == 0) {
+    Close();
   }
 }
 

@@ -7,6 +7,7 @@
 #ifndef LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_
 #define LINK_BASE_EVENT_EVENT_CHANNEL_CONTROLLER_H_
 
+#include <map>
 #include <functional>
 
 #include "link/base/event/event.h"
@@ -19,20 +20,22 @@ class EventChannel;
 
 class EventChannelController : public EventChannel::EventChannelDelegate {
  public:
-  using RegistChannel = std::function<void(int32_t)>;
+  using RegistChannelCallback = std::function<void(int32_t)>;
 
-  EventChannelController() {}
-  ~EventChannelController() {}
+  explicit EventChannelController(RegistChannelCallback regist_callback);
+  ~EventChannelController();
 
-  void AttachChannels(EventChannel* channel) {}
-  void DetatchCahnnel(EventChannel* channel) {}
-  void DispatchEvent(const Event& event) {}
+  void AttachChannels(EventChannel* channel);
+  void DetatchCahnnel(EventChannel* channel);
+  void DispatchEvent(const Event& event);
 
   // EventChannel::EventChannelDelegate
-  void OnOpend(EventChannel* channel) override {}
-  void OnClosed(EventChannel* channel) override {}
+  void OnOpend(EventChannel* channel) override;
+  void OnClosed(EventChannel* channel) override;
 
  private:
+  RegistChannelCallback regist_channel_callback_;
+  std::map<int32_t, EventChannel*> channel_map_;
 };
 
 }  // namespace base

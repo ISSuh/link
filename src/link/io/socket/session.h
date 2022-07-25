@@ -21,6 +21,8 @@ class Session {
  public:
   virtual ~Session() = default;
 
+  virtual int32_t SessionId() const = 0;
+
   // virtual const IpEndPoint LocalEndPoint() = 0;
   // virtual const IpEndPoint RemoteEndPoint() = 0;
   virtual bool IsConnected() const = 0;

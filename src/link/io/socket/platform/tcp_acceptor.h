@@ -20,13 +20,11 @@ namespace io {
 
 class TcpAcceptor : public Acceptor {
  public:
-  using SocketCreatedCallbak = std::function<void(SocketDescriptor)>;
-  using ClientAcceptedCallback = std::function<void(std::shared_ptr<Client>)>;
+  using SocketCreatedCallbak = std::function<void(SocketDescriptor, bool)>;
 
   TcpAcceptor(
     base::TaskRunner* task_runner,
-    SocketCreatedCallbak socket_created_callback,
-    ClientAcceptedCallback client_accepted_callback);
+    SocketCreatedCallbak socket_created_callback);
   virtual ~TcpAcceptor();
 
   bool Listen(const IpEndPoint& address) override;
@@ -41,13 +39,12 @@ class TcpAcceptor : public Acceptor {
     handler::AcceptHandler handler,
     int32_t res);
 
-  void CreateNewClientAndRegistSession(
+  void CreateNewSessionAndRegist(
     std::unique_ptr<TcpSocket> peer_socket,
     handler::AcceptHandler handler);
 
   base::TaskRunner* task_runner_;
   SocketCreatedCallbak socket_create_callback_;
-  ClientAcceptedCallback client_accepted_callback_;
 
   std::unique_ptr<TcpSocket> socket_;
   bool is_connected_;

@@ -18,11 +18,9 @@ namespace io {
 
 TcpAcceptor::TcpAcceptor(
   base::TaskRunner* task_runner,
-  SocketCreatedCallbak socket_create_callback,
-  ClientAcceptedCallback client_accepted_callback)
+  SocketCreatedCallbak socket_create_callback)
   : task_runner_(task_runner),
     socket_create_callback_(socket_create_callback),
-    client_accepted_callback_(client_accepted_callback),
     socket_(nullptr),
     is_connected_(false) {
 }
@@ -54,16 +52,17 @@ bool TcpAcceptor::Listen(const IpEndPoint& address) {
     return false;
   }
 
-  socket_create_callback_(socket_->Descriptor());
+  socket_create_callback_(socket_->Descriptor(), true);
   return true;
 }
 
 void TcpAcceptor::Accept(handler::AcceptHandler handler) {
+  is_connected_ = false;
   DoAccept(std::move(handler));
 }
 
 void TcpAcceptor::Close() {
-
+  
 }
 
 void TcpAcceptor::DoAccept(handler::AcceptHandler handler) {
@@ -92,7 +91,7 @@ void TcpAcceptor::InternalAcceptHandler(
   int32_t res) {
   switch (res) {
     case IOError::OK:
-      CreateNewClientAndRegistSession(
+      CreateNewSessionAndRegist(
         std::move(peer_socket), std::move(handler));
       break;
     case 11:
@@ -105,18 +104,15 @@ void TcpAcceptor::InternalAcceptHandler(
   }
 }
 
-void TcpAcceptor::CreateNewClientAndRegistSession(
+void TcpAcceptor::CreateNewSessionAndRegist(
   std::unique_ptr<TcpSocket> peer_socket,
   handler::AcceptHandler handler) {
   is_connected_ = true;
 
+  socket_create_callback_(peer_socket->Descriptor(), false);
+
   std::shared_ptr<Session> session =
     std::make_shared<TcpSocketSession>(std::move(peer_socket));
-
-  std::shared_ptr<Client> client =
-    std::make_shared<TcpSocketClient>(task_runner_, session);
-
-  client_accepted_callback_(client);
 
   if (handler) {
     handler(session);

@@ -17,7 +17,9 @@ namespace nlink {
 namespace io {
 
 TcpSocketServer::TcpSocketServer(base::TaskRunner* task_runner)
-  : task_runner_(task_runner), acceptor_(nullptr) {
+  : task_runner_(task_runner),
+    acceptor_(nullptr),
+    accept_descriptor_(kInvalidSocket) {
 }
 
 TcpSocketServer::~TcpSocketServer() {
@@ -58,10 +60,9 @@ void TcpSocketServer::OpenChannel(base::DispatcherConext* context) {
 
   if (nullptr == acceptor_) {
     acceptor_.reset(new TcpAcceptor(task_runner_,
-      [this](SocketDescriptor descriptor) {
-        this->RegistChannel(descriptor);
-      },
-      [](std::shared_ptr<Client>) {}));
+      [this](SocketDescriptor descriptor, bool is_accept_socket_descriptor) {
+        this->RegistChannel(descriptor, is_accept_socket_descriptor);
+      }));
   }
 }
 
@@ -74,19 +75,24 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
     LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
   }
 
+  if (event.Discriptor() == accept_descriptor_) {
+    acceptor_->Accept(
+      [this](std::shared_ptr<Session> session) {
+        this->InternalAcceptHandler(session);
+      });
+
+    return;
+  }
+
+  SocketDescriptor descriptor = event.Discriptor();
   for (auto& type : event.Types()) {
     base::TaskCallback callback = {};
     switch (type) {
-      case base::Event::Type::ACCEPT:
-
       case base::Event::Type::READ:
-        acceptor_->Accept(
-          [this](std::shared_ptr<Session> session) {
-            this->InternalAcceptHandler(session);
-          });
-        break;
+        HandleReadEvent(descriptor);
         break;
       case base::Event::Type::WRITE:
+        HandlerWriteEvent(descriptor);
         break;
       case base::Event::Type::CLOSE:
         CloseAllSessions();
@@ -102,8 +108,39 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
   }
 }
 
+void TcpSocketServer::HandleReadEvent(SocketDescriptor descriptor) {
+  if (sessions_.find(descriptor) == sessions_.end()) {
+    LOG(WARNING) << "[TcpSocketServer::HandleReadEvent] invalid descriptor. "
+                 << descriptor;
+    return;
+  }
+
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
+  session->Read(nullptr);
+  // task_runner_->PostTask(
+  //   [this, session = session_]() {
+  //     session->Read(nullptr);
+  //   });
+}
+
+void TcpSocketServer::HandlerWriteEvent(SocketDescriptor descriptor) {
+  if (sessions_.find(descriptor) == sessions_.end()) {
+    LOG(WARNING) << "[TcpSocketServer::HandlerWriteEvent] invalid descriptor. "
+                 << descriptor;
+    return;
+  }
+
+  if (wrtie_task_queue_.empty()) {
+    return;
+  }
+
+  auto callback = wrtie_task_queue_.front();
+  wrtie_task_queue_.pop();
+
+  task_runner_->PostTask(callback);
+}
+
 void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client> client) {
-  clients_.insert(client);
 }
 
 void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
@@ -118,47 +155,58 @@ void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
       this->InternalCloseHandler(session);
     });
 
-  if (!accept_handler_) {
-    return;
+  sessions_.insert({session->SessionId(), session});
+
+  if (accept_handler_) {
+    accept_handler_(session);
   }
-  accept_handler_(session);
 }
 
 void TcpSocketServer::InternalCloseHandler(std::shared_ptr<Session> session) {
-  sessions_.erase(session);
+  sessions_.erase(session->SessionId());
 
-  if (!close_handler_) {
-    return;
+  if (close_handler_) {
+    close_handler_(session);
   }
-  close_handler_(session);
 }
 
 void TcpSocketServer::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  if (!read_handler_) {
-    return;
+  if (read_handler_) {
+    read_handler_(buffer, session);
   }
-  read_handler_(buffer, session);
 }
 
 void TcpSocketServer::InternalWriteHandler(size_t length) {
-  if (!write_handler_) {
-    return;
+  if (write_handler_) {
+    write_handler_(length);
   }
-  write_handler_(length);
 }
 
-void TcpSocketServer::RegistChannel(SocketDescriptor descriptor) {
+void TcpSocketServer::RegistChannel(
+  SocketDescriptor descriptor, bool is_accept_socket_descriptor) {
   LOG(INFO) << __func__ << " - descriptor : " << descriptor;
+
+  if (is_accept_socket_descriptor) {
+    accept_descriptor_ = descriptor;
+  }
+
   if (!dispatcher_context_->Regist(descriptor, this)) {
     LOG(ERROR) << "[TcpSocketClient::RegistChannel] can not regist channel";
   }
 }
 
-void TcpSocketServer::CloseAllSessions() {
-  for (auto session : sessions_) {
-    session->Close();
+void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
+  if (sessions_.find(descriptor) == sessions_.end()) {
+    LOG(WARNING) << "[TcpSocketServer::CloseSession] invalid descriptor. "
+                 << descriptor;
+    return;
   }
+
+  sessions_.erase(descriptor);
+}
+
+void TcpSocketServer::CloseAllSessions() {
   sessions_.clear();
 }
 

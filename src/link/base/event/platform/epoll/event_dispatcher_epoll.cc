@@ -96,10 +96,6 @@ Event::Type EventDispatcherEpoll::HandleEvent(
   if (event_flag & EPOLLOUT) {
     types->emplace_back(Event::Type::WRITE);
   }
-  
-  if (types->empty()) {
-    types->emplace_back(Event::Type::ACCEPT);
-  }
 
   if (event_flag & EPOLLERR) {
     types->emplace_back(Event::Type::ERROR);

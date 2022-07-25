@@ -21,13 +21,6 @@ TcpSocketClient::TcpSocketClient(base::TaskRunner* task_runner)
     session_(nullptr) {
 }
 
-TcpSocketClient::TcpSocketClient(
-  base::TaskRunner* task_runner, std::shared_ptr<Session> session)
-  : task_runner_(task_runner),
-    dispatcher_context_(nullptr),
-    session_(session) {
-}
-
 TcpSocketClient::~TcpSocketClient() {
 }
 
@@ -136,19 +129,6 @@ void TcpSocketClient::HandleEvent(const base::Event& event) {
         break;
     }
   }
-}
-
-void TcpSocketClient::AdoptedSession() {
-  session_->Open(
-    [this](const base::Buffer& buffer, std::shared_ptr<Session> session) {
-      this->InternalReadHandler(buffer, session);
-    },
-    [this](size_t length) {
-      this->InternalWriteHandler(length);
-    },
-    [this](std::shared_ptr<Session> session) {
-      this->InternalCloseHandler(session);
-    });
 }
 
 void TcpSocketClient::HandleReadEvent() {
