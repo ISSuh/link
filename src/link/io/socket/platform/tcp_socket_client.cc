@@ -17,7 +17,7 @@ namespace io {
 
 TcpSocketClient::TcpSocketClient(base::TaskRunner* task_runner)
   : task_runner_(task_runner),
-    dispatcher_context_(nullptr),
+    channel_delegate_(nullptr),
     session_(nullptr) {
 }
 
@@ -87,12 +87,13 @@ void TcpSocketClient::RegistIOHandler(
   write_handler_ = write_handler;
 }
 
-void TcpSocketClient::OpenChannel(base::DispatcherConext* context) {
-  if (nullptr == context) {
+void TcpSocketClient::OpenChannel(
+  base::EventChannel::EventChannelDelegate* delegate) {
+  if (nullptr == delegate) {
     return;
   }
 
-  dispatcher_context_ = context;
+  channel_delegate_ = delegate;
 
   if (nullptr == connector_) {
     connector_.reset(new TcpConnector(
@@ -191,9 +192,7 @@ void TcpSocketClient::InternalWriteHandler(size_t length) {
 }
 
 void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {
-  if (!dispatcher_context_->Regist(descriptor, this)) {
-    LOG(ERROR) << "[TcpSocketClient::RegistChannel] can not regist channel";
-  }
+  channel_delegate_->ChannelOpend(descriptor, this);
 }
 
 }  // namespace io

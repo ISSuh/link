@@ -14,7 +14,7 @@ namespace component {
 
 class HttpComponent : public LinkComponent {
  protected:
-  explicit HttpComponent(base::EventChannelObserver* channel_subject);
+  explicit HttpComponent(base::EventChannelController* channel_controller);
   virtual ~HttpComponent();
 
   DISAALOW_COPY_AND_ASSIGN(HttpComponent);

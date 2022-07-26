@@ -22,7 +22,7 @@ AsioDispatcherConext::~AsioDispatcherConext() {
 }
 
 void* AsioDispatcherConext::context() const {
-  return (void*)(&discriptor_);
+  return (void*)(&Descriptor_);
 }
 
 bool AsioDispatcherConext::Regist(void* target) {

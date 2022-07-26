@@ -31,6 +31,7 @@ class LinkHandle {
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;
+  std::shared_ptr<base::EventChannelController> channel_controller_;
 };
 
 }  // namespace handle

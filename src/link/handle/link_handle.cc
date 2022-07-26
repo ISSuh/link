@@ -14,7 +14,8 @@ namespace nlink {
 namespace handle {
 
 LinkHandle::LinkHandle()
-  : event_dispatcher_(nullptr) {
+  : event_dispatcher_(nullptr),
+    channel_controller_(nullptr) {
 }
 
 LinkHandle::~LinkHandle() {
@@ -54,7 +55,7 @@ void LinkHandle::RegistComponent(component::LinkComponent* component) {
 }
 
 void LinkHandle::RegistEventChannls(base::EventChannel* channel) {
-  event_dispatcher_->AttachChannels(channel);
+  // event_dispatcher_->AttachChannels(channel);
 }
 
 }  // namespace handle

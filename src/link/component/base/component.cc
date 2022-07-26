@@ -9,21 +9,21 @@
 namespace nlink {
 namespace component {
 
-LinkComponent::LinkComponent(base::EventChannelObserver* channel_subject)
-  : channel_subject_(channel_subject) {
+LinkComponent::LinkComponent(base::EventChannelController* channel_controller)
+  : channel_controller_(channel_controller) {
 }
 
 LinkComponent::~LinkComponent() {
 }
 
-void LinkComponent::AttachChannelsToObserver(
+void LinkComponent::AttachChannelsToController(
   base::EventChannel* event_channel) {
-  channel_subject_->AttachChannels(event_channel);
+  channel_controller_->AttachChannels(event_channel);
 }
 
-void LinkComponent::DetatchCahnnelFromObserver(
+void LinkComponent::DetatchCahnnelFromController(
   base::EventChannel* event_channel) {
-  channel_subject_->DetatchCahnnel(event_channel);
+  channel_controller_->DetatchCahnnel(event_channel);
 }
 
 }  // namespace component

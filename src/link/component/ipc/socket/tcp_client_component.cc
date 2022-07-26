@@ -15,16 +15,16 @@ namespace nlink {
 namespace component {
 
 TcpClientComponent::TcpClientComponent(
-  base::EventChannelObserver* channel_subject,
+  base::EventChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers)
-  : SocketComponent(channel_subject),
+  : SocketComponent(channel_controller),
     client_(io::SocketFactory::CreateTcpClient(task_runner)),
     connect_handler_(handlers.connect_handler),
     close_handler_(handlers.close_handler),
     read_handler_(handlers.read_handler),
     write_handler_(handlers.write_handler) {
-  LinkComponent::AttachChannelsToObserver(client_.get());
+  LinkComponent::AttachChannelsToController(client_.get());
 
   client_->RegistIOHandler(
     [this](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
@@ -93,13 +93,13 @@ void TcpClientComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpClientComponent* TcpClientComponent::CreateComponent(
-  base::EventChannelObserver* channel_subject,
+  base::EventChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers) {
-  if (!channel_subject || !task_runner) {
+  if (!channel_controller || !task_runner) {
     return nullptr;
   }
-  return new TcpClientComponent(channel_subject, task_runner, handlers);
+  return new TcpClientComponent(channel_controller, task_runner, handlers);
 }
 
 }  // namespace component

@@ -23,29 +23,14 @@ class DispatcherConext {
   virtual ~DispatcherConext() = default;
 
   virtual void* context() const = 0;
-
-  // TODO(issuh): redesign regist channel
-  virtual bool Regist(int32_t handle, EventChannel* channel) = 0;
-  virtual bool Unregist(int32_t handle) = 0;
 };
 
-class EventChannelObserver {
- public:
-  virtual ~EventChannelObserver() = default;
-
-  virtual void AttachChannels(
-    base::EventChannel* channel) = 0;
-  virtual void DetatchCahnnel(EventChannel* channel) = 0;
-};
-
-class EventDispatcher : public EventChannelObserver {
+class EventDispatcher {
  public:
   virtual ~EventDispatcher() = default;
 
   virtual void Dispatch() = 0;
   virtual void DispatchOnce() = 0;
-  virtual DispatcherConext* GetDispatcherConext() = 0;
-  virtual void DispatchEvent(const Event& event) = 0;
 };
 
 }  // namespace base

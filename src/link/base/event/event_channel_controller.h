@@ -20,22 +20,18 @@ class EventChannel;
 
 class EventChannelController : public EventChannel::EventChannelDelegate {
  public:
-  using RegistChannelCallback = std::function<void(int32_t)>;
+  using AttachChannelCallback = std::function<void(int32_t)>;
+  using DetachChannelCallback = std::function<void(int32_t)>;
+  using UpdateChannelCallback = std::function<void(int32_t)>;
 
-  explicit EventChannelController(RegistChannelCallback regist_callback);
-  ~EventChannelController();
+  static EventChannelController* Create(
+    AttachChannelCallback attach_callback,
+    DetachChannelCallback detach_callback,
+    UpdateChannelCallback update_callback);
 
-  void AttachChannels(EventChannel* channel);
-  void DetatchCahnnel(EventChannel* channel);
-  void DispatchEvent(const Event& event);
-
-  // EventChannel::EventChannelDelegate
-  void OnOpend(EventChannel* channel) override;
-  void OnClosed(EventChannel* channel) override;
-
- private:
-  RegistChannelCallback regist_channel_callback_;
-  std::map<int32_t, EventChannel*> channel_map_;
+  virtual void AttachChannels(EventChannel* channel) = 0;
+  virtual void DetatchCahnnel(EventChannel* channel) = 0;
+  virtual void DispatchEvent(const Event& event) = 0;
 };
 
 }  // namespace base

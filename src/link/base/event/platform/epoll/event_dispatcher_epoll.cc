@@ -23,25 +23,27 @@ using EpollEvent = epoll_event;
 constexpr const int32_t kDefaultEvnetSize = 1024;
 const int32_t kDefaultTimeOut = 100;
 
-EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
-  Discriptor epoll_fd = epoll_create(kDefaultEvnetSize);
+EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher(
+  std::shared_ptr<EventChannelController> channel_controller) {
+  Descriptor epoll_fd = epoll_create(kDefaultEvnetSize);
   if (epoll_fd < 0) {
     close(epoll_fd);
     return nullptr;
   }
 
-  std::unique_ptr<EpollDispatcherConext> context =
-    std::make_unique<EpollDispatcherConext>(epoll_fd);
-
   return new EventDispatcherEpoll(
-    std::move(context), kDefaultEvnetSize, kDefaultTimeOut);
+    epoll_fd, kDefaultEvnetSize, kDefaultTimeOut, channel_controller);
 }
 
 EventDispatcherEpoll::EventDispatcherEpoll(
-  std::unique_ptr<EpollDispatcherConext> context,
+  int32_t epoll_descriptor,
   int32_t event_size,
-  int32_t timeout)
-  : context_(std::move(context)), event_size_(event_size), timeout_(timeout) {
+  int32_t timeout,
+  std::shared_ptr<EventChannelController> channel_controller)
+  : epoll_descriptor_(epoll_descriptor),
+    event_size_(event_size),
+    timeout_(timeout),
+    channel_controller_(channel_controller) {
 }
 
 EventDispatcherEpoll::~EventDispatcherEpoll() {
@@ -54,16 +56,13 @@ void EventDispatcherEpoll::Dispatch() {
 }
 
 void EventDispatcherEpoll::DispatchOnce() {
-  int32_t context = *(int32_t*)context_->context();
-
   std::array<EpollEvent, kDefaultEvnetSize> epoll_events;
   int32_t event_count =
-    epoll_wait(context, &epoll_events[0], event_size_, timeout_);
+    epoll_wait(epoll_descriptor_, &epoll_events[0], event_size_, timeout_);
   if (event_count < 0) {
     LOG(INFO) << __func__ << " - Error";
     return;
   } else if (event_count == 0) {
-    LOG(INFO) << __func__ << " - timeout";
     return;
   }
 
@@ -76,18 +75,14 @@ void EventDispatcherEpoll::DispatchOnce() {
 
     std::vector<Event::Type> types;
 
-    HandleEvent(event_flag, &types);
+    HandleEventType(event_flag, &types);
 
     Event event(fd, types);
-    DispatchEvent(event);
+    channel_controller_->DispatchEvent(event);
   }
 }
 
-DispatcherConext* EventDispatcherEpoll::GetDispatcherConext() {
-  return context_.get();
-}
-
-Event::Type EventDispatcherEpoll::HandleEvent(
+Event::Type EventDispatcherEpoll::HandleEventType(
   uint32_t event_flag, std::vector<Event::Type>* types) {
   if (event_flag & EPOLLIN) {
     types->emplace_back(Event::Type::READ);
@@ -106,15 +101,23 @@ Event::Type EventDispatcherEpoll::HandleEvent(
   }
 }
 
-void EventDispatcherEpoll::AttachChannels(EventChannel* channel) {
-  channel->OpenChannel(context_.get());
+void EventDispatcherEpoll::OnAttachChannel(int32_t descriptor) {
+  epoll_event event;
+  event.events = EPOLLIN | EPOLLERR | EPOLLRDHUP;
+  event.data.fd = descriptor;
+
+  int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_ADD, descriptor, &event);
+  if (0 > res) {
+    LOG(WARNING) << "[EventDispatcherEpoll::OnAttachChannel]"
+                 << " fail attach to epoll. " << res;
+  }
 }
 
-void EventDispatcherEpoll::DetatchCahnnel(EventChannel* channel) {
+void EventDispatcherEpoll::OnDetachChannel(int32_t descriptor) {
+  epoll_ctl(epoll_descriptor_, EPOLL_CTL_DEL, descriptor, nullptr);
 }
 
-void EventDispatcherEpoll::DispatchEvent(const Event& event) {
-  context_->Dispatch(event);
+void EventDispatcherEpoll::OnUpdatedChannel(int32_t descriptor) {
 }
 
 }  // namespace base

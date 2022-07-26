@@ -4,14 +4,14 @@
  *
  */
 
-#include "link/base/platform/linux/discriptor.h"
+#include "link/base/platform/linux/dscriptor.h"
 
 #include <fcntl.h>
 
 namespace nlink {
 namespace base {
 
-bool SetNoblocking(Discriptor fd) {
+bool SetNoblocking(Descriptor fd) {
   const int32_t flags = fcntl(fd, F_GETFL);
 
   if (flags == -1) {

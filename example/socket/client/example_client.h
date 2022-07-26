@@ -21,6 +21,7 @@ class ExampleClient {
   ~ExampleClient();
 
   void CreateAndRegistComponent(
+    nlink::base::EventChannelController* channel_controller,
     nlink::base::TaskRunner* task_runner,
     nlink::handle::LinkHandle* handle);
   void Connect(const std::string& address, int32_t port);

@@ -47,7 +47,7 @@ class TcpSocketServer : public Server {
     handler::WriteHandler write_handler) override;
 
   // EventChannel
-  void OpenChannel(base::DispatcherConext* context) override;
+  void OpenChannel(base::EventChannel::EventChannelDelegate* delegate) override;
   void CloseChannel() override;
   void HandleEvent(const base::Event& event) override;
 
@@ -69,7 +69,7 @@ class TcpSocketServer : public Server {
   void CloseAllSessions();
 
   base::TaskRunner* task_runner_;
-  base::DispatcherConext* dispatcher_context_;
+  base::EventChannel::EventChannelDelegate* event_channel_delegate_;
 
   std::unique_ptr<Acceptor> acceptor_;
   SocketDescriptor accept_descriptor_;

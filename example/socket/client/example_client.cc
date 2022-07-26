@@ -15,21 +15,33 @@ using namespace nlink;
 ExampleClient::ExampleClient()
   : handlers_({
       component::SocketComponent::Handler::AcceptHandler(),
-      base::Bind(&ExampleClient::OnConnect, this),
-      base::Bind(&ExampleClient::OnClose, this),
-      base::Bind(&ExampleClient::OnRead, this),
-      base::Bind(&ExampleClient::OnWrite, this),
-    }),
+      [this](std::shared_ptr<nlink::io::Session> session) {
+        this->OnConnect(session);
+      },
+
+      [this](std::shared_ptr<nlink::io::Session> session) {
+        this->OnClose(session);
+      },
+      [this](
+        const nlink::base::Buffer& buffer,
+        std::shared_ptr<nlink::io::Session> session) {
+        this->OnRead(buffer, session);
+      },
+      [this](size_t length) {
+        this->OnWrite(length);
+      }}),
     client_component_(nullptr),
     is_connected(false) {}
 
 ExampleClient::~ExampleClient() = default;
 
 void ExampleClient::CreateAndRegistComponent(
+  nlink::base::EventChannelController* channel_controller,
   nlink::base::TaskRunner* task_runner,
   nlink::handle::LinkHandle* handle) {
   client_component_ =
-    component::TcpClientComponent::CreateComponent(task_runner, handlers_);
+    component::TcpClientComponent::CreateComponent(
+      channel_controller, task_runner, handlers_);
 
   handle->RegistComponent(client_component_);
 }
@@ -39,7 +51,7 @@ void ExampleClient::Connect(const std::string& address, int32_t port) {
 }
 
 void ExampleClient::Disconnect() {
-  client_component_->DisConnect();
+  client_component_->Disconnect();
 }
 
 void ExampleClient::Write(const std::string& message) {

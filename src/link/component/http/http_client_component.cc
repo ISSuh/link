@@ -17,18 +17,18 @@ namespace nlink {
 namespace component {
 
 HttpClientComponent* HttpClientComponent::CreateComponent(
-  base::EventChannelObserver* channel_subject,
+  base::EventChannelController* channel_controller,
   base::TaskRunner* task_runner) {
-  if (!channel_subject || !task_runner) {
+  if (!channel_controller || !task_runner) {
     return nullptr;
   }
-  return new HttpClientComponent(channel_subject, task_runner);
+  return new HttpClientComponent(channel_controller, task_runner);
 }
 
 HttpClientComponent::HttpClientComponent(
-  base::EventChannelObserver* channel_subject,
+  base::EventChannelController* channel_controller,
   base::TaskRunner* task_runner)
-  : HttpComponent(channel_subject),
+  : HttpComponent(channel_controller),
     task_runner_(task_runner) {
 }
 
@@ -47,7 +47,7 @@ void HttpClientComponent::Get(
   net::http::Request request(net::http::Method::GET, uri);
 
   io::Client* client = io::SocketFactory::CreateTcpClient(task_runner_);
-  LinkComponent::AttachChannelsToObserver(client);
+  LinkComponent::AttachChannelsToController(client);
 
   client->RegistIOHandler(
     [this, handler](
@@ -159,7 +159,7 @@ void HttpClientComponent::Fetch(
 //   const std::string& address, int32_t port, RequestHanelder request_handler) {
 //   std::unique_ptr<io::Client> client(new io::TcpClient(task_runner_));
 
-//   LinkComponent::AttachChannelsToObserver(client.get());
+//   LinkComponent::AttachChannelsToController(client.get());
 
 //   client->RegistIOHandler(
 //     base::Bind(

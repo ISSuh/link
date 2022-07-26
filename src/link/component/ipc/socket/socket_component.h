@@ -38,7 +38,7 @@ class SocketComponent : public LinkComponent {
 
  protected:
   explicit SocketComponent(
-    base::EventChannelObserver* channel_subject);
+    base::EventChannelController* channel_controller);
   virtual ~SocketComponent();
 
   DISAALOW_COPY_AND_ASSIGN(SocketComponent);

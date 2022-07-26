@@ -14,21 +14,32 @@ using namespace nlink;
 
 ExampleServer::ExampleServer()
   : handlers_({
-      base::Bind(&ExampleServer::OnAccept, this),
+      [this](std::shared_ptr<nlink::io::Session> session) {
+        this->OnAccept(session);
+      },
       component::SocketComponent::Handler::ConnectHandler(),
-      base::Bind(&ExampleServer::OnClose, this),
-      base::Bind(&ExampleServer::OnRead, this),
-      base::Bind(&ExampleServer::OnWrite, this),
-    }),
+      [this](std::shared_ptr<nlink::io::Session> session) {
+        this->OnClose(session);
+      },
+      [this](
+        const nlink::base::Buffer& buffer,
+        std::shared_ptr<nlink::io::Session> session) {
+        this->OnRead(buffer, session);
+      },
+      [this](size_t length) {
+        this->OnWrite(length);
+      }}),
     server_component_(nullptr) {}
 
 ExampleServer::~ExampleServer() = default;
 
 void ExampleServer::CreateAndRegistComponent(
+  nlink::base::EventChannelController* channel_controller,
   nlink::base::TaskRunner* task_runner,
   nlink::handle::LinkHandle* handle) {
   server_component_ =
-      component::TcpServerComponent::CreateComponent(task_runner, handlers_);
+      component::TcpServerComponent::CreateComponent(
+        channel_controller, task_runner, handlers_);
 
   handle->RegistComponent(server_component_);
 }

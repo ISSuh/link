@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   base::EventDispatcher* dispatcher =
     base::EventDispatcherFactory::CreateEventDispatcher();
 
-  base::EventChannelObserver* channel_subject =
+  base::EventChannelController* channel_controller =
     dynamic_cast<base::EventChannelObserver*>(dispatcher);
 
   component::SocketComponent::Handler handler = {
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
   component::TcpClientComponent* client =
     component::TcpClientComponent::CreateComponent(
-      channel_subject, task_runner, handler);
+      channel_controller, task_runner, handler);
 
   client->Connect("127.0.0.1", 3600);
 

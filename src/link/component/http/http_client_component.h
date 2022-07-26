@@ -32,7 +32,7 @@ class HttpClientComponent : public HttpComponent {
   using RequestHanelder = std::function<void(const net::http::Response&)>;
 
   static HttpClientComponent* CreateComponent(
-    base::EventChannelObserver* channel_subject,
+    base::EventChannelController* channel_controller,
     base::TaskRunner* task_runner);
 
   void Get(const std::string& path, RequestHanelder handler);
@@ -81,7 +81,7 @@ class HttpClientComponent : public HttpComponent {
 
  private:
   HttpClientComponent(
-    base::EventChannelObserver* channel_subject,
+    base::EventChannelController* channel_controller,
     base::TaskRunner* task_runner);
   virtual ~HttpClientComponent();
 

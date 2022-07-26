@@ -7,9 +7,8 @@
 #ifndef LINK_BASE_EVENT_EVENT_H_
 #define LINK_BASE_EVENT_EVENT_H_
 
+#include <cstdint>
 #include <vector>
-
-#include "link/base/platform/discriptor.h"
 
 namespace nlink {
 namespace base {
@@ -33,7 +32,7 @@ class Event {
   Event(Event&& rhs);
   ~Event();
 
-  int32_t Discriptor() const;
+  int32_t Descriptor() const;
   const std::vector<Event::Type>&  Types() const;
 
   Event& operator=(const Event& rhs);

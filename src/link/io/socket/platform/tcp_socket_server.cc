@@ -51,12 +51,13 @@ void TcpSocketServer::RegistIOHandler(
   write_handler_ = write_handler;
 }
 
-void TcpSocketServer::OpenChannel(base::DispatcherConext* context) {
-  if (!context) {
+void TcpSocketServer::OpenChannel(
+  base::EventChannel::EventChannelDelegate* delegate) {
+  if (nullptr == delegate) {
     return;
   }
 
-  dispatcher_context_ = context;
+  event_channel_delegate_ = delegate;
 
   if (nullptr == acceptor_) {
     acceptor_.reset(new TcpAcceptor(task_runner_,
@@ -67,7 +68,7 @@ void TcpSocketServer::OpenChannel(base::DispatcherConext* context) {
 }
 
 void TcpSocketServer::CloseChannel() {
-  Close();
+  CloseAllSessions();
 }
 
 void TcpSocketServer::HandleEvent(const base::Event& event) {
@@ -75,7 +76,7 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
     LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
   }
 
-  if (event.Discriptor() == accept_descriptor_) {
+  if (event.Descriptor() == accept_descriptor_) {
     acceptor_->Accept(
       [this](std::shared_ptr<Session> session) {
         this->InternalAcceptHandler(session);
@@ -84,7 +85,7 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
     return;
   }
 
-  SocketDescriptor descriptor = event.Discriptor();
+  SocketDescriptor descriptor = event.Descriptor();
   for (auto& type : event.Types()) {
     base::TaskCallback callback = {};
     switch (type) {
@@ -95,10 +96,8 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
         HandlerWriteEvent(descriptor);
         break;
       case base::Event::Type::CLOSE:
-        CloseAllSessions();
-        break;
       case base::Event::Type::ERROR:
-        CloseAllSessions();
+        CloseSession(descriptor);
         break;
       default:
         LOG(WARNING) << "[TcpSocketServer::ProcessEvent] invalid event type. "
@@ -191,9 +190,7 @@ void TcpSocketServer::RegistChannel(
     accept_descriptor_ = descriptor;
   }
 
-  if (!dispatcher_context_->Regist(descriptor, this)) {
-    LOG(ERROR) << "[TcpSocketClient::RegistChannel] can not regist channel";
-  }
+  event_channel_delegate_->ChannelOpend(descriptor, this);
 }
 
 void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
@@ -203,6 +200,10 @@ void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
     return;
   }
 
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
+  InternalCloseHandler(session);
+
+  event_channel_delegate_->ChannelClosed(descriptor, this);
   sessions_.erase(descriptor);
 }
 

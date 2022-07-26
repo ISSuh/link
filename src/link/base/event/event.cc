@@ -24,7 +24,7 @@ Event::Event(Event&& rhs)
 Event::~Event() {
 }
 
-int32_t Event::Discriptor() const {
+int32_t Event::Descriptor() const {
   return fd_;
 }
 

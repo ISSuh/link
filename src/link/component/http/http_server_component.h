@@ -18,7 +18,7 @@ class HttpServerComponent : public HttpComponent {
  public:
 
  private:
-  explicit HttpServerComponent(base::EventChannelObserver* channel_subject);
+  explicit HttpServerComponent(base::EventChannelController* channel_controller);
   virtual ~HttpServerComponent();
 
   DISAALOW_COPY_AND_ASSIGN(HttpServerComponent);

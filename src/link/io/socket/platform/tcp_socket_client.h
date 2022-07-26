@@ -49,7 +49,7 @@ class TcpSocketClient : public Client {
   bool IsConnected() const override;
 
   // EventChannel
-  void OpenChannel(base::DispatcherConext* context) override;
+  void OpenChannel(base::EventChannel::EventChannelDelegate* delegate) override;
   void CloseChannel() override;
   void HandleEvent(const base::Event& event) override;
 
@@ -66,7 +66,7 @@ class TcpSocketClient : public Client {
   void RegistChannel(SocketDescriptor descriptor);
 
   base::TaskRunner* task_runner_;
-  base::DispatcherConext* dispatcher_context_;
+  base::EventChannel::EventChannelDelegate* channel_delegate_;
 
   std::unique_ptr<Connector> connector_;
   std::shared_ptr<Session> session_;
