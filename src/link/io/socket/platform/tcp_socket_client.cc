@@ -109,6 +109,10 @@ void TcpSocketClient::CloseChannel() {
 }
 
 void TcpSocketClient::HandleEvent(const base::Event& event) {
+  for (auto type : event.Types()) {
+    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  }
+
   for (auto& type : event.Types()) {
     base::TaskCallback callback = {};
     switch (type) {

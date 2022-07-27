@@ -12,6 +12,7 @@
 
 #include "link/base/event/event_dispatcher.h"
 #include "link/component/base/component.h"
+#include "link/component/base/component_factory.h"
 
 namespace nlink {
 namespace handle {
@@ -26,12 +27,11 @@ class LinkHandle {
   void RunOnce();
   void Shutdown();
 
-  void RegistComponent(component::LinkComponent* component);
-  void RegistEventChannls(base::EventChannel* channel);
+  std::shared_ptr<component::ComponentFctaory> ComponentFactory() const;
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;
-  std::shared_ptr<base::EventChannelController> channel_controller_;
+  std::shared_ptr<component::ComponentFctaory> component_factory_;
 };
 
 }  // namespace handle

@@ -17,10 +17,8 @@ namespace base {
 
 class EventDispatcherFactory {
  public:
-  static EventDispatcher* CreateEventDispatcher(
-    std::shared_ptr<EventChannelController> channel_controller) {
-    // return EventDispatcherAsio::CreateEventDispatcher();
-    return EventDispatcherEpoll::CreateEventDispatcher(channel_controller);
+  static EventDispatcher* CreateEventDispatcher() {
+    return EventDispatcherEpoll::CreateEventDispatcher();
   }
 };
 

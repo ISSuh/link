@@ -44,6 +44,8 @@ void TestReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
   std::string message = buffer.ToString();
   LOG(INFO) << __func__ << " - message : " << message;
+
+  session->Write(buffer);
 }
 
 int main(int argc, char* argv[]) {
@@ -57,9 +59,6 @@ int main(int argc, char* argv[]) {
   base::EventDispatcher* dispatcher =
     base::EventDispatcherFactory::CreateEventDispatcher();
 
-  base::EventChannelController* channel_controller =
-    dynamic_cast<base::EventChannelObserver*>(dispatcher);
-
   component::SocketComponent::Handler handler = {
     [](std::shared_ptr<io::Session> session) { TestAcceptHandler(session); },
     component::SocketComponent::Handler::ConnectHandler(),
@@ -69,9 +68,10 @@ int main(int argc, char* argv[]) {
     [](size_t size) { TestWriteHandler(size); }
   };
 
+  auto channel_controller = dispatcher->ChannelController();
   component::TcpServerComponent* server =
     component::TcpServerComponent::CreateComponent(
-      channel_controller, task_runner, handler);
+      channel_controller.get(), task_runner, handler);
 
   server->Open("127.0.0.1", 3600);
 

@@ -15,7 +15,7 @@ class EventChannelControllerImpl : public EventChannelController {
     EventChannelController::AttachChannelCallback attach_callback,
     EventChannelController::DetachChannelCallback detach_callback,
     EventChannelController::UpdateChannelCallback update_callback);
-  ~EventChannelControllerImpl();
+  virtual ~EventChannelControllerImpl();
 
   void AttachChannels(EventChannel* channel);
   void DetatchCahnnel(EventChannel* channel);

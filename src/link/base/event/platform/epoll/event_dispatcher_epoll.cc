@@ -23,8 +23,7 @@ using EpollEvent = epoll_event;
 constexpr const int32_t kDefaultEvnetSize = 1024;
 const int32_t kDefaultTimeOut = 100;
 
-EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher(
-  std::shared_ptr<EventChannelController> channel_controller) {
+EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
   Descriptor epoll_fd = epoll_create(kDefaultEvnetSize);
   if (epoll_fd < 0) {
     close(epoll_fd);
@@ -32,18 +31,20 @@ EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher(
   }
 
   return new EventDispatcherEpoll(
-    epoll_fd, kDefaultEvnetSize, kDefaultTimeOut, channel_controller);
+    epoll_fd, kDefaultEvnetSize, kDefaultTimeOut);
 }
 
 EventDispatcherEpoll::EventDispatcherEpoll(
   int32_t epoll_descriptor,
   int32_t event_size,
-  int32_t timeout,
-  std::shared_ptr<EventChannelController> channel_controller)
+  int32_t timeout)
   : epoll_descriptor_(epoll_descriptor),
     event_size_(event_size),
     timeout_(timeout),
-    channel_controller_(channel_controller) {
+    channel_controller_(EventChannelController::Create(
+        [this](int32_t descriptor) { this->OnAttachChannel(descriptor); },
+        [this](int32_t descriptor) { this->OnDetachChannel(descriptor); },
+        [this](int32_t descriptor) { this->OnUpdatedChannel(descriptor); })) {
 }
 
 EventDispatcherEpoll::~EventDispatcherEpoll() {
@@ -59,22 +60,15 @@ void EventDispatcherEpoll::DispatchOnce() {
   std::array<EpollEvent, kDefaultEvnetSize> epoll_events;
   int32_t event_count =
     epoll_wait(epoll_descriptor_, &epoll_events[0], event_size_, timeout_);
-  if (event_count < 0) {
-    LOG(INFO) << __func__ << " - Error";
-    return;
-  } else if (event_count == 0) {
+  if (event_count <= 0) {
     return;
   }
-
-  LOG(INFO) << __func__ << " - event_count : " << event_count;
-
 
   for (int i = 0 ; i < event_count ; ++i) {
     int32_t fd = epoll_events[i].data.fd;
     uint32_t event_flag = epoll_events[i].events;
 
     std::vector<Event::Type> types;
-
     HandleEventType(event_flag, &types);
 
     Event event(fd, types);
@@ -100,6 +94,11 @@ Event::Type EventDispatcherEpoll::HandleEventType(
     types->emplace_back(Event::Type::CLOSE);
   }
 }
+
+std::shared_ptr<EventChannelController>
+EventDispatcherEpoll::ChannelController() const {
+  return channel_controller_;
+};
 
 void EventDispatcherEpoll::OnAttachChannel(int32_t descriptor) {
   epoll_event event;

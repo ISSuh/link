@@ -21,19 +21,18 @@ namespace base {
 
 class EventDispatcherEpoll : public EventDispatcher {
  public:
-  static EventDispatcherEpoll* CreateEventDispatcher(
-    std::shared_ptr<EventChannelController> channel_controller);
+  static EventDispatcherEpoll* CreateEventDispatcher();
 
   EventDispatcherEpoll(
     int32_t epoll_descriptor,
     int32_t event_size,
-    int32_t timeout,
-    std::shared_ptr<EventChannelController> channel_controller);
+    int32_t timeout);
   virtual ~EventDispatcherEpoll();
 
   // nlink::base::EventDispatcher
   void Dispatch() override;
   void DispatchOnce() override;
+  std::shared_ptr<EventChannelController> ChannelController() const override;
 
  private:
   Event::Type HandleEventType(

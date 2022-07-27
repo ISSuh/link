@@ -53,9 +53,6 @@ int main(int argc, char* argv[]) {
   base::EventDispatcher* dispatcher =
     base::EventDispatcherFactory::CreateEventDispatcher();
 
-  base::EventChannelController* channel_controller =
-    dynamic_cast<base::EventChannelObserver*>(dispatcher);
-
   component::SocketComponent::Handler handler = {
     component::SocketComponent::Handler::AcceptHandler(),
     [](std::shared_ptr<io::Session> session) { TestConnectHandler(session); },
@@ -65,9 +62,10 @@ int main(int argc, char* argv[]) {
     [](size_t size) { TestWriteHandler(size); }
   };
 
+  auto channel_controller = dispatcher->ChannelController();
   component::TcpClientComponent* client =
     component::TcpClientComponent::CreateComponent(
-      channel_controller, task_runner, handler);
+      channel_controller.get(), task_runner, handler);
 
   client->Connect("127.0.0.1", 3600);
 

@@ -15,7 +15,7 @@ namespace handle {
 
 LinkHandle::LinkHandle()
   : event_dispatcher_(nullptr),
-    channel_controller_(nullptr) {
+    component_factory_(nullptr) {
 }
 
 LinkHandle::~LinkHandle() {
@@ -29,6 +29,10 @@ void LinkHandle::Initialize() {
   }
 
   event_dispatcher_.reset(dispatcher);
+
+  auto channel_controller = event_dispatcher_->ChannelController();
+  component_factory_ =
+    std::make_shared<component::ComponentFctaory>(channel_controller);
 }
 
 void LinkHandle::Run() {
@@ -48,14 +52,9 @@ void LinkHandle::RunOnce() {
 void LinkHandle::Shutdown() {
 }
 
-void LinkHandle::RegistComponent(component::LinkComponent* component) {
-  if (!event_dispatcher_) {
-    return;
-  }
-}
-
-void LinkHandle::RegistEventChannls(base::EventChannel* channel) {
-  // event_dispatcher_->AttachChannels(channel);
+std::shared_ptr<component::ComponentFctaory>
+LinkHandle::ComponentFactory() const {
+  return component_factory_;
 }
 
 }  // namespace handle

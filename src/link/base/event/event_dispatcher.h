@@ -31,6 +31,8 @@ class EventDispatcher {
 
   virtual void Dispatch() = 0;
   virtual void DispatchOnce() = 0;
+
+  virtual std::shared_ptr<EventChannelController> ChannelController() const = 0;
 };
 
 }  // namespace base
