@@ -54,7 +54,7 @@ const std::string Arguments::log_level() const {
   return log_level_;
 }
 
-std::vector<module::Specification> Arguments::module_specs() const {
+const std::vector<module::Specification>& Arguments::Modulespecifications() const {
   return module_specs_;
 }
 

@@ -114,12 +114,16 @@ void TcpSocketServer::HandleReadEvent(SocketDescriptor descriptor) {
     return;
   }
 
-  std::shared_ptr<Session> session = sessions_.at(descriptor);
-  session->Read(nullptr);
-  // task_runner_->PostTask(
-  //   [this, session = session_]() {
-  //     session->Read(nullptr);
-  //   });
+  std::weak_ptr<Session> session = sessions_.at(descriptor);
+  // session.lock()->Read(nullptr);
+
+  task_runner_->PostTask(
+    [this, session_wadk = session]() {
+      std::shared_ptr<Session> session = session_wadk.lock();
+      if (session) {
+        session->Read(nullptr);
+      }
+    });
 }
 
 void TcpSocketServer::HandlerWriteEvent(SocketDescriptor descriptor) {
@@ -162,8 +166,6 @@ void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
 }
 
 void TcpSocketServer::InternalCloseHandler(std::shared_ptr<Session> session) {
-  sessions_.erase(session->SessionId());
-
   if (close_handler_) {
     close_handler_(session);
   }
@@ -184,8 +186,6 @@ void TcpSocketServer::InternalWriteHandler(size_t length) {
 
 void TcpSocketServer::RegistChannel(
   SocketDescriptor descriptor, bool is_accept_socket_descriptor) {
-  LOG(INFO) << __func__ << " - descriptor : " << descriptor;
-
   if (is_accept_socket_descriptor) {
     accept_descriptor_ = descriptor;
   }
@@ -199,9 +199,6 @@ void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
                  << descriptor;
     return;
   }
-
-  std::shared_ptr<Session> session = sessions_.at(descriptor);
-  InternalCloseHandler(session);
 
   event_channel_delegate_->ChannelClosed(descriptor, this);
   sessions_.erase(descriptor);

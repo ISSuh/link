@@ -52,7 +52,7 @@ template<typename UserModuleImpl, typename UserModule>
 void ModuleRegister::CreateModuleFactory(const std::string& class_name,
                                         const std::string& base_class_name) {
   LOG(INFO) << __func__ << " - "
-              << ", class_name : " << class_name
+              << "class_name : " << class_name
               << ", base_class_name : " << base_class_name;
 
   if (factories_.find(class_name) != factories_.end()) {

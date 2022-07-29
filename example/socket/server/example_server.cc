@@ -34,14 +34,13 @@ ExampleServer::ExampleServer()
 ExampleServer::~ExampleServer() = default;
 
 void ExampleServer::CreateAndRegistComponent(
-  nlink::base::EventChannelController* channel_controller,
   nlink::base::TaskRunner* task_runner,
   nlink::handle::LinkHandle* handle) {
-  server_component_ =
-      component::TcpServerComponent::CreateComponent(
-        channel_controller, task_runner, handlers_);
+  auto component_factory_weak = handle->ComponentFactory();
+  auto component_factory = component_factory_weak.lock();
 
-  handle->RegistComponent(server_component_);
+  server_component_ =
+    component_factory->CreateTcpServerComponent(task_runner, handlers_);
 }
 
 void ExampleServer::ServerOpen(const std::string& address, int32_t port) {

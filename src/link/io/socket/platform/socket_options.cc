@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #endif
 
 namespace nlink {
@@ -33,16 +34,28 @@ int32_t SetReuseAddr(SocketDescriptor fd, bool reuse) {
 #if defined(__WIN32__) || defined(__WIN64__)
   BOOL boolean_value = reuse ? TRUE : FALSE;
 #elif defined(__linux__)
-  int boolean_value = reuse ? 1 : 0;
+  int32_t boolean_value = reuse ? 1 : 0;
 #endif
-  int res = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+  int32_t res = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+                      reinterpret_cast<const char*>(&boolean_value),
+                      sizeof(boolean_value));
+  return res == -1 ? SystemErrorToNetError(NLINK_ERRNO) : IOError::OK;
+}
+
+int32_t SetReusePort(SocketDescriptor fd, bool reuse) {
+#if defined(__WIN32__) || defined(__WIN64__)
+  BOOL boolean_value = reuse ? TRUE : FALSE;
+#elif defined(__linux__)
+  int32_t boolean_value = reuse ? 1 : 0;
+#endif
+  int32_t res = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
                       reinterpret_cast<const char*>(&boolean_value),
                       sizeof(boolean_value));
   return res == -1 ? SystemErrorToNetError(NLINK_ERRNO) : IOError::OK;
 }
 
 int32_t SetKeepAlive(SocketDescriptor fd, bool enable, int32_t delay) {
-  int on = enable ? 1 : 0;
+  int32_t on = enable ? 1 : 0;
   if (setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof(on))) {
     return SystemErrorToNetError(NLINK_ERRNO);
   }
@@ -62,6 +75,12 @@ int32_t SetKeepAlive(SocketDescriptor fd, bool enable, int32_t delay) {
 #endif
 
   return IOError::OK;
+}
+
+int32_t SetNonBlocking(SocketDescriptor fd) {
+  uint32_t flag = 1;
+  int32_t res = ioctl(fd, FIONBIO, &flag);
+  return res == -1 ? SystemErrorToNetError(NLINK_ERRNO) : IOError::OK;
 }
 
 }  // namespace io

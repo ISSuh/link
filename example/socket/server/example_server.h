@@ -21,7 +21,6 @@ class ExampleServer {
   ~ExampleServer();
 
   void CreateAndRegistComponent(
-    nlink::base::EventChannelController* channel_controller,
     nlink::base::TaskRunner* task_runner,
     nlink::handle::LinkHandle* handle);
   void ServerOpen(const std::string& address, int32_t port);

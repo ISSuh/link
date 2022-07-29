@@ -36,14 +36,13 @@ ExampleClient::ExampleClient()
 ExampleClient::~ExampleClient() = default;
 
 void ExampleClient::CreateAndRegistComponent(
-  nlink::base::EventChannelController* channel_controller,
   nlink::base::TaskRunner* task_runner,
   nlink::handle::LinkHandle* handle) {
-  client_component_ =
-    component::TcpClientComponent::CreateComponent(
-      channel_controller, task_runner, handlers_);
+  auto component_factory_weak = handle->ComponentFactory();
+  auto component_factory = component_factory_weak.lock();
 
-  handle->RegistComponent(client_component_);
+  client_component_ =
+    component_factory->CreateTcpClientComponent(task_runner, handlers_);
 }
 
 void ExampleClient::Connect(const std::string& address, int32_t port) {

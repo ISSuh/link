@@ -106,8 +106,9 @@ int32_t TcpSocket::HandleConnectCompleted(int32_t res) {
 }
 
 int32_t TcpSocket::Close() {
-  socket_->Close();
+  int32_t res = socket_->Close();
   socket_.reset();
+  return res;
 }
 
 int32_t TcpSocket::Read(

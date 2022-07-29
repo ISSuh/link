@@ -16,7 +16,6 @@ ComponentFctaory::ComponentFctaory(
 }
 
 ComponentFctaory::~ComponentFctaory() {
-
 }
 
 TcpClientComponent* ComponentFctaory::CreateTcpClientComponent(

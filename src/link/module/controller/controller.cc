@@ -43,12 +43,12 @@ void ModuleController::LoadingModule(
     base::TaskRunner* controller_task_runner =
       task_manager_->CreateTaskRunner(
         controller_task_runner_name,
-        base::TaskRunner::Type::CONCURRENT, specs.size());
+        base::TaskRunner::Type::SEQUENCE, specs.size());
 
     controller_task_runners_.insert({module_name, controller_task_runner});
 
     controller_task_runners_[module_name]->PostTask(
-      [this, &spec, &will_loaded_module_count, status_callback]() {
+      [this, spec, will_loaded_module_count, status_callback]() {
         this->LodingModuleInternal(
           spec, will_loaded_module_count, status_callback);
       });
@@ -68,7 +68,7 @@ void ModuleController::RunningModule(StatusCallback status_callback) {
     ModuleExecutor* excutor =  executors_[name].get();
 
     controller_task_runners_[name]->PostTask(
-      [&excutor, &module]() {
+      [excutor, module]() {
         excutor->RunningModule(module);
       });
   }
@@ -169,7 +169,7 @@ void ModuleController::TerminateModuleTaskRunner(
     base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
 
     auto StopRunnerCallback =
-      [task_manager = task_manager_, &task_runner_label]() {
+      [task_manager = task_manager_, task_runner_label]() {
         task_manager->StopRunner(task_runner_label);
       };
 

@@ -15,19 +15,10 @@
 #include "link/base/logging.h"
 #include "link/io/base/io_error.h"
 #include "link/io/socket/platform/socket_descripor.h"
+#include "link/io/socket/platform/socket_options.h"
 
 namespace nlink {
 namespace io {
-
-bool SetNonBlocking(SocketDescriptor socket_fd) {
-  bool res = false;
-  uint32_t flag = 1;
-
-  int32_t error = ioctl(socket_fd, FIONBIO, &flag);
-  res = (error == NLINK_ERRNO);
-
-  return res;
-}
 
 int32_t MapConnectError(int32_t os_error) {
   switch (os_error) {
@@ -64,8 +55,10 @@ int32_t Socket::Open(AddressFamily address_family, Socket::Type type) {
     return NLINK_ERRNO;
   }
 
-  if (!SetNonBlocking(socket_fd)) {
-    LOG(ERROR) << "[Socket::Open] can not setting to nonblocking. "
+  if (IOError::OK != SetNonBlocking(socket_fd) ||
+      IOError::OK != SetReuseAddr(socket_fd, true) ||
+      IOError::OK != SetKeepAlive(socket_fd, true, 5)) {
+    LOG(ERROR) << "[Socket::Open] socket setting fail. "
                << std::strerror(NLINK_ERRNO);
 
     int32_t err = NLINK_ERRNO;
@@ -89,7 +82,9 @@ int32_t Socket::AdoptConnectedSocket(
 }
 
 int32_t Socket::AdoptUnconnectedSocket(SocketDescriptor socket_fd) {
-  if (!SetNonBlocking(socket_fd)) {
+  if (IOError::OK != SetNonBlocking(socket_fd) ||
+      IOError::OK != SetReuseAddr(socket_fd, true) ||
+      IOError::OK != SetKeepAlive(socket_fd, true, 5)) {
     LOG(ERROR) << "[Socket::AdoptUnconnectedSocket] fail setting nonblocking. "
                << std::strerror(NLINK_ERRNO);
 
@@ -221,10 +216,10 @@ int32_t Socket::Read(
       [this](int32_t res) {
         this->RetryRead(res);
       });
-  if (res == IOError::ERR_IO_PENDING) {
-    pending_read_buffer_.reset(buffer);
-    peding_read_callback_ = std::move(callback);
-  }
+  // if (res == IOError::ERR_IO_PENDING) {
+  //   pending_read_buffer_.reset(buffer);
+  //   peding_read_callback_ = std::move(callback);
+  // }
   return res;
 }
 

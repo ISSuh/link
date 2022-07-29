@@ -139,7 +139,9 @@ void TcpSocketClient::HandleEvent(const base::Event& event) {
 void TcpSocketClient::HandleReadEvent() {
   task_runner_->PostTask(
     [this, session = session_]() {
-      session->Read(nullptr);
+      if (nullptr != session) {
+        session->Read(nullptr);
+      }
     });
 }
 
@@ -196,6 +198,7 @@ void TcpSocketClient::InternalWriteHandler(size_t length) {
 }
 
 void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {
+  LOG(INFO) << __func__ << " - descriptor : " << descriptor;  
   channel_delegate_->ChannelOpend(descriptor, this);
 }
 

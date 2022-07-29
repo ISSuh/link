@@ -25,7 +25,7 @@ class Arguments {
   const std::string config_path() const;
   const std::string node_name() const;
   const std::string log_level() const;
-  std::vector<module::Specification> module_specs() const;
+  const std::vector<module::Specification>& Modulespecifications() const;
 
  private:
   bool ParseFromeConfigureFile(const std::string&  config_file_path);

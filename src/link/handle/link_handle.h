@@ -27,7 +27,7 @@ class LinkHandle {
   void RunOnce();
   void Shutdown();
 
-  std::shared_ptr<component::ComponentFctaory> ComponentFactory() const;
+  std::weak_ptr<component::ComponentFctaory> ComponentFactory() const;
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;

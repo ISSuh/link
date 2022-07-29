@@ -20,7 +20,7 @@ namespace nlink {
 namespace component {
 
 class ComponentFctaory {
- protected:
+ public:
   explicit ComponentFctaory(
     std::shared_ptr<base::EventChannelController> channel_controller);
   virtual ~ComponentFctaory();

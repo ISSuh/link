@@ -37,7 +37,9 @@ struct SocketOptions {
 
 int32_t SetNoDelay(SocketDescriptor fd, bool no_delay);
 int32_t SetReuseAddr(SocketDescriptor fd, bool reuse);
+int32_t SetReusePort(SocketDescriptor fd, bool reuse);
 int32_t SetKeepAlive(SocketDescriptor fd, bool enable, int32_t delay);
+int32_t SetNonBlocking(SocketDescriptor fd);
 
 }  // namespace io
 }  // namespace nlink

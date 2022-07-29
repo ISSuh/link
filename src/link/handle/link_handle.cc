@@ -52,7 +52,7 @@ void LinkHandle::RunOnce() {
 void LinkHandle::Shutdown() {
 }
 
-std::shared_ptr<component::ComponentFctaory>
+std::weak_ptr<component::ComponentFctaory>
 LinkHandle::ComponentFactory() const {
   return component_factory_;
 }

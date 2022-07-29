@@ -33,7 +33,7 @@ bool LinkNode::Init(int32_t argc, char *argv[]) {
 
 void LinkNode::Run() {
   controller_->LoadingModule(
-    args_.module_specs(),
+    args_.Modulespecifications(),
     [this](bool status) {
       this->ModuleLoadedStatus(status);
     });
