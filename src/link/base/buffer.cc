@@ -28,6 +28,10 @@ Buffer::Buffer(const std::vector<uint8_t>& buffer)
   : raw_buffer_(buffer) {;
 }
 
+Buffer::Buffer(const uint8_t* start, const uint8_t* end)
+  : raw_buffer_(start, end) {
+}
+
 Buffer::Buffer(const uint8_t* data, size_t length)
   : raw_buffer_(data, data + length) {
 }

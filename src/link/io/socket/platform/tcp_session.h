@@ -46,7 +46,6 @@ class TcpSocketSession
  private:
   void InternalWriteHandler(int32_t res);
   void InternalReadHandler(const base::Buffer& buffer, int32_t res);
-  void InternalCloseHandler(int32_t res);
 
   std::unique_ptr<TcpSocket> socket_;
 

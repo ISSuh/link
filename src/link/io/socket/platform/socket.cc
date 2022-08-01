@@ -209,34 +209,10 @@ int32_t Socket::Close() {
   return IOError::OK;
 }
 
-int32_t Socket::Read(
-  base::Buffer* buffer, base::CompletionCallback callback) {
-  int res = ReadIfReady(
-      buffer,
-      [this](int32_t res) {
-        this->RetryRead(res);
-      });
-  // if (res == IOError::ERR_IO_PENDING) {
-  //   pending_read_buffer_.reset(buffer);
-  //   peding_read_callback_ = std::move(callback);
-  // }
-  return res;
-}
-
-int32_t Socket::ReadIfReady(
+void Socket::Read(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = DoRead(buffer);
-  if (res != IOError::ERR_IO_PENDING) {
-    return res;
-  }
-
-  read_if_ready_callback_ = std::move(callback);
-  return IOError::ERR_IO_PENDING;
-}
-
-int32_t Socket::CancelReadIfReady() {
-  read_if_ready_callback_ = {};
-  return IOError::OK;
+  callback(res);
 }
 
 // TODO(issuh) : must change read logic through unuse buffer copy
@@ -249,60 +225,17 @@ int32_t Socket::DoRead(base::Buffer* buffer) {
   return size;
 }
 
-void Socket::RetryRead(int32_t res) {
-  if (res == IOError::OK) {
-    res = ReadIfReady(
-        pending_read_buffer_.get(),
-        [this](int32_t res) {
-          this->RetryRead(res);
-        });
-    if (res == IOError::ERR_IO_PENDING) {
-      return;
-    }
-  }
-
-  pending_read_buffer_ = nullptr;
-  peding_read_callback_(res);
-  peding_read_callback_ = {};
-}
-
-void Socket::ReadCompleted() {
-  read_if_ready_callback_(IOError::OK);
-  read_if_ready_callback_ = {};
-}
-
 int32_t Socket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = DoWrite(buffer);
-  if (res == IOError::ERR_IO_PENDING) {
-    WaitForWrite(buffer, std::move(callback));
-  }
+  // callback(res);
   return res;
-}
-
-int32_t Socket::WaitForWrite(
-  base::Buffer* buffer, base::CompletionCallback callback) {
-  pending_write_buffer_.reset(buffer);
-  peding_write_callback_ = std::move(callback);
-  return IOError::ERR_IO_PENDING;
 }
 
 int32_t Socket::DoWrite(base::Buffer* buffer) {
   int32_t size = send(
       descriptor_, buffer->RawData(), buffer->Size(), MSG_NOSIGNAL);
   return size;
-}
-
-// TODO(issuh): should implement pending write process
-void Socket::WriteIfPending() {
-  int32_t res = DoWrite(pending_write_buffer_.get());
-  if (res == IOError::ERR_IO_PENDING) {
-    return;
-  }
-
-  pending_write_buffer_.reset();
-  peding_write_callback_(res);
-  peding_write_callback_ = {};
 }
 
 bool Socket::IsConnected() const {

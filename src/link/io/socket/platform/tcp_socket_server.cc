@@ -95,10 +95,10 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
       case base::Event::Type::WRITE:
         HandlerWriteEvent(descriptor);
         break;
-      case base::Event::Type::CLOSE:
-      case base::Event::Type::ERROR:
-        CloseSession(descriptor);
-        break;
+      // case base::Event::Type::CLOSE:
+      // case base::Event::Type::ERROR:
+      //   CloseSession(descriptor);
+      //   break;
       default:
         LOG(WARNING) << "[TcpSocketServer::ProcessEvent] invalid event type. "
                     << base::EventTypeToString(type);
@@ -115,8 +115,6 @@ void TcpSocketServer::HandleReadEvent(SocketDescriptor descriptor) {
   }
 
   std::weak_ptr<Session> session = sessions_.at(descriptor);
-  // session.lock()->Read(nullptr);
-
   task_runner_->PostTask(
     [this, session_wadk = session]() {
       std::shared_ptr<Session> session = session_wadk.lock();
@@ -169,6 +167,8 @@ void TcpSocketServer::InternalCloseHandler(std::shared_ptr<Session> session) {
   if (close_handler_) {
     close_handler_(session);
   }
+
+  CloseSession(session->SessionId());
 }
 
 void TcpSocketServer::InternalReadHandler(
@@ -200,11 +200,21 @@ void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
     return;
   }
 
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
+  session.reset();
+
   event_channel_delegate_->ChannelClosed(descriptor, this);
   sessions_.erase(descriptor);
 }
 
 void TcpSocketServer::CloseAllSessions() {
+  for (const auto& item : sessions_) {
+    SocketDescriptor descriptor = item.first;
+    std::shared_ptr<Session> session = item.second;
+
+    session->Close();
+    event_channel_delegate_->ChannelClosed(descriptor, this);
+  }
   sessions_.clear();
 }
 

@@ -40,10 +40,7 @@ class TcpSocket {
     const IpEndPoint& address, base::CompletionCallback&& callback);
   int32_t Close();
 
-  int32_t Read(base::Buffer* buffer, base::CompletionCallback callback);
-  int32_t ReadIfReady(base::Buffer* buffer, base::CompletionCallback callback);
-  int32_t CancelReadIfReady();
-
+  void Read(base::Buffer* buffer, base::CompletionCallback callback);
   int32_t Write(base::Buffer* buffer, base::CompletionCallback callback);
 
   bool IsConnected() const;
@@ -58,7 +55,6 @@ class TcpSocket {
 
   void ReadCompleted(
     base::Buffer* buffer, base::CompletionCallback callback, int32_t res);
-  void ReadIfReadyCompleted(base::CompletionCallback callback, int32_t res);
   int32_t HandleReadCompleted(base::Buffer* buffer, int32_t res);
 
   void WriteCompleted(

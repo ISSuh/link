@@ -85,6 +85,6 @@ void ExampleClient::OnRead(
 }
 
 void ExampleClient::OnWrite(size_t lengeh) {
-  // LOG(INFO) << "[ExampleClient::OnWrite]"
-  //           << " lengeh : " << lengeh;
+  LOG(INFO) << "[ExampleClient::OnWrite]"
+            << " lengeh : " << lengeh;
 }

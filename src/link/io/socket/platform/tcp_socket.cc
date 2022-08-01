@@ -111,34 +111,13 @@ int32_t TcpSocket::Close() {
   return res;
 }
 
-int32_t TcpSocket::Read(
+void TcpSocket::Read(
   base::Buffer* buffer, base::CompletionCallback callback) {
-  int32_t res = socket_->Read(
+  socket_->Read(
     buffer,
     [this, &buffer, callback](int32_t res) {
-      this->ReadCompleted(buffer, std::move(callback), res);
+      this->ReadCompleted(buffer, callback, res);
     });
-  if (res != IOError::ERR_IO_PENDING) {
-    res = HandleReadCompleted(buffer, res);
-  }
-  return res;
-}
-
-int32_t TcpSocket::ReadIfReady(
-  base::Buffer* buffer, base::CompletionCallback callback) {
-  int res = socket_->ReadIfReady(
-    buffer,
-    [this, callback](int32_t res) {
-      this->ReadIfReadyCompleted(std::move(callback), res);
-    });
-  if (res != IOError::ERR_IO_PENDING) {
-    res = HandleReadCompleted(buffer, res);
-  }
-  return res;
-}
-
-int32_t TcpSocket::CancelReadIfReady() {
-  return socket_->CancelReadIfReady();
 }
 
 void TcpSocket::ReadCompleted(
@@ -146,14 +125,9 @@ void TcpSocket::ReadCompleted(
   callback(HandleReadCompleted(buffer, res));
 }
 
-void TcpSocket::ReadIfReadyCompleted(
-  base::CompletionCallback callback, int32_t res) {
-  callback(res);
-}
-
 int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
   if (res < 0) {
-    LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
+    LOG(ERROR) << "[TcpSocket::HandleReadCompleted] socket read fail."
                << std::strerror(NLINK_ERRNO);
     return res;
   }
@@ -165,12 +139,10 @@ int32_t TcpSocket::Write(
   int32_t res = socket_->Write(
     buffer,
     [this, callback](int32_t res) {
-      this->WriteCompleted(std::move(callback), res);
+      // this->WriteCompleted(std::move(callback), res);
     });
-  if (res != IOError::ERR_IO_PENDING) {
-    res = HandleWriteCompleted(res);
-  }
-  return res;
+
+  WriteCompleted(callback, res);
 }
 
 void TcpSocket::WriteCompleted(

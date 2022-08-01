@@ -39,22 +39,32 @@ void TcpSocketSession::Close() {
 }
 
 void TcpSocketSession::Read(base::Buffer* buffer) {
-  int32_t res = socket_->Read(&read_buffer_,
+  socket_->Read(&read_buffer_,
     [this](int32_t res) {
       this->InternalReadHandler(read_buffer_, res);
     });
-
-  InternalReadHandler(read_buffer_, res);
 }
 
 void TcpSocketSession::Write(const base::Buffer& buffer) {
-  base::Buffer temp =  buffer;
-  int32_t res = socket_->Write(&temp,
-    [this](int32_t error_code ) {
-      this->InternalWriteHandler(error_code);
-    });
+  size_t writed_buffer_size = 0;
+  size_t buffer_size = buffer.Size();
+  while (writed_buffer_size < buffer_size) {
+    size_t send_size =
+      kDefaultBufferSize < buffer_size ? kDefaultBufferSize : buffer_size;
 
-  InternalWriteHandler(res);
+    base::Buffer temp(
+      buffer.RawData() + writed_buffer_size,
+      buffer.RawData() + writed_buffer_size + send_size);
+
+    socket_->Write(&temp,
+      [this](int32_t error_code) {
+        this->InternalWriteHandler(error_code);
+      });
+
+    writed_buffer_size += send_size;
+  }
+
+  InternalWriteHandler(writed_buffer_size);
 }
 
 void TcpSocketSession::Write(
@@ -97,10 +107,6 @@ void TcpSocketSession::InternalReadHandler(
   if (res == 0) {
     Close();
   }
-}
-
-void TcpSocketSession::InternalCloseHandler(int32_t) {
-
 }
 
 }  // namespace io

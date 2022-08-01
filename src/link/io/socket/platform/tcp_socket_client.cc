@@ -44,10 +44,12 @@ void TcpSocketClient::Disconnect() {
     return;
   }
 
-  task_runner_->PostTask(
-    [this, session = session_]() {
-      session->Close();
-    });
+  session_->Close();
+
+  // task_runner_->PostTask(
+  //   [this, session = session_]() {
+  //     session->Close();
+  //   });
 }
 
 void TcpSocketClient::Write(const base::Buffer& buffer) {

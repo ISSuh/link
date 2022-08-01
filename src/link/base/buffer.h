@@ -21,6 +21,7 @@ class Buffer {
   explicit Buffer(const std::string& data);
   explicit Buffer(const std::vector<uint8_t>& data);
   Buffer(const uint8_t* data, size_t length);
+  Buffer(const uint8_t* start, const uint8_t* end);
   Buffer(const Buffer& buffer);
   Buffer(Buffer&& buffer);
 

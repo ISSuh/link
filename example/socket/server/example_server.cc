@@ -60,10 +60,15 @@ void ExampleServer::OnClose(std::shared_ptr<nlink::io::Session> session) {
 void ExampleServer::OnRead(
   const nlink::base::Buffer& buffer,
   std::shared_ptr<nlink::io::Session> session) {
+  static int32_t receiver_size = 0;
+
+  receiver_size += buffer.Size();
+
   const std::vector<uint8_t>& received_data = buffer.Data();
   std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleServer::OnRead]"
-            << " received : " << buffer.Size();
+            << " received : " << buffer.Size()
+            << " total : " << receiver_size;
 
   // session->Write(buffer);
 }

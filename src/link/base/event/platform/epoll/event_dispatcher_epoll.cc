@@ -90,9 +90,9 @@ Event::Type EventDispatcherEpoll::HandleEventType(
     types->emplace_back(Event::Type::ERROR);
   }
 
-  if (event_flag & EPOLLRDHUP) {
-    types->emplace_back(Event::Type::CLOSE);
-  }
+  // if (event_flag & EPOLLRDHUP) {
+  //   types->emplace_back(Event::Type::CLOSE);
+  // }
 }
 
 std::shared_ptr<EventChannelController>
