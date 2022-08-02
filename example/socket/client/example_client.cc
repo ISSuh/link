@@ -7,6 +7,7 @@
 #include "example_client.h"
 
 #include <vector>
+#include <utility>
 
 #include "link/base/logging.h"
 
@@ -31,7 +32,10 @@ ExampleClient::ExampleClient()
         this->OnWrite(length);
       }}),
     client_component_(nullptr),
-    is_connected(false) {}
+    is_connected(false),
+    need_waiting_for_write_(false),
+    finish_(false),
+    write_size_(0) {}
 
 ExampleClient::~ExampleClient() = default;
 
@@ -54,12 +58,25 @@ void ExampleClient::Disconnect() {
 }
 
 void ExampleClient::Write(const std::string& message) {
-  base::Buffer buffer(message);
-  client_component_->Write(buffer);
+  write_size_ = message.size();
+
+  std::shared_ptr<base::Buffer> buffer
+    = std::make_shared<base::Buffer>(message);
+  client_component_->Write(std::move(buffer));
+
+  need_waiting_for_write_ = true;
 }
 
 bool ExampleClient::IsConnected() {
   return is_connected;
+}
+
+bool ExampleClient::NeedWaitingForWrite() {
+  return need_waiting_for_write_;
+}
+
+bool ExampleClient::WriteFinished() {
+  return finish_;
 }
 
 void ExampleClient::OnConnect(std::shared_ptr<nlink::io::Session> session) {
@@ -87,4 +104,11 @@ void ExampleClient::OnRead(
 void ExampleClient::OnWrite(size_t lengeh) {
   LOG(INFO) << "[ExampleClient::OnWrite]"
             << " lengeh : " << lengeh;
+  static int32_t writed_size = 0;
+  writed_size += lengeh;
+
+  if (writed_size >= write_size_) {
+    need_waiting_for_write_ = false;
+    finish_ = true;
+  }
 }

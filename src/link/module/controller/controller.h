@@ -41,6 +41,7 @@ class ModuleController
 
  private:
   void LodingModuleInternal(
+    base::TaskRunner* controller_task_runner,
     const Specification spec,
     size_t will_loaded_module_count,
     StatusCallback status_callback);

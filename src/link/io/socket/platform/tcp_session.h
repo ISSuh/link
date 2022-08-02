@@ -39,6 +39,7 @@ class TcpSocketSession
     const base::Buffer& buffer,
     handler::WriteHandler write_handler,
     handler::ReadHandler read_handler) override;
+  void Write(std::shared_ptr<base::Buffer> buffer) override;
 
   bool IsConnected() const override;
   int32_t SessionId() const override;

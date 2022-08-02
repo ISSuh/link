@@ -139,7 +139,7 @@ int32_t TcpSocket::Write(
   int32_t res = socket_->Write(
     buffer,
     [this, callback](int32_t res) {
-      // this->WriteCompleted(std::move(callback), res);
+      this->WriteCompleted(std::move(callback), res);
     });
 
   WriteCompleted(callback, res);

@@ -28,6 +28,8 @@ class ExampleClient {
   void Write(const std::string& message);
 
   bool IsConnected();
+  bool NeedWaitingForWrite();
+  bool WriteFinished();
 
  private:
   void OnConnect(std::shared_ptr<nlink::io::Session> session);
@@ -40,6 +42,9 @@ class ExampleClient {
   nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpClientComponent* client_component_;
   bool is_connected;
+  bool need_waiting_for_write_;
+  bool finish_;
+  size_t write_size_;
 };
 
 #endif  // EXAMPLE_SOCKET_CLIENT_EXAMPLE_CLIENT_H_

@@ -7,6 +7,7 @@
 #include "link/component/ipc/socket/tcp_client_component.h"
 
 #include <vector>
+#include <utility>
 
 #include "link/base/logging.h"
 #include "link/io/socket/socket_factory.h"
@@ -55,6 +56,10 @@ void TcpClientComponent::Disconnect() {
 
 void TcpClientComponent::Write(const base::Buffer& buffer) {
   client_->Write(buffer);
+}
+
+void TcpClientComponent::Write(std::shared_ptr<base::Buffer> buffer) {
+  client_->Write(std::move(buffer));
 }
 
 bool TcpClientComponent::IsConnected() const {

@@ -48,9 +48,11 @@ void ModuleController::LoadingModule(
     controller_task_runners_.insert({module_name, controller_task_runner});
 
     controller_task_runners_[module_name]->PostTask(
-      [this, spec, will_loaded_module_count, status_callback]() {
+      [this, spec, will_loaded_module_count,
+       status_callback, controller_task_runner]() {
         this->LodingModuleInternal(
-          spec, will_loaded_module_count, status_callback);
+          controller_task_runner, spec,
+          will_loaded_module_count, status_callback);
       });
   }
 }
@@ -93,29 +95,30 @@ void ModuleController::TerminateModule(const std::string& module_name) {
 
   if (task_manager_->CheckRunningByLabel(controller_task_runner_name)) {
     controller_task_runners_[module_name]->PostTask(
-      [this, &module_name]() {
+      [this, module_name]() {
         this->TerminateModuleInternal(module_name);
       });
   }
 }
 
 void ModuleController::LodingModuleInternal(
+  base::TaskRunner* controller_task_runner,
   const Specification spec,
   size_t will_loaded_module_count,
   StatusCallback status_callback) {
   const std::string module_name = spec.module_name();
+
+  if (!CreateModuleExecutor(module_name, controller_task_runner)) {
+    status_callback(false);
+    TerminateModule(module_name);
+    return;
+  }
 
   base::TaskRunner* task_runner =
     CreateTaskRunnerForModule(module_name);
   if (!task_runner) {
     LOG(WARNING) << " Can not create task runner for module. " << module_name;
     status_callback(false);
-    return;
-  }
-
-  if (!CreateModuleExecutor(module_name, task_runner)) {
-    status_callback(false);
-    TerminateModule(module_name);
     return;
   }
 

@@ -21,22 +21,32 @@ ModuleExecutor::~ModuleExecutor() {
 
 void ModuleExecutor::RunningModule(LinkModule* module) {
   module_ = module;
-  // task_runner_->PostTask(base::Bind(&LinkModule::Initialize, module));
-  module_->Initialize();
+  task_runner_->PostTask(
+    [this, module = module_]() { module->Initialize(); });
+  // module_->Initialize();
 }
 
 void ModuleExecutor::AfterInitialize(const std::string& module_name) {
-  // task_runner_->PostTask(base::Bind(&LinkModule::Process, module_));
-  module_->Process();
+  task_runner_->PostTask(
+    [this, module = module_]() { module->Process(); });
+
+  // module_->Process();
 }
 
 void ModuleExecutor::AfterProcess(const std::string& module_name) {
-  // task_runner_->PostTask(base::Bind(&LinkModule::Terminate, module_));
-  module_->Terminate();
+  task_runner_->PostTask(
+    [this, module = module_]() { module->Terminate(); });
+
+  // module_->Terminate();
 }
 
 void ModuleExecutor::AfterTerminate(const std::string& module_name) {
-  excutor_client_->TerminateModule(module_name);
+  task_runner_->PostTask(
+    [this, excutor_client = excutor_client_, module_name]() {
+      excutor_client->TerminateModule(module_name);
+    });
+
+  // excutor_client_->TerminateModule(module_name);
 }
 
 }  // namespace module

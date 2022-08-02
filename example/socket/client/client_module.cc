@@ -36,8 +36,7 @@ void ExampleClientModule::Run() {
   client_.Connect(address_, port_);
 
   int32_t try_connect_count = 0;
-  int32_t count = 0;
-  while (count < 1) {
+  while (true) {
     handle.RunOnce();
     if (!client_.IsConnected()) {
       LOG(INFO) << "[ExampleClientModule] wait for connect";
@@ -50,12 +49,17 @@ void ExampleClientModule::Run() {
       continue;
     }
 
-    const uint32_t message_size = 5 * 1024 * 1024;
-    std::string message(message_size, '1');
-    client_.Write(message);
-    LOG(INFO) << "[ExampleClientModule] write : " << message.size();
+    if (client_.WriteFinished()) {
+      break;
+    }
 
-    ++count;
+    if (!client_.NeedWaitingForWrite()) {
+      const uint32_t message_size = 5 * 1024 * 1024;
+      std::string message(message_size, '1');
+      client_.Write(message);
+      LOG(INFO) << "[ExampleClientModule] write : " << message.size();
+    }
+
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 

@@ -44,12 +44,10 @@ void TcpSocketClient::Disconnect() {
     return;
   }
 
-  session_->Close();
-
-  // task_runner_->PostTask(
-  //   [this, session = session_]() {
-  //     session->Close();
-  //   });
+  task_runner_->PostTask(
+    [this, session = session_]() {
+      session->Close();
+    });
 }
 
 void TcpSocketClient::Write(const base::Buffer& buffer) {
@@ -59,10 +57,12 @@ void TcpSocketClient::Write(const base::Buffer& buffer) {
     return;
   }
 
-  // wrtie_task_queue_.emplace(
-  //   [this, session = session_, &buffer]() {
-      session_->Write(buffer);
-    // });
+  task_runner_->PostTask(
+    [this, session = session_, buffer = std::move(buffer)]() {
+      if (session_ != nullptr) {
+        session_->Write(buffer);
+      }
+    });
 }
 
 void TcpSocketClient::Write(
@@ -73,6 +73,21 @@ void TcpSocketClient::Write(
     return;
   }
   session_->Write(buffer, write_handler, read_handler);
+}
+
+void TcpSocketClient::Write(std::shared_ptr<base::Buffer> buffer) {
+  if (nullptr == session_ || buffer->IsEmpty()) {
+    LOG(WARNING) << "[TcpSocketClient::Write] cannot write. "
+                 << " session is nullptr or buffer size is empty";
+    return;
+  }
+
+  task_runner_->PostTask(
+    [this, session = session_, buffer]() {
+      if (session_ != nullptr) {
+        session_->Write(buffer);
+      }
+    });
 }
 
 bool TcpSocketClient::IsConnected() const {
@@ -125,8 +140,6 @@ void TcpSocketClient::HandleEvent(const base::Event& event) {
         HandlerWriteEvent();
         break;
       case base::Event::Type::CLOSE:
-        Disconnect();
-        break;
       case base::Event::Type::ERROR:
         Disconnect();
         break;
@@ -200,7 +213,7 @@ void TcpSocketClient::InternalWriteHandler(size_t length) {
 }
 
 void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {
-  LOG(INFO) << __func__ << " - descriptor : " << descriptor;  
+  LOG(INFO) << __func__ << " - descriptor : " << descriptor;
   channel_delegate_->ChannelOpend(descriptor, this);
 }
 

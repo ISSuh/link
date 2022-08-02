@@ -45,6 +45,7 @@ void TcpSocketSession::Read(base::Buffer* buffer) {
     });
 }
 
+// TODO(issuh): should change task
 void TcpSocketSession::Write(const base::Buffer& buffer) {
   size_t writed_buffer_size = 0;
   size_t buffer_size = buffer.Size();
@@ -58,7 +59,7 @@ void TcpSocketSession::Write(const base::Buffer& buffer) {
 
     socket_->Write(&temp,
       [this](int32_t error_code) {
-        this->InternalWriteHandler(error_code);
+        // this->InternalWriteHandler(error_code);
       });
 
     writed_buffer_size += send_size;
@@ -74,6 +75,29 @@ void TcpSocketSession::Write(
 
 }
 
+void TcpSocketSession::Write(
+  std::shared_ptr<base::Buffer> buffer) {
+  size_t writed_buffer_size = 0;
+  size_t buffer_size = buffer->Size();
+  while (writed_buffer_size < buffer_size) {
+    size_t send_size =
+      kDefaultBufferSize < buffer_size ? kDefaultBufferSize : buffer_size;
+
+    base::Buffer temp(
+      buffer->RawData() + writed_buffer_size,
+      buffer->RawData() + writed_buffer_size + send_size);
+
+    socket_->Write(&temp,
+      [this](int32_t error_code) {
+        // this->InternalWriteHandler(error_code);
+      });
+
+    writed_buffer_size += send_size;
+  }
+
+  InternalWriteHandler(writed_buffer_size);
+}
+
 bool TcpSocketSession::IsConnected() const {
   if (nullptr == socket_) {
     return false;
@@ -86,12 +110,10 @@ SocketDescriptor TcpSocketSession::SessionId() const {
 }
 
 void TcpSocketSession::InternalWriteHandler(int32_t res) {
-  if (res > 0) {
-    if (!write_handler_) {
-      return;
-    }
-    write_handler_(res);
+  if (!write_handler_) {
+    return;
   }
+  write_handler_(res);
 }
 
 void TcpSocketSession::InternalReadHandler(
