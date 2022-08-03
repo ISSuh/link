@@ -65,37 +65,53 @@ void TcpSocketSession::Write(const base::Buffer& buffer) {
     writed_buffer_size += send_size;
   }
 
-  InternalWriteHandler(writed_buffer_size);
-}
-
-void TcpSocketSession::Write(
-  const base::Buffer& buffer,
-  handler::WriteHandler write_handler,
-  handler::ReadHandler read_handler) {
-
+  // InternalWriteHandler(writed_buffer_size);
 }
 
 void TcpSocketSession::Write(
   std::shared_ptr<base::Buffer> buffer) {
-  size_t writed_buffer_size = 0;
-  size_t buffer_size = buffer->Size();
-  while (writed_buffer_size < buffer_size) {
-    size_t send_size =
-      kDefaultBufferSize < buffer_size ? kDefaultBufferSize : buffer_size;
+  // size_t writed_buffer_size = 0;
+  // size_t buffer_size = buffer->Size();
+  // while (writed_buffer_size < buffer_size) {
+  //   size_t send_size =
+  //     kDefaultBufferSize < buffer_size ? kDefaultBufferSize : buffer_size;
 
-    base::Buffer temp(
-      buffer->RawData() + writed_buffer_size,
-      buffer->RawData() + writed_buffer_size + send_size);
+  //   base::Buffer temp(
+  //     buffer->RawData() + writed_buffer_size,
+  //     buffer->RawData() + writed_buffer_size + send_size);
 
-    socket_->Write(&temp,
-      [this](int32_t error_code) {
-        // this->InternalWriteHandler(error_code);
-      });
+  //   socket_->Write(&temp,
+  //     [this](int32_t writed_size) {
+  //       this->InternalWriteHandler(writed_size);
+  //     });
 
-    writed_buffer_size += send_size;
+  //   writed_buffer_size += send_size;
+  // }
+
+  // InternalWriteHandler(buffer_size - writed_buffer_size, writed_buffer_size);
+
+  DoWrite(buffer, 0);
+}
+
+void TcpSocketSession::DoWrite(
+  std::shared_ptr<base::Buffer> buffer,
+  int32_t clumulative_trasmission_size) {
+  if (clumulative_trasmission_size >= buffer->Size()) {
+    return;
   }
 
-  InternalWriteHandler(writed_buffer_size);
+  size_t send_size =
+    kDefaultBufferSize < buffer->Size() ? kDefaultBufferSize : buffer->Size();
+
+  base::Buffer temp(
+    buffer->RawData() + clumulative_trasmission_size,
+    buffer->RawData() + clumulative_trasmission_size + send_size);
+
+  socket_->Write(&temp,
+    [this, buffer, clumulative_trasmission_size](int32_t writed_size) {
+      this->InternalWriteHandler(
+        buffer, clumulative_trasmission_size, writed_size);
+    });
 }
 
 bool TcpSocketSession::IsConnected() const {
@@ -109,24 +125,36 @@ SocketDescriptor TcpSocketSession::SessionId() const {
   return socket_->Descriptor();
 }
 
-void TcpSocketSession::InternalWriteHandler(int32_t res) {
-  if (!write_handler_) {
-    return;
+void TcpSocketSession::InternalWriteHandler(
+  std::shared_ptr<base::Buffer> buffer,
+  int32_t clumulative_trasmission_size,
+  int32_t writed_size) {
+  if (0 <= writed_size) {
+    clumulative_trasmission_size += writed_size;
+    if (clumulative_trasmission_size >= buffer->Size()) {
+      if (!write_handler_) {
+        return;
+      }
+      write_handler_(clumulative_trasmission_size);
+    } else {
+      DoWrite(buffer, clumulative_trasmission_size);
+    }
+  } else {
+    DoWrite(buffer, clumulative_trasmission_size);
   }
-  write_handler_(res);
 }
 
 void TcpSocketSession::InternalReadHandler(
-  const base::Buffer& buffer, int32_t res) {
-  LOG(INFO) << __func__ << " - res : " << res;
-  if (res > 0) {
+  const base::Buffer& buffer, int32_t size) {
+  LOG(INFO) << __func__ << " - res : " << size;
+  if (size > 0) {
     if (!read_handler_) {
       return;
     }
     read_handler_(buffer, shared_from_this());
   }
 
-  if (res == 0) {
+  if (size == 0) {
     Close();
   }
 }

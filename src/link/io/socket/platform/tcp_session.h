@@ -36,17 +36,21 @@ class TcpSocketSession
 
   void Write(const base::Buffer& buffer) override;
   void Write(
-    const base::Buffer& buffer,
-    handler::WriteHandler write_handler,
-    handler::ReadHandler read_handler) override;
-  void Write(std::shared_ptr<base::Buffer> buffer) override;
+    std::shared_ptr<base::Buffer> buffer) override;
 
   bool IsConnected() const override;
   int32_t SessionId() const override;
 
  private:
-  void InternalWriteHandler(int32_t res);
-  void InternalReadHandler(const base::Buffer& buffer, int32_t res);
+  void DoWrite(
+    std::shared_ptr<base::Buffer> buffer,
+    int32_t clumulative_trasmission_size);
+
+  void InternalWriteHandler(
+    std::shared_ptr<base::Buffer> buffer,
+    int32_t clumulative_trasmission_size,
+    int32_t writed_size);
+  void InternalReadHandler(const base::Buffer& buffer, int32_t size);
 
   std::unique_ptr<TcpSocket> socket_;
 

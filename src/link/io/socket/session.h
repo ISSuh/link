@@ -37,10 +37,7 @@ class Session {
 
   virtual void Write(const base::Buffer& buffer) = 0;
   virtual void Write(
-    const base::Buffer& buffer,
-    handler::WriteHandler write_handler,
-    handler::ReadHandler read_handler) = 0;
-  virtual void Write(std::shared_ptr<base::Buffer> buffer) = 0;
+    std::shared_ptr<base::Buffer> buffer) = 0;
 };
 
 }  // namespace io

@@ -65,16 +65,6 @@ void TcpSocketClient::Write(const base::Buffer& buffer) {
     });
 }
 
-void TcpSocketClient::Write(
-  const base::Buffer& buffer,
-  handler::WriteHandler write_handler,
-  handler::ReadHandler read_handler) {
-  if (nullptr == session_ || buffer.IsEmpty()) {
-    return;
-  }
-  session_->Write(buffer, write_handler, read_handler);
-}
-
 void TcpSocketClient::Write(std::shared_ptr<base::Buffer> buffer) {
   if (nullptr == session_ || buffer->IsEmpty()) {
     LOG(WARNING) << "[TcpSocketClient::Write] cannot write. "

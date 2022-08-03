@@ -41,10 +41,6 @@ class TcpSocketClient : public Client {
     handler::ReadHandler read_handler,
     handler::WriteHandler write_handler) override;
   void Write(const base::Buffer& buffer) override;
-  void Write(
-    const base::Buffer& buffer,
-    handler::WriteHandler write_handler,
-    handler::ReadHandler read_handler) override;
   void Write(std::shared_ptr<base::Buffer> buffer) override;
 
   bool IsConnected() const override;

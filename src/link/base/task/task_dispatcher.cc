@@ -18,19 +18,24 @@ TaskDispatcher::TaskDispatcher(TaskManager* manager)
 
 TaskDispatcher::~TaskDispatcher() = default;
 
-void TaskDispatcher::PostTask(const std::string& label,
-              const TaskCallback& task_callback) {
-  PostDelayTask(label, task_callback, TimeTick());
+void TaskDispatcher::PostTask(
+  const std::string& group,
+  const std::string& label,
+  const TaskCallback& task) {
+  PostDelayTask(group, label, task, TimeTick());
 }
 
-void TaskDispatcher::PostDelayTask(const std::string& label,
-              const TaskCallback& task_callback, TimeTick delay) {
-  TaskRunner* runner = manager_->GetTaskRunner(label);
+void TaskDispatcher::PostDelayTask(
+  const std::string& group,
+  const std::string& label,
+  const TaskCallback& task,
+  TimeTick delay) {
+  TaskRunner* runner = manager_->GetTaskRunner(group, label);
   if (runner == nullptr) {
     return;
   }
 
-  runner->PostDelayTask(task_callback, delay);
+  runner->PostDelayTask(task, delay);
 }
 
 }  // namespace base

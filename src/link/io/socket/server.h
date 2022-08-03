@@ -29,7 +29,9 @@ class Server : public base::EventChannel {
   virtual void Accept(
     handler::AcceptHandler accept_handler,
     handler::CloseHandler close_handler) = 0;
+
   virtual void Close() = 0;
+
   virtual void RegistIOHandler(
     handler::ReadHandler read_handler,
     handler::WriteHandler write_handler) = 0;

@@ -25,11 +25,16 @@ class TaskDispatcher {
   explicit TaskDispatcher(TaskManager* manager);
   ~TaskDispatcher();
 
-  void PostTask(const std::string& task_runner_label,
-                const TaskCallback& task_callback);
+  void PostTask(
+    const std::string& group,
+    const std::string& label,
+    const TaskCallback& task);
 
-  void PostDelayTask(const std::string& task_runner_label,
-                const TaskCallback& task_callback, TimeTick delay);
+  void PostDelayTask(
+    const std::string& group,
+    const std::string& label,
+    const TaskCallback& task,
+    TimeTick delay);
 
  private:
   TaskManager* manager_;

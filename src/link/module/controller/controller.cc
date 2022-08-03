@@ -42,7 +42,7 @@ void ModuleController::LoadingModule(
 
     base::TaskRunner* controller_task_runner =
       task_manager_->CreateTaskRunner(
-        controller_task_runner_name,
+        module_name, controller_task_runner_name,
         base::TaskRunner::Type::SEQUENCE, specs.size());
 
     controller_task_runners_.insert({module_name, controller_task_runner});
@@ -91,14 +91,20 @@ void ModuleController::TerminateModule(const std::string& module_name) {
   const std::string controller_task_runner_name =
     module_name + kControllerTaskRunnerNamePostfix;
 
-  TerminateModuleTaskRunner(module_name);
+  TerminateModuleTaskRunner(
+    module_name,
+    module_name,
+    [this, module_name]() {
+      this->TerminateModuleInternal(module_name);
+    });
 
-  if (task_manager_->CheckRunningByLabel(controller_task_runner_name)) {
-    controller_task_runners_[module_name]->PostTask(
-      [this, module_name]() {
-        this->TerminateModuleInternal(module_name);
-      });
-  }
+  // if (task_manager_->IsTaskRunnerRunning(
+  //       module_name, controller_task_runner_name)) {
+  //   controller_task_runners_[module_name]->PostTask(
+  //     [this, module_name]() {
+  //       this->TerminateModuleInternal(module_name);
+  //     });
+  // }
 }
 
 void ModuleController::LodingModuleInternal(
@@ -115,7 +121,7 @@ void ModuleController::LodingModuleInternal(
   }
 
   base::TaskRunner* task_runner =
-    CreateTaskRunnerForModule(module_name);
+    CreateWorkerTaskRunnerForModule(module_name, module_name);
   if (!task_runner) {
     LOG(WARNING) << " Can not create task runner for module. " << module_name;
     status_callback(false);
@@ -140,17 +146,18 @@ void ModuleController::TerminateModuleInternal(const std::string& module_name) {
   const std::string controller_task_runner_name =
     module_name + kControllerTaskRunnerNamePostfix;
 
-  if (loader_.HasModule(module_name)) {
-    loader_.UnLoadModule(module_name);
-  }
-
-  TerminateModuleTaskRunner(controller_task_runner_name);
+  TerminateModuleTaskRunner(
+    module_name,
+    controller_task_runner_name,
+    [this, module_name]() {
+      this->UnLoadModule(module_name);
+    });
 }
 
-base::TaskRunner* ModuleController::CreateTaskRunnerForModule(
-  const std::string& module_name) {
+base::TaskRunner* ModuleController::CreateWorkerTaskRunnerForModule(
+  const std::string& module_name, const std::string& task_runner_label) {
   return task_manager_->CreateTaskRunner(
-    module_name, base::TaskRunner::Type::SEQUENCE);
+    module_name, task_runner_label, base::TaskRunner::Type::SEQUENCE);
 }
 
 bool ModuleController::CreateModuleExecutor(
@@ -167,16 +174,32 @@ bool ModuleController::CreateModuleExecutor(
 }
 
 void ModuleController::TerminateModuleTaskRunner(
-  const std::string& task_runner_label) {
-  if (task_manager_->CheckRunningByLabel(task_runner_label)) {
-    base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
+  const std::string& task_runner_group_label,
+  const std::string& task_runner_label,
+  std::function<void()> after_terminate_task_runner) {
+  if (!task_manager_->IsTaskRunnerRunning(
+    task_runner_group_label, task_runner_label)) {
+    return;
+  }
 
-    auto StopRunnerCallback =
-      [task_manager = task_manager_, task_runner_label]() {
-        task_manager->StopRunner(task_runner_label);
-      };
+  base::TaskDispatcher* task_dispatcher = task_manager_->GetTaskDispatcher();
 
-    task_dispatcher->PostTask(task_runner_label, std::move(StopRunnerCallback));
+  auto stop_runner_task =
+    [task_manager = task_manager_,
+     task_runner_group_label,
+     task_runner_label,
+     after_terminate_task_runner]() {
+      task_manager->StopRunner(task_runner_group_label, task_runner_label);
+      after_terminate_task_runner();
+    };
+
+  task_dispatcher->PostTask(
+    task_runner_group_label, task_runner_label, std::move(stop_runner_task));
+}
+
+void ModuleController::UnLoadModule(const std::string& module_name) {
+  if (loader_.HasModule(module_name)) {
+    loader_.UnLoadModule(module_name);
   }
 }
 
