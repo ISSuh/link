@@ -31,7 +31,6 @@ class Client : public base::EventChannel {
   virtual void RegistIOHandler(
     handler::ReadHandler read_handler,
     handler::WriteHandler write_handler) = 0;
-  virtual void Write(const base::Buffer& buffer) = 0;
   virtual void Write(std::shared_ptr<base::Buffer> buffer) = 0;
 
   virtual bool IsConnected() const = 0;

@@ -54,10 +54,6 @@ void TcpClientComponent::Disconnect() {
   client_->Disconnect();
 }
 
-void TcpClientComponent::Write(const base::Buffer& buffer) {
-  client_->Write(buffer);
-}
-
 void TcpClientComponent::Write(std::shared_ptr<base::Buffer> buffer) {
   client_->Write(std::move(buffer));
 }

@@ -30,6 +30,8 @@ class Buffer {
   size_t Size() const;
   bool IsEmpty() const;
   void Clear();
+  void Resize(size_t size);
+  void Append(const Buffer& buffer);
 
   void FromString(const std::string& buffer);
 

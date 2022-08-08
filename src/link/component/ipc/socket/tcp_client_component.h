@@ -32,7 +32,6 @@ class TcpClientComponent : public SocketComponent {
   void Connect(const std::string& address, int32_t port);
   void Disconnect();
 
-  void Write(const base::Buffer& buffer);
   void Write(std::shared_ptr<base::Buffer> buffer);
 
   bool IsConnected() const;

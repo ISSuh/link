@@ -59,6 +59,17 @@ void Buffer::Clear() {
   raw_buffer_.clear();
 }
 
+void Buffer::Resize(size_t size) {
+  raw_buffer_.resize(size);
+}
+
+void Buffer::Append(const Buffer& buffer) {
+  std::copy(
+    buffer.raw_buffer_.begin(),
+    buffer.raw_buffer_.end(),
+    std::back_inserter(raw_buffer_));
+}
+
 const std::vector<uint8_t>& Buffer::Data() const {
   return raw_buffer_;
 }

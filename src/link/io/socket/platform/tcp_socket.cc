@@ -127,14 +127,14 @@ void TcpSocket::ReadCompleted(
 
 int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
   if (res < 0) {
-    LOG(ERROR) << "[TcpSocket::HandleReadCompleted] socket read fail."
-               << std::strerror(NLINK_ERRNO);
+    // LOG(ERROR) << "[TcpSocket::HandleReadCompleted] socket read fail."
+    //            << std::strerror(NLINK_ERRNO);
     return res;
   }
   return res;
 }
 
-int32_t TcpSocket::Write(
+void TcpSocket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = socket_->Write(
     buffer,

@@ -50,21 +50,6 @@ void TcpSocketClient::Disconnect() {
     });
 }
 
-void TcpSocketClient::Write(const base::Buffer& buffer) {
-  if (nullptr == session_ || buffer.IsEmpty()) {
-    LOG(WARNING) << "[TcpSocketClient::Write] cannot write. "
-                 << " session is nullptr or buffer size is empty";
-    return;
-  }
-
-  task_runner_->PostTask(
-    [this, session = session_, buffer = std::move(buffer)]() {
-      if (session_ != nullptr) {
-        session_->Write(buffer);
-      }
-    });
-}
-
 void TcpSocketClient::Write(std::shared_ptr<base::Buffer> buffer) {
   if (nullptr == session_ || buffer->IsEmpty()) {
     LOG(WARNING) << "[TcpSocketClient::Write] cannot write. "
@@ -72,12 +57,7 @@ void TcpSocketClient::Write(std::shared_ptr<base::Buffer> buffer) {
     return;
   }
 
-  task_runner_->PostTask(
-    [this, session = session_, buffer]() {
-      if (session_ != nullptr) {
-        session_->Write(buffer);
-      }
-    });
+  session_->Write(buffer);
 }
 
 bool TcpSocketClient::IsConnected() const {
@@ -116,12 +96,11 @@ void TcpSocketClient::CloseChannel() {
 }
 
 void TcpSocketClient::HandleEvent(const base::Event& event) {
-  for (auto type : event.Types()) {
-    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
-  }
+  // for (auto type : event.Types()) {
+    // LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  // }
 
   for (auto& type : event.Types()) {
-    base::TaskCallback callback = {};
     switch (type) {
       case base::Event::Type::READ:
         HandleReadEvent();
@@ -142,12 +121,10 @@ void TcpSocketClient::HandleEvent(const base::Event& event) {
 }
 
 void TcpSocketClient::HandleReadEvent() {
-  task_runner_->PostTask(
-    [this, session = session_]() {
-      if (nullptr != session) {
-        session->Read(nullptr);
-      }
-    });
+  if (nullptr == session_) {
+    return;
+  }
+  session_->Read();
 }
 
 void TcpSocketClient::HandlerWriteEvent() {

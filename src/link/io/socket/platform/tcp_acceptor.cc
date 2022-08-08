@@ -112,7 +112,7 @@ void TcpAcceptor::CreateNewSessionAndRegist(
   socket_create_callback_(peer_socket->Descriptor(), false);
 
   std::shared_ptr<Session> session =
-    std::make_shared<TcpSocketSession>(std::move(peer_socket));
+    std::make_shared<TcpSocketSession>(task_runner_, std::move(peer_socket));
 
   if (handler) {
     handler(session);

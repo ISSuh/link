@@ -41,7 +41,7 @@ class TcpSocket {
   int32_t Close();
 
   void Read(base::Buffer* buffer, base::CompletionCallback callback);
-  int32_t Write(base::Buffer* buffer, base::CompletionCallback callback);
+  void Write(base::Buffer* buffer, base::CompletionCallback callback);
 
   bool IsConnected() const;
 

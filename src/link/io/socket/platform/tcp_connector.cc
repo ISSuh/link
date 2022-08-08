@@ -83,7 +83,7 @@ void TcpConnector::CreateAndRegistNewSession(
   is_connected_ = true;
 
   std::shared_ptr<Session> session =
-    std::make_shared<TcpSocketSession>(std::move(socket_));
+    std::make_shared<TcpSocketSession>(task_runner_, std::move(socket_));
   if (handler) {
     handler(session);
   }

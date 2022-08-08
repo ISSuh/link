@@ -33,11 +33,8 @@ class Session {
     handler::CloseHandler close_handler) = 0;
   virtual void Close() = 0;
 
-  virtual void Read(base::Buffer* buffer) = 0;
-
-  virtual void Write(const base::Buffer& buffer) = 0;
-  virtual void Write(
-    std::shared_ptr<base::Buffer> buffer) = 0;
+  virtual void Read() = 0;
+  virtual void Write(std::shared_ptr<base::Buffer> buffer) = 0;
 };
 
 }  // namespace io

@@ -182,7 +182,8 @@ void HttpClientComponent::InternalConnectHandler(
     return;
   }
 
-  base::Buffer buffer(request.Serialize());
+  std::shared_ptr<base::Buffer> buffer =
+    std::make_shared<base::Buffer>(request.Serialize());
   client->Write(buffer);
 
   std::unique_ptr<io::Client> client_ptr;

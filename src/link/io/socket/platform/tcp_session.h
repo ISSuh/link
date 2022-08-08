@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "link/base/callback/callback.h"
+#include "link/base/task/task_runner.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/tcp_socket.h"
 
@@ -22,7 +23,8 @@ class TcpSocketSession
   : public Session,
     public std::enable_shared_from_this<TcpSocketSession> {
  public:
-  explicit TcpSocketSession(std::unique_ptr<TcpSocket> socket);
+  TcpSocketSession(
+    base::TaskRunner* task_runner, std::unique_ptr<TcpSocket> socket);
   ~TcpSocketSession();
 
   // Session
@@ -32,33 +34,33 @@ class TcpSocketSession
     handler::CloseHandler close_handler) override;
   void Close() override;
 
-  void Read(base::Buffer* buffer) override;
-
-  void Write(const base::Buffer& buffer) override;
-  void Write(
-    std::shared_ptr<base::Buffer> buffer) override;
+  void Read() override;
+  void Write(std::shared_ptr<base::Buffer> buffer) override;
 
   bool IsConnected() const override;
   int32_t SessionId() const override;
 
  private:
+  void DoRead();
   void DoWrite(
     std::shared_ptr<base::Buffer> buffer,
-    int32_t clumulative_trasmission_size);
+    size_t clumulative_trasmission_size);
 
   void InternalWriteHandler(
     std::shared_ptr<base::Buffer> buffer,
-    int32_t clumulative_trasmission_size,
+    size_t clumulative_trasmission_size,
     int32_t writed_size);
-  void InternalReadHandler(const base::Buffer& buffer, int32_t size);
+  void InternalReadHandler(
+    std::shared_ptr<base::Buffer> buffer, int32_t size);
 
+  base::TaskRunner* task_runner_;
   std::unique_ptr<TcpSocket> socket_;
-
-  base::Buffer read_buffer_;
 
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;
   handler::CloseHandler close_handler_;
+
+  bool is_opend_;
 };
 
 }  // namespace io

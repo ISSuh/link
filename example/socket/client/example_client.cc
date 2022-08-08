@@ -98,13 +98,12 @@ void ExampleClient::OnRead(
   std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleClient::OnRead]"
             << " received : " << buffer.Size();
-
 }
 
 void ExampleClient::OnWrite(size_t lengeh) {
   LOG(INFO) << "[ExampleClient::OnWrite]"
             << " lengeh : " << lengeh;
-  static int32_t writed_size = 0;
+  static size_t writed_size = 0;
   writed_size += lengeh;
 
   if (writed_size >= write_size_) {

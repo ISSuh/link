@@ -72,9 +72,9 @@ void TcpSocketServer::CloseChannel() {
 }
 
 void TcpSocketServer::HandleEvent(const base::Event& event) {
-  for (auto type : event.Types()) {
-    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
-  }
+  // for (auto type : event.Types()) {
+    // LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  // }
 
   if (event.Descriptor() == accept_descriptor_) {
     acceptor_->Accept(
@@ -87,7 +87,6 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
 
   SocketDescriptor descriptor = event.Descriptor();
   for (auto& type : event.Types()) {
-    base::TaskCallback callback = {};
     switch (type) {
       case base::Event::Type::READ:
         HandleReadEvent(descriptor);
@@ -114,14 +113,11 @@ void TcpSocketServer::HandleReadEvent(SocketDescriptor descriptor) {
     return;
   }
 
-  std::weak_ptr<Session> session = sessions_.at(descriptor);
-  task_runner_->PostTask(
-    [this, session_wadk = session]() {
-      std::shared_ptr<Session> session = session_wadk.lock();
-      if (session) {
-        session->Read(nullptr);
-      }
-    });
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
+
+  if (session->IsConnected()) {
+    session->Read();
+  }
 }
 
 void TcpSocketServer::HandlerWriteEvent(SocketDescriptor descriptor) {
