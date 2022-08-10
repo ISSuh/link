@@ -43,7 +43,7 @@ void TcpConnector::Connect(
 
   socket_create_callback_(socket_->Descriptor());
 
-  DoConnect(std::move(handler));
+  PostConnectTask(std::move(handler));
 }
 
 void TcpConnector::DoConnect(handler::ConnectHandler handler) {

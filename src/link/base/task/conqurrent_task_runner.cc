@@ -95,7 +95,7 @@ Task ConcurrentTaskRunner::NextTask() {
     return Task();
   }
 
-  Task task = queue_.top();
+  Task task = queue_.front();
   queue_.pop();
 
   return task;

@@ -21,9 +21,7 @@ TaskExecutor::TaskExecutor(TaskRunnerProxy* task_runner_proxy)
 }
 
 TaskExecutor::~TaskExecutor() {
-  if (worker_.joinable()) {
-    worker_.join();
-  }
+  Join();
 }
 
 void TaskExecutor::Join() {

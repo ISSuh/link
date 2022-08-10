@@ -16,8 +16,7 @@ ModuleExecutor::ModuleExecutor(
     module_(nullptr) {
 }
 
-ModuleExecutor::~ModuleExecutor() {
-}
+ModuleExecutor::~ModuleExecutor() = default;
 
 void ModuleExecutor::RunningModule(LinkModule* module) {
   module_ = module;

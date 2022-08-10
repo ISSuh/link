@@ -18,9 +18,7 @@ SequencedTaskRunner::SequencedTaskRunner(const std::string& label)
       new TaskExecutor(dynamic_cast<TaskRunnerProxy*>(this)));
 }
 
-SequencedTaskRunner::~SequencedTaskRunner() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
-}
+SequencedTaskRunner::~SequencedTaskRunner() = default;
 
 void SequencedTaskRunner::PostDelayTask(
   const TaskCallback& task_callback, TimeTick delay) {
@@ -82,7 +80,7 @@ Task SequencedTaskRunner::NextTask() {
     return Task();
   }
 
-  Task task = queue_.top();
+  Task task = queue_.front();
   queue_.pop();
 
   return task;

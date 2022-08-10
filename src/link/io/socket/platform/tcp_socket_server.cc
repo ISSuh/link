@@ -22,8 +22,7 @@ TcpSocketServer::TcpSocketServer(base::TaskRunner* task_runner)
     accept_descriptor_(kInvalidSocket) {
 }
 
-TcpSocketServer::~TcpSocketServer() {
-}
+TcpSocketServer::~TcpSocketServer() = default;
 
 bool TcpSocketServer::Listen(
   const IpEndPoint& address,
@@ -62,7 +61,7 @@ void TcpSocketServer::OpenChannel(
   if (nullptr == acceptor_) {
     acceptor_.reset(new TcpAcceptor(task_runner_,
       [this](SocketDescriptor descriptor, bool is_accept_socket_descriptor) {
-        this->RegistChannel(descriptor, is_accept_socket_descriptor);
+      this->RegistChannel(descriptor, is_accept_socket_descriptor);
       }));
   }
 }
@@ -72,9 +71,9 @@ void TcpSocketServer::CloseChannel() {
 }
 
 void TcpSocketServer::HandleEvent(const base::Event& event) {
-  // for (auto type : event.Types()) {
-    // LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
-  // }
+  for (auto type : event.Types()) {
+    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  }
 
   if (event.Descriptor() == accept_descriptor_) {
     acceptor_->Accept(
@@ -94,10 +93,10 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
       case base::Event::Type::WRITE:
         HandlerWriteEvent(descriptor);
         break;
-      // case base::Event::Type::CLOSE:
-      // case base::Event::Type::ERROR:
-      //   CloseSession(descriptor);
-      //   break;
+      case base::Event::Type::CLOSE:
+      case base::Event::Type::ERROR:
+        HandleCloseEvent(descriptor);
+        break;
       default:
         LOG(WARNING) << "[TcpSocketServer::ProcessEvent] invalid event type. "
                     << base::EventTypeToString(type);
@@ -114,7 +113,6 @@ void TcpSocketServer::HandleReadEvent(SocketDescriptor descriptor) {
   }
 
   std::shared_ptr<Session> session = sessions_.at(descriptor);
-
   if (session->IsConnected()) {
     session->Read();
   }
@@ -126,15 +124,20 @@ void TcpSocketServer::HandlerWriteEvent(SocketDescriptor descriptor) {
                  << descriptor;
     return;
   }
+}
 
-  if (wrtie_task_queue_.empty()) {
+void TcpSocketServer::HandleCloseEvent(SocketDescriptor descriptor) {
+  if (sessions_.find(descriptor) == sessions_.end()) {
+    LOG(WARNING) << "[TcpSocketServer::HandleCloseEvent] invalid descriptor. "
+                 << descriptor;
     return;
   }
 
-  auto callback = wrtie_task_queue_.front();
-  wrtie_task_queue_.pop();
-
-  task_runner_->PostTask(callback);
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
+  task_runner_->PostTask(
+    [this, session]() {
+      session->Close();
+    });
 }
 
 void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client> client) {
@@ -196,10 +199,9 @@ void TcpSocketServer::CloseSession(SocketDescriptor descriptor) {
     return;
   }
 
-  std::shared_ptr<Session> session = sessions_.at(descriptor);
-  session.reset();
-
   event_channel_delegate_->ChannelClosed(descriptor, this);
+
+  std::shared_ptr<Session> session = sessions_.at(descriptor);
   sessions_.erase(descriptor);
 }
 

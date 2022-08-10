@@ -54,6 +54,7 @@ class TcpSocketServer : public Server {
  private:
   void HandleReadEvent(SocketDescriptor descriptor);
   void HandlerWriteEvent(SocketDescriptor descriptor);
+  void HandleCloseEvent(SocketDescriptor descriptor);
 
   void RegistAcceptedClient(std::shared_ptr<Client> client);
   void InternalAcceptHandler(std::shared_ptr<Session> session);
@@ -74,8 +75,6 @@ class TcpSocketServer : public Server {
   std::unique_ptr<Acceptor> acceptor_;
   SocketDescriptor accept_descriptor_;
   std::map<SocketDescriptor, std::shared_ptr<Session>> sessions_;
-
-  EventTaskQueue wrtie_task_queue_;
 
   handler::AcceptHandler accept_handler_;
   handler::CloseHandler close_handler_;

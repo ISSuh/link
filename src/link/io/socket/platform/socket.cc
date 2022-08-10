@@ -42,8 +42,7 @@ Socket::Socket()
   : descriptor_(-1) {
 }
 
-Socket::~Socket() {
-}
+Socket::~Socket() = default;
 
 int32_t Socket::Open(AddressFamily address_family, Socket::Type type) {
   SocketDescriptor socket_fd = CreatePlatformSocket(

@@ -22,8 +22,7 @@ ModuleController::ModuleController(
     loaded_module_count_(0) {
 }
 
-ModuleController::~ModuleController() {
-}
+ModuleController::~ModuleController() = default;
 
 void ModuleController::LoadingModule(
   const std::vector<Specification>& specs, StatusCallback status_callback) {

@@ -32,7 +32,7 @@ struct Task {
   }
 };
 
-using TaskQueue = std::priority_queue<Task>;
+using TaskQueue = std::queue<Task>;
 
 }  // namespace base
 }  // namespace nlink

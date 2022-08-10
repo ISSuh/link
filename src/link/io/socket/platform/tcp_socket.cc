@@ -20,8 +20,7 @@ TcpSocket::TcpSocket(SocketOptions options)
   : options_(options) {
 }
 
-TcpSocket::~TcpSocket() {
-}
+TcpSocket::~TcpSocket() = default;
 
 int32_t TcpSocket::Open(AddressFamily address_family) {
   socket_.reset(new Socket());

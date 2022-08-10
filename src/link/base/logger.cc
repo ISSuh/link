@@ -39,8 +39,7 @@ LoggerImpl::LoggerImpl(const std::string& name)
   : name_(name) {
 }
 
-LoggerImpl::~LoggerImpl() {
-}
+LoggerImpl::~LoggerImpl() = default;
 
 void LoggerImpl::PrintLog(LogLevel level, const std::string& log) {
   switch (level) {

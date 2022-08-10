@@ -13,8 +13,7 @@ LinkComponent::LinkComponent(base::EventChannelController* channel_controller)
   : channel_controller_(channel_controller) {
 }
 
-LinkComponent::~LinkComponent() {
-}
+LinkComponent::~LinkComponent() = default;
 
 void LinkComponent::AttachChannelsToController(
   base::EventChannel* event_channel) {

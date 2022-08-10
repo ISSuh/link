@@ -21,8 +21,7 @@ TcpSocketClient::TcpSocketClient(base::TaskRunner* task_runner)
     session_(nullptr) {
 }
 
-TcpSocketClient::~TcpSocketClient() {
-}
+TcpSocketClient::~TcpSocketClient() = default;
 
 void TcpSocketClient::Connect(
   IpEndPoint address,

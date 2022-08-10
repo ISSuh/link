@@ -22,7 +22,11 @@ TcpSocketSession::TcpSocketSession(
     is_opend_(false) {
 }
 
-TcpSocketSession::~TcpSocketSession() {}
+TcpSocketSession::~TcpSocketSession() {
+  if (nullptr != socket_) {
+    socket_->Close();
+  }
+}
 
 void TcpSocketSession::Open(
   handler::ReadHandler read_handler,
@@ -36,12 +40,7 @@ void TcpSocketSession::Open(
 }
 
 void TcpSocketSession::Close() {
-  LOG(INFO) << "[TcpSocketSession::Close]";
   close_handler_(shared_from_this());
-
-  if (nullptr != socket_) {
-    socket_->Close();
-  }
 }
 
 void TcpSocketSession::Read() {
@@ -112,9 +111,9 @@ void TcpSocketSession::InternalWriteHandler(
   std::shared_ptr<base::Buffer> buffer,
   size_t clumulative_trasmission_size,
   int32_t writed_size) {
-  LOG(INFO) << __func__ << " - "
-            << " trasmission_size : " << clumulative_trasmission_size
-            << ", writed_size : " << writed_size;
+  // LOG(INFO) << __func__ << " - "
+  //           << " trasmission_size : " << clumulative_trasmission_size
+  //           << ", writed_size : " << writed_size;
 
   if (0 > writed_size) {
     task_runner_->PostTask(
@@ -144,20 +143,30 @@ void TcpSocketSession::InternalWriteHandler(
 
 void TcpSocketSession::InternalReadHandler(
   std::shared_ptr<base::Buffer> buffer, int32_t size) {
-  // LOG(INFO) << __func__ << " - res : " << size;
+  LOG(INFO) << __func__ << " - res : " << size;
+
+  std::weak_ptr<TcpSocketSession> session_weak =
+    shared_from_this();
 
   if (0 > size) {
     task_runner_->PostTask(
-      [this]() {
-        this->Read();
+      [session_weak]() {
+        auto session = session_weak.lock();
+        if (nullptr != session) {
+          session->Close();
+        }
       });
   } else if (0 == size) {
     task_runner_->PostTask(
-      [this]() {
-        this->Close();
+      [session_weak]() {
+        auto session = session_weak.lock();
+        if (nullptr != session) {
+          session->Close();
+        }
       });
   } else {
     if (!read_handler_) {
+      LOG(WARNING) << __func__ << " - need read handler";
       return;
     }
 

@@ -58,11 +58,10 @@ bool TcpAcceptor::Listen(const IpEndPoint& address) {
 
 void TcpAcceptor::Accept(handler::AcceptHandler handler) {
   is_connected_ = false;
-  DoAccept(std::move(handler));
+  PostAcceptTask(std::move(handler));
 }
 
 void TcpAcceptor::Close() {
-  
 }
 
 void TcpAcceptor::DoAccept(handler::AcceptHandler handler) {
