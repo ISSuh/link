@@ -12,6 +12,10 @@
 namespace nlink {
 namespace net {
 
+uint16_t kInvalidPort = 0;
+uint16_t kDefalutHttpPort = 80;
+uint16_t kDefalutHttpsPort = 443;
+
 Uri::UserInfo ParseUserInfo(const std::string& user_info_string) {
   if (user_info_string.empty()) {
     return {};
@@ -91,9 +95,20 @@ Uri Uri::Parse(const std::string& uri_string) {
 
   const std::string host = parse_uri.host().to_string();
   const std::string port_string = parse_uri.port().to_string();
-  int32_t port = std::stoi(port_string);
-  if (port <= 0 || 65535 < port) {
-    port = 0;
+  int32_t port = 0;
+  if (port_string.empty()) {
+    if (scheme == "http") {
+      port = kDefalutHttpPort;
+    } else if (scheme == "https") {
+      port = kDefalutHttpsPort;
+    } else {
+      port = kInvalidPort;
+    }
+  } else {
+    port = std::stoi(port_string);
+    if (port <= 0 || 65535 < port) {
+      port = kInvalidPort;
+    }
   }
 
   std::string path = parse_uri.path().to_string();

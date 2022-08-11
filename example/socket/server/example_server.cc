@@ -50,6 +50,14 @@ void ExampleServer::ServerOpen(const std::string& address, int32_t port) {
 void ExampleServer::OnAccept(std::shared_ptr<nlink::io::Session> session) {
   LOG(INFO) << "[ExampleServer::OnAccept]"
             << " session : " << session.get();
+
+  const uint32_t message_size = 5 * 1024;
+  std::string message(message_size, '1');
+
+  std::shared_ptr<base::Buffer> buffer =
+    std::make_shared<base::Buffer>(message);
+
+  session->Write(buffer);
 }
 
 void ExampleServer::OnClose(std::shared_ptr<nlink::io::Session> session) {
@@ -74,6 +82,9 @@ void ExampleServer::OnRead(
 }
 
 void ExampleServer::OnWrite(size_t lengeh) {
-  // LOG(INFO) << "[ExampleServer::OnWrite]"
-  //           << " lengeh : " << lengeh;
+  static size_t writed_size = 0;
+  writed_size += lengeh;
+  LOG(INFO) << "[ExampleClient::OnWrite]"
+            << " lengeh : " << lengeh
+            << " total write : " << writed_size;
 }

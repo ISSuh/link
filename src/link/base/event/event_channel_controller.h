@@ -20,9 +20,9 @@ class EventChannel;
 
 class EventChannelController : public EventChannel::EventChannelDelegate {
  public:
-  using AttachChannelCallback = std::function<void(int32_t)>;
-  using DetachChannelCallback = std::function<void(int32_t)>;
-  using UpdateChannelCallback = std::function<void(int32_t)>;
+  using AttachChannelCallback = std::function<void(int32_t, EventChannel*)>;
+  using DetachChannelCallback = std::function<void(int32_t, EventChannel*)>;
+  using UpdateChannelCallback = std::function<void(int32_t, EventChannel*)>;
 
   static EventChannelController* Create(
     AttachChannelCallback attach_callback,

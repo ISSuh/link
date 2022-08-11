@@ -15,6 +15,7 @@ using namespace nlink;
 
 void handler(int32_t) {
   base::PrintStackTrace();
+  exit(0);
 }
 
 int main(int32_t argc, char *argv[]) {

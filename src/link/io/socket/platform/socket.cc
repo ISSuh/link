@@ -219,8 +219,12 @@ int32_t Socket::DoRead(base::Buffer* buffer) {
   std::vector<uint8_t> temp(buffer->Size(), 0);
   int32_t size = read(descriptor_, &temp[0], buffer->Size());
 
-  base::Buffer temp_buffer(temp);
-  *buffer = temp_buffer;
+  if (-1 != size) {
+    temp.resize(size);
+    base::Buffer temp_buffer(temp);
+    *buffer = temp_buffer;
+  }
+
   return size;
 }
 

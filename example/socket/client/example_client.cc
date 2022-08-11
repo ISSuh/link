@@ -94,20 +94,25 @@ void ExampleClient::OnClose(std::shared_ptr<nlink::io::Session> session) {
 void ExampleClient::OnRead(
   const nlink::base::Buffer& buffer,
   std::shared_ptr<nlink::io::Session> session) {
+  static int32_t receiver_size = 0;
+
+  receiver_size += buffer.Size();
+
   const std::vector<uint8_t>& received_data = buffer.Data();
   std::string received(received_data.begin(), received_data.end());
   LOG(INFO) << "[ExampleClient::OnRead]"
-            << " received : " << buffer.Size();
+            << " received : " << buffer.Size()
+            << " total : " << receiver_size;
+
+  std::shared_ptr<base::Buffer> write_buffer =
+    std::make_shared<base::Buffer>(buffer);
+  session->Write(write_buffer);
 }
 
 void ExampleClient::OnWrite(size_t lengeh) {
-  LOG(INFO) << "[ExampleClient::OnWrite]"
-            << " lengeh : " << lengeh;
   static size_t writed_size = 0;
   writed_size += lengeh;
-
-  if (writed_size >= write_size_) {
-    need_waiting_for_write_ = false;
-    finish_ = true;
-  }
+  LOG(INFO) << "[ExampleClient::OnWrite]"
+            << " lengeh : " << lengeh
+            << " total write : " << writed_size;
 }

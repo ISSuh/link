@@ -38,9 +38,9 @@ class EventDispatcherEpoll : public EventDispatcher {
   Event::Type HandleEventType(
     uint32_t event_flag, std::vector<Event::Type>* types);
 
-  void OnAttachChannel(int32_t descriptor);
-  void OnDetachChannel(int32_t descriptor);
-  void OnUpdatedChannel(int32_t descriptor);
+  void OnAttachChannel(int32_t descriptor, EventChannel* channel);
+  void OnDetachChannel(int32_t descriptor, EventChannel* channel);
+  void OnUpdatedChannel(int32_t descriptor, EventChannel* channel);
 
   uint32_t event_size_;
   int32_t timeout_;

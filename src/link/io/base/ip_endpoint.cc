@@ -72,8 +72,8 @@ bool IpEndPoint::ToSockAddr(
   constexpr socklen_t kSockaddrIn6Size =
       static_cast<socklen_t>(sizeof(sockaddr_in6));
 
-  switch (address_.Size()) {
-    case IpAddress::kIPv4AddressSize: {
+  switch (address_.AddressType()) {
+    case IpAddress::Type::IPv4: {
       if (*address_length < kSockaddrInSize) {
         return false;
       }
@@ -89,7 +89,7 @@ bool IpEndPoint::ToSockAddr(
       // addr->sin_addr.s_addr = inet_addr("127.0.0.1");
       break;
     }
-    case IpAddress::kIPv6AddressSize: {
+    case IpAddress::Type::IPv6: {
       if (*address_length < kSockaddrIn6Size) {
         return false;
       }
@@ -106,7 +106,13 @@ bool IpEndPoint::ToSockAddr(
              IpAddress::kIPv6AddressSize);
       break;
     }
+    case IpAddress::Type::DOMAIN_NAME: {
+
+      break;
+    }
     default:
+
+
       LOG(ERROR) << __func__ << " - invalid size";
       return false;
   }

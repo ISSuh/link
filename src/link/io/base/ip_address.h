@@ -32,6 +32,7 @@ class IpAddress {
   IpAddress(IpAddress&& lhs);
   ~IpAddress();
 
+  Type AddressType() const;
   bool IsIPv4() const;
   bool IsIPv6() const;
   bool IsZero() const;

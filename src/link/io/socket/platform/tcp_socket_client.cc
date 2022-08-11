@@ -42,11 +42,7 @@ void TcpSocketClient::Disconnect() {
   if (nullptr == session_) {
     return;
   }
-
-  task_runner_->PostTask(
-    [this, session = session_]() {
-      session->Close();
-    });
+  session_->Close();
 }
 
 void TcpSocketClient::Write(std::shared_ptr<base::Buffer> buffer) {
@@ -95,9 +91,9 @@ void TcpSocketClient::CloseChannel() {
 }
 
 void TcpSocketClient::HandleEvent(const base::Event& event) {
-  // for (auto type : event.Types()) {
-    // LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
-  // }
+  for (auto type : event.Types()) {
+    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  }
 
   for (auto& type : event.Types()) {
     switch (type) {
@@ -157,6 +153,9 @@ void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {
 }
 
 void TcpSocketClient::InternalCloseHandler(std::shared_ptr<Session> session) {
+  SocketDescriptor descriptor = session->SessionId();
+  channel_delegate_->ChannelClosed(descriptor, this);
+
   if (!close_handler_) {
     return;
   }
@@ -179,7 +178,6 @@ void TcpSocketClient::InternalWriteHandler(size_t length) {
 }
 
 void TcpSocketClient::RegistChannel(SocketDescriptor descriptor) {
-  LOG(INFO) << __func__ << " - descriptor : " << descriptor;
   channel_delegate_->ChannelOpend(descriptor, this);
 }
 

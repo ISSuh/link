@@ -42,13 +42,17 @@ EventDispatcherEpoll::EventDispatcherEpoll(
     event_size_(event_size),
     timeout_(timeout),
     channel_controller_(EventChannelController::Create(
-        [this](int32_t descriptor) { this->OnAttachChannel(descriptor); },
-        [this](int32_t descriptor) { this->OnDetachChannel(descriptor); },
-        [this](int32_t descriptor) { this->OnUpdatedChannel(descriptor); })) {
-}
+        [this](int32_t descriptor, EventChannel* channel) {
+          this->OnAttachChannel(descriptor, channel);
+        },
+        [this](int32_t descriptor, EventChannel* channel) {
+          this->OnDetachChannel(descriptor, channel);
+        },
+        [this](int32_t descriptor, EventChannel* channel) {
+          this->OnUpdatedChannel(descriptor, channel);
+    })) {}
 
-EventDispatcherEpoll::~EventDispatcherEpoll() {
-}
+EventDispatcherEpoll::~EventDispatcherEpoll() = default;
 
 void EventDispatcherEpoll::Dispatch() {
   while (1) {
@@ -65,34 +69,52 @@ void EventDispatcherEpoll::DispatchOnce() {
   }
 
   for (int i = 0 ; i < event_count ; ++i) {
+    // EventChannel* channel =
+      // reinterpret_cast<EventChannel*>(epoll_events[i].data.ptr);
     int32_t fd = epoll_events[i].data.fd;
     uint32_t event_flag = epoll_events[i].events;
+
+    LOG(WARNING) << "[EventDispatcherEpoll::dispatch] fd : " << fd;
 
     std::vector<Event::Type> types;
     HandleEventType(event_flag, &types);
 
     Event event(fd, types);
     channel_controller_->DispatchEvent(event);
+
+    // if (nullptr != channel) {
+      // LOG(WARNING) << "[EventDispatcherEpoll::dispatch] channel : " << channel << " / " << fd;
+    //   channel->HandleEvent(event);
+    // }
   }
 }
 
 Event::Type EventDispatcherEpoll::HandleEventType(
   uint32_t event_flag, std::vector<Event::Type>* types) {
   if (event_flag & EPOLLIN) {
+    LOG(INFO) << __func__ << " - EPOLLIN";
     types->emplace_back(Event::Type::READ);
   }
 
   if (event_flag & EPOLLOUT) {
+    LOG(INFO) << __func__ << " - EPOLLOUT";
     types->emplace_back(Event::Type::WRITE);
   }
 
   if (event_flag & EPOLLERR) {
+    LOG(INFO) << __func__ << " - EPOLLERR";
     types->emplace_back(Event::Type::ERROR);
   }
 
-  // if (event_flag & EPOLLRDHUP) {
-  //   types->emplace_back(Event::Type::CLOSE);
-  // }
+  if (event_flag & EPOLLRDHUP) {
+    LOG(INFO) << __func__ << " - EPOLLRDHUP";
+    types->emplace_back(Event::Type::CLOSE);
+  }
+
+  if (event_flag & EPOLLHUP) {
+    LOG(INFO) << __func__ << " - EPOLLHUP";
+    types->emplace_back(Event::Type::CLOSE);
+  }
 }
 
 std::shared_ptr<EventChannelController>
@@ -100,9 +122,13 @@ EventDispatcherEpoll::ChannelController() const {
   return channel_controller_;
 };
 
-void EventDispatcherEpoll::OnAttachChannel(int32_t descriptor) {
+void EventDispatcherEpoll::OnAttachChannel(
+  int32_t descriptor, EventChannel* channel) {
+    LOG(WARNING) << "[EventDispatcherEpoll::OnAttachChannel] fd : " << descriptor;
+
   epoll_event event;
-  event.events = EPOLLIN | EPOLLERR | EPOLLRDHUP;
+  // event.data.ptr = channel; 
+  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET | EPOLLONESHOT);
   event.data.fd = descriptor;
 
   int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_ADD, descriptor, &event);
@@ -112,11 +138,23 @@ void EventDispatcherEpoll::OnAttachChannel(int32_t descriptor) {
   }
 }
 
-void EventDispatcherEpoll::OnDetachChannel(int32_t descriptor) {
+void EventDispatcherEpoll::OnDetachChannel(
+  int32_t descriptor, EventChannel* channel) {
   epoll_ctl(epoll_descriptor_, EPOLL_CTL_DEL, descriptor, nullptr);
 }
 
-void EventDispatcherEpoll::OnUpdatedChannel(int32_t descriptor) {
+void EventDispatcherEpoll::OnUpdatedChannel(
+  int32_t descriptor, EventChannel* channel) {
+  epoll_event event;
+  // event.data.ptr = channel;
+  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET | EPOLLONESHOT);
+  event.data.fd = descriptor;
+
+  int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_MOD, descriptor, &event);
+  if (0 > res) {
+    LOG(WARNING) << "[EventDispatcherEpoll::OnUpdatedChannel]"
+                 << " fail attach to epoll. " << res;
+  }
 }
 
 }  // namespace base

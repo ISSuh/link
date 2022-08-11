@@ -7,6 +7,7 @@
 #include "link/io/base/ip_address.h"
 
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #include <regex>
 
@@ -15,8 +16,7 @@
 namespace nlink {
 namespace io {
 
-bool CheckPattern(
-  const std::string& address, const char* address_pattern) {
+bool CheckPattern(const std::string& address, const char* address_pattern) {
   std::regex pattern(address_pattern);
   if (std::regex_match(address, pattern)) {
     return true;
@@ -26,14 +26,25 @@ bool CheckPattern(
 
 bool CheckAddressIPv4(const std::string& address) {
   const char* kIPv4Pattern =
-    "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";;
+      "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9]["
+      "0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
+  ;
 
   return CheckPattern(address, kIPv4Pattern);
 }
 
 bool CheckAddressIPv6(const std::string& address) {
   const char* kIPv6Pattern =
-    "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
+      "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-"
+      "9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-"
+      "fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-"
+      "9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:["
+      "0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:["
+      "0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|:"
+      ":(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){"
+      "3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:(("
+      "25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}["
+      "0-9]){0,1}[0-9]))";
 
   return CheckPattern(address, kIPv6Pattern);
 }
@@ -44,6 +55,22 @@ bool IsValidIPv4Address(const std::string& address) {
   return result != 0;
 }
 
+bool ParseDomainName(const std::string& address_str, std::string* ip_str) {
+  hostent* he;
+  in_addr** addr_list;
+  int i;
+  if ((he = gethostbyname(address_str.c_str())) == NULL) {
+    return false;
+  }
+
+  addr_list = (struct in_addr**)he->h_addr_list;
+  for (i = 0; addr_list[i] != NULL; i++) {
+    *ip_str = inet_ntoa(*addr_list[i]);
+    return true;
+  }
+  return false;
+}
+
 IpAddress ParseAddress(const std::string& address_str) {
   IpAddress::Type type = IpAddress::Type::INVALID;
   if (CheckAddressIPv4(address_str)) {
@@ -51,29 +78,32 @@ IpAddress ParseAddress(const std::string& address_str) {
   } else if (CheckAddressIPv6(address_str)) {
     type = IpAddress::Type::IPv6;
   } else {
-    type = IpAddress::Type::DOMAIN_NAME;
+    std::string ip_str;
+    if (ParseDomainName(address_str, &ip_str)) {
+      return ParseAddress(ip_str);
+    }
   }
 
+  LOG(INFO) << __func__ << " - addr : " << address_str;
   return IpAddress(address_str, type);
 }
 
-IpAddress::IpAddress()
-  : IpAddress("", IpAddress::Type::INVALID) {
-}
+IpAddress::IpAddress() : IpAddress("", IpAddress::Type::INVALID) {}
 
 IpAddress::IpAddress(const std::string& address, IpAddress::Type type)
-  : address_(address), type_(type) {
-}
+    : address_(address), type_(type) {}
 
 IpAddress::IpAddress(const IpAddress& lhs)
-  : address_(lhs.address_), type_(lhs.type_) {
-}
+    : address_(lhs.address_), type_(lhs.type_) {}
 
 IpAddress::IpAddress(IpAddress&& lhs)
-  : address_(lhs.address_), type_(lhs.type_) {
-}
+    : address_(lhs.address_), type_(lhs.type_) {}
 
 IpAddress::~IpAddress() = default;
+
+IpAddress::Type IpAddress::AddressType() const {
+  return type_;
+}
 
 bool IpAddress::IsIPv4() const {
   return type_ == IpAddress::Type::IPv4;

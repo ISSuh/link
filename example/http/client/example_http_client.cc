@@ -22,10 +22,11 @@ ExampleHttpClient::~ExampleHttpClient() = default;
 void ExampleHttpClient::CreateAndRegistComponent(
   nlink::base::TaskRunner* task_runner,
   nlink::handle::LinkHandle* handle) {
-  client_component_ =
-    component::HttpClientComponent::CreateComponent(task_runner);
+  auto component_factory_weak = handle->ComponentFactory();
+  auto component_factory = component_factory_weak.lock();
 
-  handle->RegistComponent(client_component_);
+  client_component_ =
+    component_factory->CreateHttpClientComponent(task_runner);
 }
 
 bool ExampleHttpClient::IsReceivedResponse() const {
@@ -35,7 +36,9 @@ bool ExampleHttpClient::IsReceivedResponse() const {
 void ExampleHttpClient::Get(const std::string& path) {
   client_component_->Get(
     path,
-    base::Bind(&ExampleHttpClient::GetHandler, this));
+    [this](const net::http::Response& response) {
+      this->GetHandler(response);
+    });
 
   received_reponse_ = false;
 }

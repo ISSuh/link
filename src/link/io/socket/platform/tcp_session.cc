@@ -23,9 +23,7 @@ TcpSocketSession::TcpSocketSession(
 }
 
 TcpSocketSession::~TcpSocketSession() {
-  if (nullptr != socket_) {
-    socket_->Close();
-  }
+  LOG(INFO) << __func__;
 }
 
 void TcpSocketSession::Open(
@@ -41,11 +39,20 @@ void TcpSocketSession::Open(
 
 void TcpSocketSession::Close() {
   close_handler_(shared_from_this());
+
+  if (nullptr != socket_) {
+    socket_->Close();
+  }
 }
 
 void TcpSocketSession::Read() {
   task_runner_->PostTask(
-    [this]() { this->DoRead(); });
+    [this]() {
+      std::shared_ptr<base::Buffer> buffer =
+        std::make_shared<base::Buffer>();
+
+      this->DoRead(buffer);
+    });
 }
 
 void TcpSocketSession::Write(std::shared_ptr<base::Buffer> buffer) {
@@ -55,17 +62,17 @@ void TcpSocketSession::Write(std::shared_ptr<base::Buffer> buffer) {
     });
 }
 
-void TcpSocketSession::DoRead() {
+void TcpSocketSession::DoRead(std::shared_ptr<base::Buffer> buffer) {
   if (!IsConnected()) {
     return;
   }
 
-  std::shared_ptr<base::Buffer> buffer =
+  std::shared_ptr<base::Buffer> received_buffer =
     std::make_shared<base::Buffer>(kDefaultBufferSize);
 
-  socket_->Read(buffer.get(),
-    [this, buffer](int32_t res) {
-      this->InternalReadHandler(buffer, res);
+  socket_->Read(received_buffer.get(),
+    [this, buffer, received_buffer](int32_t res) {
+      this->InternalReadHandler(buffer, received_buffer, res);
     });
 }
 
@@ -111,9 +118,9 @@ void TcpSocketSession::InternalWriteHandler(
   std::shared_ptr<base::Buffer> buffer,
   size_t clumulative_trasmission_size,
   int32_t writed_size) {
-  // LOG(INFO) << __func__ << " - "
-  //           << " trasmission_size : " << clumulative_trasmission_size
-  //           << ", writed_size : " << writed_size;
+  LOG(INFO) << __func__ << " - "
+            << " trasmission_size : " << clumulative_trasmission_size
+            << ", writed_size : " << writed_size;
 
   if (0 > writed_size) {
     task_runner_->PostTask(
@@ -142,13 +149,26 @@ void TcpSocketSession::InternalWriteHandler(
 }
 
 void TcpSocketSession::InternalReadHandler(
-  std::shared_ptr<base::Buffer> buffer, int32_t size) {
+  std::shared_ptr<base::Buffer> buffer,
+  std::shared_ptr<base::Buffer> received_buffer,
+  int32_t size) {
   LOG(INFO) << __func__ << " - res : " << size;
 
   std::weak_ptr<TcpSocketSession> session_weak =
     shared_from_this();
 
-  if (0 > size) {
+  if (-1 == size) {
+    if (!read_handler_) {
+      LOG(WARNING) << __func__ << " - need read handler";
+      return;
+    }
+
+    task_runner_->PostTask(
+      [this, read_handler = read_handler_, buffer]() {
+        read_handler(*buffer, shared_from_this());
+      });
+    return;
+  } else if (-1 > size) {
     task_runner_->PostTask(
       [session_weak]() {
         auto session = session_weak.lock();
@@ -165,15 +185,15 @@ void TcpSocketSession::InternalReadHandler(
         }
       });
   } else {
-    if (!read_handler_) {
-      LOG(WARNING) << __func__ << " - need read handler";
-      return;
-    }
+    received_buffer->Resize(size);
+    buffer->Append(*received_buffer);
 
-    buffer->Resize(size);
     task_runner_->PostTask(
-      [this, read_handler = read_handler_, buffer]() {
-        read_handler(*buffer, shared_from_this());
+      [session_weak, buffer]() {
+        auto session = session_weak.lock();
+        if (nullptr != session) {
+          session->DoRead(buffer);
+        }
       });
   }
 }

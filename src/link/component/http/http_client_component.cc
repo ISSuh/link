@@ -32,8 +32,7 @@ HttpClientComponent::HttpClientComponent(
     task_runner_(task_runner) {
 }
 
-HttpClientComponent::~HttpClientComponent() {
-}
+HttpClientComponent::~HttpClientComponent() = default;
 
 void HttpClientComponent::Get(
   const std::string& url_string, RequestHanelder handler) {
@@ -60,7 +59,7 @@ void HttpClientComponent::Get(
 
   client->Connect(
     io::IpEndPoint(uri.Host(), uri.Port()),
-    [this, &request, &client](std::shared_ptr<io::Session> session) {
+    [this, request, client](std::shared_ptr<io::Session> session) {
       this->InternalConnectHandler(request, client, session);
     },
     [this](std::shared_ptr<io::Session> session) {
@@ -184,6 +183,9 @@ void HttpClientComponent::InternalConnectHandler(
 
   std::shared_ptr<base::Buffer> buffer =
     std::make_shared<base::Buffer>(request.Serialize());
+
+  LOG(INFO) << __func__ << " - request : \n" << request.Serialize();
+
   client->Write(buffer);
 
   std::unique_ptr<io::Client> client_ptr;

@@ -71,9 +71,9 @@ void TcpSocketServer::CloseChannel() {
 }
 
 void TcpSocketServer::HandleEvent(const base::Event& event) {
-  for (auto type : event.Types()) {
-    LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
-  }
+  // for (auto type : event.Types()) {
+  //   LOG(INFO) << __func__ << " type : " << EventTypeToString(type);
+  // }
 
   if (event.Descriptor() == accept_descriptor_) {
     acceptor_->Accept(
@@ -163,11 +163,11 @@ void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {
 }
 
 void TcpSocketServer::InternalCloseHandler(std::shared_ptr<Session> session) {
+  CloseSession(session->SessionId());
+
   if (close_handler_) {
     close_handler_(session);
   }
-
-  CloseSession(session->SessionId());
 }
 
 void TcpSocketServer::InternalReadHandler(
@@ -175,6 +175,9 @@ void TcpSocketServer::InternalReadHandler(
   if (read_handler_) {
     read_handler_(buffer, session);
   }
+
+  SocketDescriptor descriptor = session->SessionId();
+  event_channel_delegate_->UpdateChannel(descriptor, this);
 }
 
 void TcpSocketServer::InternalWriteHandler(size_t length) {

@@ -63,18 +63,18 @@ void EventChannelControllerImpl::DispatchEvent(const Event& event) {
 void EventChannelControllerImpl::ChannelOpend(
   int32_t descriptor, EventChannel* channel) {
   channel_map_.insert({descriptor, channel});
-  attach_channel_callback_(descriptor);
+  attach_channel_callback_(descriptor, channel);
 }
 
 void EventChannelControllerImpl::ChannelClosed(
   int32_t descriptor, EventChannel* channel) {
-  detach_channel_callback_(descriptor);
+  detach_channel_callback_(descriptor, channel);
   channel_map_.erase(descriptor);
 }
 
 void EventChannelControllerImpl::UpdateChannel(
   int32_t descriptor, EventChannel* channel) {
-  update_channel_callback_(descriptor);
+  update_channel_callback_(descriptor, channel);
 }
 
 EventChannelController* EventChannelController::Create(

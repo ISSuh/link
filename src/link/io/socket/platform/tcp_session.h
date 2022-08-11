@@ -41,7 +41,7 @@ class TcpSocketSession
   int32_t SessionId() const override;
 
  private:
-  void DoRead();
+  void DoRead(std::shared_ptr<base::Buffer> buffer);
   void DoWrite(
     std::shared_ptr<base::Buffer> buffer,
     size_t clumulative_trasmission_size);
@@ -51,7 +51,9 @@ class TcpSocketSession
     size_t clumulative_trasmission_size,
     int32_t writed_size);
   void InternalReadHandler(
-    std::shared_ptr<base::Buffer> buffer, int32_t size);
+    std::shared_ptr<base::Buffer> buffer,
+    std::shared_ptr<base::Buffer> received_buffer,
+    int32_t size);
 
   base::TaskRunner* task_runner_;
   std::unique_ptr<TcpSocket> socket_;
