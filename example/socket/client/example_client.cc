@@ -33,7 +33,6 @@ ExampleClient::ExampleClient()
       }}),
     client_component_(nullptr),
     is_connected(false),
-    need_waiting_for_write_(false),
     finish_(false),
     write_size_(0) {}
 
@@ -63,20 +62,14 @@ void ExampleClient::Write(const std::string& message) {
   std::shared_ptr<base::Buffer> buffer
     = std::make_shared<base::Buffer>(message);
   client_component_->Write(std::move(buffer));
-
-  need_waiting_for_write_ = true;
 }
 
 bool ExampleClient::IsConnected() {
   return is_connected;
 }
 
-bool ExampleClient::NeedWaitingForWrite() {
-  return need_waiting_for_write_;
-}
-
-bool ExampleClient::WriteFinished() {
-  return finish_;
+bool ExampleClient::IsRunning() {
+  return !finish_;
 }
 
 void ExampleClient::OnConnect(std::shared_ptr<nlink::io::Session> session) {
@@ -115,4 +108,6 @@ void ExampleClient::OnWrite(size_t lengeh) {
   LOG(INFO) << "[ExampleClient::OnWrite]"
             << " lengeh : " << lengeh
             << " total write : " << writed_size;
+
+  finish_ = true;
 }

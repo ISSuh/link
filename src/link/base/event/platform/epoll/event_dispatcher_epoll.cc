@@ -128,7 +128,7 @@ void EventDispatcherEpoll::OnAttachChannel(
 
   epoll_event event;
   // event.data.ptr = channel; 
-  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET | EPOLLONESHOT);
+  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP)| (EPOLLET | EPOLLONESHOT);
   event.data.fd = descriptor;
 
   int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_ADD, descriptor, &event);

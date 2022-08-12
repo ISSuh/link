@@ -74,6 +74,8 @@ class TcpSocketClient : public Client {
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;
 
+  bool try_connecting_;
+
   DISAALOW_COPY_AND_ASSIGN(TcpSocketClient)
 };
 

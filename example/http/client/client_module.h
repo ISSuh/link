@@ -26,8 +26,6 @@ class ExampleHttpClientModule final : public nlink::module::UserModule {
 
   nlink::handle::LinkHandle handle_;
   ExampleHttpClient http_client_;
-
-  std::string path_for_get_;
 };
 
 REGIST_MODULE(ExampleHttpClientModule);

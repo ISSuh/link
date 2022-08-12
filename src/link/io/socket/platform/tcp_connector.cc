@@ -41,8 +41,6 @@ void TcpConnector::Connect(
   socket_ = std::make_unique<TcpSocket>(options);
   socket_->Open(AddressFamily::ADDRESS_FAMILY_IPV4);
 
-  socket_create_callback_(socket_->Descriptor());
-
   PostConnectTask(std::move(handler));
 }
 
@@ -81,6 +79,8 @@ void TcpConnector::InternalConnectHnadler(
 void TcpConnector::CreateAndRegistNewSession(
   handler::AcceptHandler handler) {
   is_connected_ = true;
+
+  socket_create_callback_(socket_->Descriptor());
 
   std::shared_ptr<Session> session =
     std::make_shared<TcpSocketSession>(task_runner_, std::move(socket_));

@@ -25,10 +25,13 @@ class Request {
   Request(
     Method method, Uri uri, const HttpHeader& header);
   Request(
+    Method method, Uri uri, const HttpHeader& header, const std::string& body);
+  Request(
     Method method, Uri uri, Version version,
     const HttpHeader& header, const std::string& body);
   ~Request();
 
+  Uri RequestUri() const;
   HttpHeader Header() const;
   const std::string Body() const;
 

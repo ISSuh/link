@@ -27,12 +27,18 @@ class ExampleHttpClient {
   bool IsReceivedResponse() const;
 
   void Get(const std::string& path);
+  void Post(
+    const std::string& path,
+    const std::string& content_type,
+    const std::string& body);
 
  private:
   void GetHandler(const nlink::net::http::Response& response);
+  void PostHandler(const nlink::net::http::Response& response);
 
   nlink::component::HttpClientComponent* client_component_;
-  bool received_reponse_;
+  bool received_get_reponse_;
+  bool received_post_reponse_;
 };
 
 #endif  // EXAMPLE_HTTP_CLIENT_EXAMPLE_HTTP_CLIENT_H_

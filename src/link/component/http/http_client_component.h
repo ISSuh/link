@@ -49,24 +49,22 @@ class HttpClientComponent : public HttpComponent {
   void Post(
     const std::string& path,
     const net::http::HttpHeader& header,
-    const std::string& content_type,
     const std::string& body,
     RequestHanelder handler);
 
-  void Put(const std::string& path, RequestHanelder handler);
+  void Put(
+    const std::string& path,
+    const std::string& content_type,
+    const std::string& body,
+    RequestHanelder handler);
   void Put(
     const std::string& path,
     const net::http::HttpHeader& header,
+    const std::string& body,
     RequestHanelder handler);
 
   void Delete(const std::string& path, RequestHanelder handler);
   void Delete(
-    const std::string& path,
-    const net::http::HttpHeader& header,
-    RequestHanelder handler);
-
-  void Options(const std::string& path, RequestHanelder handler);
-  void Options(
     const std::string& path,
     const net::http::HttpHeader& header,
     RequestHanelder handler);
@@ -85,8 +83,21 @@ class HttpClientComponent : public HttpComponent {
     base::TaskRunner* task_runner);
   virtual ~HttpClientComponent();
 
-  // std::unique_ptr<io::Client> CreateIOClientAndConnet(
-  //   const std::string& address, int32_t port, RequestHanelder request_handler);
+  void DoFetch(
+    net::http::Method method,
+    const std::string& path,
+    const net::http::HttpHeader& header,
+    RequestHanelder handler);
+
+  void DoFetchWithBody(
+    net::http::Method method,
+    const std::string& path,
+    const net::http::HttpHeader& header,
+    const std::string& body,
+    RequestHanelder handler);
+
+  void CreateIOClientAndConnet(
+    const net::http::Request& request, RequestHanelder handler);
 
   void InternalConnectHandler(
     const net::http::Request& request,

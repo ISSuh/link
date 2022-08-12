@@ -51,6 +51,8 @@ void ExampleServer::OnAccept(std::shared_ptr<nlink::io::Session> session) {
   LOG(INFO) << "[ExampleServer::OnAccept]"
             << " session : " << session.get();
 
+  // session->Close();
+
   const uint32_t message_size = 5 * 1024;
   std::string message(message_size, '1');
 

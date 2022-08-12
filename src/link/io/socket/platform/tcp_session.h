@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include "link/base/callback/callback.h"
 #include "link/base/task/task_runner.h"
@@ -41,6 +42,10 @@ class TcpSocketSession
   int32_t SessionId() const override;
 
  private:
+  void FinishCurrentProcess();
+  void DoNextProcess();
+
+  void DoClose();
   void DoRead(std::shared_ptr<base::Buffer> buffer);
   void DoWrite(
     std::shared_ptr<base::Buffer> buffer,
@@ -61,6 +66,8 @@ class TcpSocketSession
   handler::ReadHandler read_handler_;
   handler::WriteHandler write_handler_;
   handler::CloseHandler close_handler_;
+
+  std::queue<std::function<void()>> task_queue_;
 
   bool is_opend_;
 };

@@ -36,6 +36,11 @@ Request::Request(
 }
 
 Request::Request(
+  Method method, Uri uri, const HttpHeader& header, const std::string& body)
+  : Request(method, uri, Version::HTTP_1_1, header, body) {
+}
+
+Request::Request(
   Method method, Uri uri, Version version,
   const HttpHeader& header, const std::string& body)
   : version_(version),
@@ -47,7 +52,10 @@ Request::Request(
   header_.Set("Accept", "*/*");
 }
 
-Request::~Request() {
+Request::~Request() = default;
+
+Uri Request::RequestUri() const {
+  return uri_;
 }
 
 HttpHeader Request::Header() const {

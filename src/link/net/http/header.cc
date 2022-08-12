@@ -16,11 +16,13 @@ namespace http {
 
 constexpr const char kHeaderDelm = ':';
 
-HttpHeader::HttpHeader() {
+HttpHeader::HttpHeader()
+  : header_fields_({
+    {"User-Agent", "nLink   0.0.1"},
+    {"Connection", "Close"}}) {
 }
 
-HttpHeader::~HttpHeader() {
-}
+HttpHeader::~HttpHeader() = default;
 
 void HttpHeader::Set(const std::pair<std::string, std::string>& header) {
   header_fields_.insert(header);

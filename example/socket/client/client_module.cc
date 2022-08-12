@@ -35,34 +35,7 @@ void ExampleClientModule::Run() {
   client_.CreateAndRegistComponent(GetTaskRunner(), &handle);
   client_.Connect(address_, port_);
 
-  // while (true) {
-  //   handle.RunOnce();
-  //   if (!client_.IsConnected()) {
-  //     LOG(INFO) << "[ExampleClientModule] wait for connect";
-  //     ++try_connect_count;
-
-  //     if (try_connect_count > 10) {
-  //       break;
-  //     }
-
-  //     continue;
-  //   }
-
-  //   if (client_.WriteFinished()) {
-  //     break;
-  //   }
-
-  //   if (!client_.NeedWaitingForWrite()) {
-  //     // const uint32_t message_size = 5 * 1024 * 1024;
-  //     const uint32_t message_size = 5 * 1024;
-  //     std::string message(message_size, '1');
-  //     client_.Write(message);
-  //   }
-
-  //   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  // }
-
-  while (true) {
+  while (client_.IsRunning()) {
     handle.RunOnce();
   }
 
