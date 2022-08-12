@@ -141,16 +141,14 @@ add_subdirectory(example)
 #-------------------------------------------------------------------------------
 # Set gTest
 #-------------------------------------------------------------------------------
-if(LINK_WITH_ASIO)
-  set(TEST_DIR ${PROJECT_DIR}/tests)
+set(TEST_DIR ${PROJECT_DIR}/test)
 
-  include(${PROJECT_DIR}/cmake/googletest.cmake)
+include(${PROJECT_DIR}/cmake/googletest.cmake)
 
-  fetch_googletest(
-      ${PROJECT_DIR}/test
-      ${PROJECT_DIR}/cmake
-      ${BUILD_DIR}/googletest
-  )
+fetch_googletest(
+    ${PROJECT_DIR}/test
+    ${PROJECT_DIR}/cmake
+    ${BUILD_DIR}/googletest
+)
 
-  add_subdirectory(${TEST_DIR})
-endif()
+add_subdirectory(${TEST_DIR})
