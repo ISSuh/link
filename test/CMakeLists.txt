@@ -2,6 +2,8 @@ project(link_test)
 
 message("Build Link Test")
 
+include(CTest) 
+
 #-------------------------------------------------------------------------------
 # Set Configure
 #-------------------------------------------------------------------------------
@@ -21,35 +23,7 @@ link_directories(
 #-------------------------------------------------------------------------------
 # Unit Tests
 #-------------------------------------------------------------------------------
-# add_subdirectory(io)
-# add_subdirectory(net)
+enable_testing()
 
-include(${TEST_DIR}/io/CmakeLists.txt)
-
-add_executable(${PROJECT_NAME}
-  ${IO_BASE_UNITTESTS}
-)
-
-target_include_directories(${PROJECT_NAME}
- PRIVATE
-  ${PROJECT_LINK_INCLUDE_DIR}
-  ${GOOGLETEST_INCLUDE_DIR}
-)
-
-target_link_libraries(${PROJECT_NAME}
- PRIVATE
-  gtest
-  gtest_main
-  gmock
-  gmock_main
-  pthread
-
-  ${LINK_LIBRARY_NAME}
-)
-
-add_test(
-  NAME
-    ${PROJECT_NAME}
-  COMMAND
-    ${PROJECT_NAME}_Tests
-)
+add_subdirectory(io)
+add_subdirectory(net)

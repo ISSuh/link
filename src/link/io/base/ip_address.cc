@@ -28,8 +28,6 @@ bool CheckAddressIPv4(const std::string& address) {
   const char* kIPv4Pattern =
       "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9]["
       "0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
-  ;
-
   return CheckPattern(address, kIPv4Pattern);
 }
 
@@ -83,8 +81,6 @@ IpAddress ParseAddress(const std::string& address_str) {
       return ParseAddress(ip_str);
     }
   }
-
-  LOG(INFO) << __func__ << " - addr : " << address_str;
   return IpAddress(address_str, type);
 }
 
