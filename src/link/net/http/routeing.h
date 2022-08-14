@@ -8,6 +8,7 @@
 #define LINK_NET_HTTP_ROUTING_H_
 
 #include <string>
+#include <vector>
 #include <map>
 #include <memory>
 #include <functional>
@@ -28,9 +29,15 @@ class Routing {
     using SubRoutingNodeMap =
       std::map<std::string, std::unique_ptr<RoutingNode>>;
 
+    RoutingNode(
+      const std::string& node_path,
+      std::function<void()> node_handler = {},
+      bool is_parameter_path = false);
+
     std::string path;
     std::function<void()> handler;
     SubRoutingNodeMap sub_nodes;
+    bool is_parameter;
   };
 
   Routing();
@@ -40,21 +47,29 @@ class Routing {
     const std::string& path,
     std::function<void()> handler);
 
- private:
-  void SearchPath(const std::string& path);
-  void RecursiceSearch();
+  std::function<void()> Route(const std::string& path);
+  
 
-  void RecursiveInsert(
-    const std::string& path,
-    std::function<void()> handler,
-    std::unique_ptr<RoutingNode>& current_node);
+ private:
+  void RegistHandlerInternal(
+    std::vector<std::string>* splited_path,
+    std::unique_ptr<RoutingNode>* current_node,
+    std::function<void()> handler);
+
+  RoutingNode* SearchRoutingNode(
+    std::vector<std::string>* splited_path,
+    std::unique_ptr<RoutingNode>* current_nodez);
 
   std::unique_ptr<RoutingNode> CreateNewRoutingNode(
     const std::string& path,
-    std::function<void()> handler);
+    std::function<void()> handler = {});
 
   std::unique_ptr<RoutingNode> root_;
 };
+
+void SplitPathBySlash(
+  const std::string& origin,
+  std::vector<std::string>* splited_path);
 
 }  // namespace http
 }  // namespace net
