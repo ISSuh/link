@@ -26,11 +26,9 @@ void ExampleHttpClientModule::Run() {
   GetArgument("path_for_post", &path_for_post);
 
   handle_.Initialize();
-
   http_client_.CreateAndRegistComponent(GetTaskRunner(), &handle_);
 
   http_client_.Get(path_for_get);
-
 
   base::Json json = {
     {"Id", 12345},
@@ -41,6 +39,8 @@ void ExampleHttpClientModule::Run() {
   std::string body(json.dump(4));
   http_client_.Post(path_for_post, "application/json", body);
   WaitingForResponse();
+
+  handle_.Shutdown();
 }
 
 void ExampleHttpClientModule::Shutdown() {

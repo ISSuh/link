@@ -34,6 +34,7 @@ link_directories(
 add_library(${SERVER_EXAMPLE}
  MODULE
   server/server_module.cc
+  server/example_http_server.cc
 )
 
 target_include_directories(${SERVER_EXAMPLE}

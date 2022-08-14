@@ -15,11 +15,19 @@ namespace handle {
 
 LinkHandle::LinkHandle()
   : event_dispatcher_(nullptr),
-    component_factory_(nullptr) {
+    channel_controller_(std::make_shared<base::ChannelController>()),
+    component_factory_(
+      std::make_shared<component::ComponentFctaory>(channel_controller_)) {
 }
 
-LinkHandle::~LinkHandle() {
+LinkHandle::LinkHandle(nlink::module::UserModule* user_module)
+  : event_dispatcher_(nullptr),
+    channel_controller_(std::make_shared<base::ChannelController>()),
+    component_factory_(
+      std::make_shared<component::ComponentFctaory>(channel_controller_)) {
 }
+
+LinkHandle::~LinkHandle() = default;
 
 void LinkHandle::Initialize() {
   base::EventDispatcher* dispatcher =
@@ -29,10 +37,7 @@ void LinkHandle::Initialize() {
   }
 
   event_dispatcher_.reset(dispatcher);
-
-  auto channel_controller = event_dispatcher_->ChannelController();
-  component_factory_ =
-    std::make_shared<component::ComponentFctaory>(channel_controller);
+  event_dispatcher_->RegistEventChannelContoller(channel_controller_);
 }
 
 void LinkHandle::Run() {
@@ -50,6 +55,8 @@ void LinkHandle::RunOnce() {
 }
 
 void LinkHandle::Shutdown() {
+  event_dispatcher_->Stop();
+  channel_controller_->CloseAllChannels();
 }
 
 std::weak_ptr<component::ComponentFctaory>

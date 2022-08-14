@@ -8,8 +8,7 @@
 
 #include <vector>
 
-#include "link/base/macro.h"
-#include "link/base/callback/bind.h"
+#include "link/base/buffer.h"
 #include "link/base/logging.h"
 #include "link/io/socket/socket_factory.h"
 
@@ -17,7 +16,7 @@ namespace nlink {
 namespace component {
 
 TcpServerComponent::TcpServerComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers)
   : SocketComponent(channel_controller),
@@ -86,7 +85,7 @@ void TcpServerComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpServerComponent* TcpServerComponent::CreateComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers) {
   if (!channel_controller || !task_runner) {

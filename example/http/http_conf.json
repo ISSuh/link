@@ -4,7 +4,7 @@
   "modules": [
     {
       "module_name": "Client",
-      "module_path": "/root/workspace/link/build/link/example/http/libhttpclient_example.so",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/http/libhttpclient_example.so",
       "module": {
         "class_name": "ExampleHttpClientModule",
         "arguments": {

@@ -13,19 +13,27 @@ using namespace nlink;
 
 void ExampleHttpServerModule::Init() {
   LOG(INFO) << "ExampleHttpServerModule::init";
-  GetArgument("address", &address_);
-  GetArgument("port", &port_);
 }
 
 void ExampleHttpServerModule::Run() {
   LOG(INFO) << "ExampleHttpServerModule::Run";
-  LOG(INFO) << "address : " << address_;
-  LOG(INFO) << "port : " << port_;
+  std::string address;
+  int32_t port;
+  GetArgument("address", &address);
+  GetArgument("port", &port);
 
   handle::LinkHandle handle;
   handle.Initialize();
 
+  ExampleHttpServer http_server(GetTaskRunner(), &handle);
+  http_server.OpenServer(address, port);
+
+  LOG(INFO) << "Open Example Http Server(" << address << ":" << port << ")";
+
   handle.Run();
+
+  http_server.CloseServer();
+  handle.Shutdown();
 }
 
 void ExampleHttpServerModule::Shutdown() {

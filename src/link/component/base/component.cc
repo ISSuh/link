@@ -9,7 +9,8 @@
 namespace nlink {
 namespace component {
 
-LinkComponent::LinkComponent(base::EventChannelController* channel_controller)
+LinkComponent::LinkComponent(
+  base::ComponentChannelController* channel_controller)
   : channel_controller_(channel_controller) {
 }
 

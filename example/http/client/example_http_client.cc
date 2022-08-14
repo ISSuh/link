@@ -27,7 +27,8 @@ void ExampleHttpClient::CreateAndRegistComponent(
   auto component_factory = component_factory_weak.lock();
 
   client_component_ =
-    component_factory->CreateHttpClientComponent(task_runner);
+    component_factory->CreateHttpComponent<
+      nlink::component::HttpClientComponent>(task_runner);
 }
 
 bool ExampleHttpClient::IsReceivedResponse() const {

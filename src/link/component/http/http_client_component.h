@@ -15,12 +15,12 @@
 
 #include "link/base/task/task_runner.h"
 #include "link/base/callback/callback.h"
-#include "link/component/http/http_component.h"
 #include "link/net/http/method.h"
 #include "link/net/http/header.h"
 #include "link/net/http/request.h"
 #include "link/net/http/response.h"
 #include "link/component/ipc/socket/tcp_client_component.h"
+#include "link/component/http/http_component.h"
 
 namespace nlink {
 namespace component {
@@ -32,7 +32,7 @@ class HttpClientComponent : public HttpComponent {
   using RequestHanelder = std::function<void(const net::http::Response&)>;
 
   static HttpClientComponent* CreateComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner);
 
   void Get(const std::string& path, RequestHanelder handler);
@@ -79,7 +79,7 @@ class HttpClientComponent : public HttpComponent {
 
  private:
   HttpClientComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner);
   virtual ~HttpClientComponent();
 

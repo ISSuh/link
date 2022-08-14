@@ -11,12 +11,11 @@ namespace nlink {
 namespace component {
 
 ComponentFctaory::ComponentFctaory(
-  std::shared_ptr<base::EventChannelController> channel_controller)
+  std::shared_ptr<base::ComponentChannelController> channel_controller)
   : channel_controller_(channel_controller) {
 }
 
-ComponentFctaory::~ComponentFctaory() {
-}
+ComponentFctaory::~ComponentFctaory() = default;
 
 TcpClientComponent* ComponentFctaory::CreateTcpClientComponent(
   base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
@@ -30,10 +29,10 @@ TcpServerComponent* ComponentFctaory::CreateTcpServerComponent(
     channel_controller_.get(), task_runner, handlers);
 }
 
-HttpClientComponent* ComponentFctaory::CreateHttpClientComponent(
+template <typename ComponentType>
+ComponentType* ComponentFctaory::CreateHttpComponent(
   base::TaskRunner* task_runner) {
-  return HttpClientComponent::CreateComponent(
-    channel_controller_.get(), task_runner);
+  return ComponentType::CreateComponent(channel_controller_.get(), task_runner);
 }
 
 }  // namespace component

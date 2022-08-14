@@ -16,7 +16,7 @@ namespace nlink {
 namespace component {
 
 TcpClientComponent::TcpClientComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers)
   : SocketComponent(channel_controller),
@@ -94,7 +94,7 @@ void TcpClientComponent::InternalWriteHandler(size_t length) {
 }
 
 TcpClientComponent* TcpClientComponent::CreateComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner,
   SocketComponent::Handler handlers) {
   if (!channel_controller || !task_runner) {

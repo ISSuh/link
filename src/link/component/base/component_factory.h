@@ -15,6 +15,7 @@
 #include "link/component/ipc/socket/tcp_client_component.h"
 #include "link/component/ipc/socket/tcp_server_component.h"
 #include "link/component/http/http_client_component.h"
+#include "link/component/http/http_server_component.h"
 
 namespace nlink {
 namespace component {
@@ -22,7 +23,7 @@ namespace component {
 class ComponentFctaory {
  public:
   explicit ComponentFctaory(
-    std::shared_ptr<base::EventChannelController> channel_controller);
+    std::shared_ptr<base::ComponentChannelController> channel_controller);
   virtual ~ComponentFctaory();
 
   TcpClientComponent* CreateTcpClientComponent(
@@ -31,11 +32,17 @@ class ComponentFctaory {
   TcpServerComponent* CreateTcpServerComponent(
     base::TaskRunner* task_runner, SocketComponent::Handler handlers);
 
+  template <typename ComponentType>
+  ComponentType* CreateHttpComponent(base::TaskRunner* task_runner);
+
   HttpClientComponent* CreateHttpClientComponent(
     base::TaskRunner* task_runner);
 
+  HttpServerComponent* CreateHttpServerComponent(
+    base::TaskRunner* task_runner);
+
  private:
-  std::shared_ptr<base::EventChannelController> channel_controller_;
+  std::shared_ptr<base::ComponentChannelController> channel_controller_;
 };
 
 }  // namespace component

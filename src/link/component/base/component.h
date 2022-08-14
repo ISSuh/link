@@ -19,14 +19,14 @@ namespace component {
 
 class LinkComponent {
  protected:
-  explicit LinkComponent(base::EventChannelController* channel_controller);
+  explicit LinkComponent(base::ComponentChannelController* channel_controller);
   virtual ~LinkComponent();
 
   void AttachChannelsToController(base::EventChannel* event_channel);
   void DetatchCahnnelFromController(base::EventChannel* event_channel);
 
  private:
-  base::EventChannelController* channel_controller_;
+  base::ComponentChannelController* channel_controller_;
 
   DISAALOW_COPY_AND_ASSIGN(LinkComponent);
 };

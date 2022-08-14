@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "link/base/event/event_channel.h"
+#include "link/base/event/channel_controller.h"
 #include "link/base/event/event_channel_controller.h"
 
 namespace nlink {
@@ -29,10 +30,11 @@ class EventDispatcher {
  public:
   virtual ~EventDispatcher() = default;
 
+  virtual void RegistEventChannelContoller(
+    std::shared_ptr<ChannelController> channel_controller) = 0;
   virtual void Dispatch() = 0;
   virtual void DispatchOnce() = 0;
-
-  virtual std::shared_ptr<EventChannelController> ChannelController() const = 0;
+  virtual void Stop() = 0;
 };
 
 }  // namespace base

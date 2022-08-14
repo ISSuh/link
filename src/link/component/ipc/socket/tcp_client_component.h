@@ -25,7 +25,7 @@ class RpcComponent;
 class TcpClientComponent : public SocketComponent {
  public:
   static TcpClientComponent* CreateComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
 
@@ -38,7 +38,7 @@ class TcpClientComponent : public SocketComponent {
 
  private:
   TcpClientComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
   virtual ~TcpClientComponent();

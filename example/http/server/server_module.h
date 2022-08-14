@@ -11,6 +11,8 @@
 
 #include <link/module/base/user_module.h>
 
+#include "example_http_server.h"
+
 class ExampleHttpServerModule final : public nlink::module::UserModule {
  public:
   MODULE_CONSTRUCTOR(ExampleHttpServerModule)
@@ -18,10 +20,6 @@ class ExampleHttpServerModule final : public nlink::module::UserModule {
   void Init() override;
   void Run() override;
   void Shutdown() override;
-
- private:
-  std::string address_;
-  int32_t port_;
 };
 
 REGIST_MODULE(ExampleHttpServerModule);

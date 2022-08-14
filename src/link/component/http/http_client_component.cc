@@ -17,7 +17,7 @@ namespace nlink {
 namespace component {
 
 HttpClientComponent* HttpClientComponent::CreateComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner) {
   if (!channel_controller || !task_runner) {
     return nullptr;
@@ -26,7 +26,7 @@ HttpClientComponent* HttpClientComponent::CreateComponent(
 }
 
 HttpClientComponent::HttpClientComponent(
-  base::EventChannelController* channel_controller,
+  base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner)
   : HttpComponent(channel_controller),
     task_runner_(task_runner) {

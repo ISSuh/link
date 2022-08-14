@@ -18,19 +18,18 @@ namespace base {
 
 class EventChannel;
 
+class ComponentChannelController {
+ public:
+  virtual void AttachChannels(EventChannel* channel) = 0;
+  virtual void DetatchCahnnel(EventChannel* channel) = 0;
+};
+
 class EventChannelController : public EventChannel::EventChannelDelegate {
  public:
   using AttachChannelCallback = std::function<void(int32_t, EventChannel*)>;
   using DetachChannelCallback = std::function<void(int32_t, EventChannel*)>;
   using UpdateChannelCallback = std::function<void(int32_t, EventChannel*)>;
 
-  static EventChannelController* Create(
-    AttachChannelCallback attach_callback,
-    DetachChannelCallback detach_callback,
-    UpdateChannelCallback update_callback);
-
-  virtual void AttachChannels(EventChannel* channel) = 0;
-  virtual void DetatchCahnnel(EventChannel* channel) = 0;
   virtual void DispatchEvent(const Event& event) = 0;
 };
 

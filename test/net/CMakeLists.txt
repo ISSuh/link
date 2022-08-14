@@ -8,6 +8,7 @@ message("Build Link Test")
 
 set(NET_BASE_UNITTESTS
   ${PROJECT_SOURCE_DIR}/base/url_unittest.cc
+  ${PROJECT_SOURCE_DIR}/http/routing_unittest.cc
 )
 
 add_executable(${PROJECT_NAME}

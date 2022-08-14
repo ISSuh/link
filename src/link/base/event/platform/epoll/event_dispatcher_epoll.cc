@@ -30,18 +30,26 @@ EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
     return nullptr;
   }
 
-  return new EventDispatcherEpoll(
-    epoll_fd, kDefaultEvnetSize, kDefaultTimeOut);
+  return new EventDispatcherEpoll(epoll_fd, kDefaultEvnetSize, kDefaultTimeOut);
 }
 
 EventDispatcherEpoll::EventDispatcherEpoll(
   int32_t epoll_descriptor,
   int32_t event_size,
   int32_t timeout)
-  : epoll_descriptor_(epoll_descriptor),
+  : running_(false),
+    epoll_descriptor_(epoll_descriptor),
     event_size_(event_size),
     timeout_(timeout),
-    channel_controller_(EventChannelController::Create(
+    event_channel_controller_(nullptr) {}
+
+EventDispatcherEpoll::~EventDispatcherEpoll() {
+  close(epoll_descriptor_);
+}
+
+void EventDispatcherEpoll::RegistEventChannelContoller(
+  std::shared_ptr<ChannelController> channel_controller)  {
+  channel_controller->RegistEventChannelDelegateCallback(
         [this](int32_t descriptor, EventChannel* channel) {
           this->OnAttachChannel(descriptor, channel);
         },
@@ -50,12 +58,13 @@ EventDispatcherEpoll::EventDispatcherEpoll(
         },
         [this](int32_t descriptor, EventChannel* channel) {
           this->OnUpdatedChannel(descriptor, channel);
-    })) {}
+        });
 
-EventDispatcherEpoll::~EventDispatcherEpoll() = default;
+  event_channel_controller_ = channel_controller;
+}
 
 void EventDispatcherEpoll::Dispatch() {
-  while (1) {
+  while (running_.load()) {
     DispatchOnce();
   }
 }
@@ -80,7 +89,7 @@ void EventDispatcherEpoll::DispatchOnce() {
     HandleEventType(event_flag, &types);
 
     Event event(fd, types);
-    channel_controller_->DispatchEvent(event);
+    event_channel_controller_->DispatchEvent(event);
 
     // if (nullptr != channel) {
       // LOG(WARNING) << "[EventDispatcherEpoll::dispatch] channel : " << channel << " / " << fd;
@@ -117,17 +126,17 @@ Event::Type EventDispatcherEpoll::HandleEventType(
   }
 }
 
-std::shared_ptr<EventChannelController>
-EventDispatcherEpoll::ChannelController() const {
-  return channel_controller_;
-};
+void EventDispatcherEpoll::Stop() {
+  running_.store(true);
+  
+}
 
 void EventDispatcherEpoll::OnAttachChannel(
   int32_t descriptor, EventChannel* channel) {
     LOG(WARNING) << "[EventDispatcherEpoll::OnAttachChannel] fd : " << descriptor;
 
   epoll_event event;
-  // event.data.ptr = channel; 
+  // event.data.ptr = channel;
   event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP)| (EPOLLET | EPOLLONESHOT);
   event.data.fd = descriptor;
 

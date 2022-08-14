@@ -10,7 +10,7 @@ namespace nlink {
 namespace component {
 
 SocketComponent::SocketComponent(
-  base::EventChannelController* channel_controller)
+  base::ComponentChannelController* channel_controller)
   : LinkComponent(channel_controller) {
 }
 

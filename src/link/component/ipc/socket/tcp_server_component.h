@@ -24,7 +24,7 @@ class SocketComponent;
 class TcpServerComponent : public SocketComponent {
  public:
   static TcpServerComponent* CreateComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
 
@@ -33,7 +33,7 @@ class TcpServerComponent : public SocketComponent {
 
  private:
   explicit TcpServerComponent(
-    base::EventChannelController* channel_controller,
+    base::ComponentChannelController* channel_controller,
     base::TaskRunner* task_runner,
     SocketComponent::Handler handlers);
   virtual ~TcpServerComponent();

@@ -9,12 +9,13 @@
 
 #include <vector>
 #include <memory>
+#include <atomic>
 
 #include "link/base/macro.h"
 #include "link/base/platform/descriptor.h"
 #include "link/base/event/event_channel.h"
 #include "link/base/event/event_dispatcher.h"
-#include "link/base/event/event_channel_controller.h"
+#include "link/base/event/channel_controller.h"
 
 namespace nlink {
 namespace base {
@@ -30,9 +31,11 @@ class EventDispatcherEpoll : public EventDispatcher {
   virtual ~EventDispatcherEpoll();
 
   // nlink::base::EventDispatcher
+  void RegistEventChannelContoller(
+    std::shared_ptr<ChannelController> channel_controller);
   void Dispatch() override;
   void DispatchOnce() override;
-  std::shared_ptr<EventChannelController> ChannelController() const override;
+  void Stop() override;
 
  private:
   Event::Type HandleEventType(
@@ -42,11 +45,13 @@ class EventDispatcherEpoll : public EventDispatcher {
   void OnDetachChannel(int32_t descriptor, EventChannel* channel);
   void OnUpdatedChannel(int32_t descriptor, EventChannel* channel);
 
+  std::atomic_bool running_;
+
   uint32_t event_size_;
   int32_t timeout_;
 
   int32_t epoll_descriptor_;
-  std::shared_ptr<EventChannelController> channel_controller_;
+  std::shared_ptr<EventChannelController> event_channel_controller_;
 
   DISAALOW_COPY_AND_ASSIGN(EventDispatcherEpoll);
 };
