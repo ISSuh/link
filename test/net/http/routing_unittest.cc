@@ -14,7 +14,7 @@
 #include <link/net/http/routeing.h>
 
 TEST(Parse_path, Rounting) {
-  std::vector<std::string> paths;
+  std::vector<nlink::net::http::Routing::SplitedPath> paths;
 
   std::string empty_path("");
   nlink::net::http::SplitPathBySlash(empty_path, &paths);
@@ -25,18 +25,22 @@ TEST(Parse_path, Rounting) {
   EXPECT_TRUE(paths.empty());
 
   std::string path_1("/foo/bar");
-  std::vector<std::string> temp_paths_1 = {"foo", "bar"};
+  std::vector<nlink::net::http::Routing::SplitedPath> temp_paths_1 =
+    {{"foo", false}, {"bar", false}};
   nlink::net::http::SplitPathBySlash(path_1, &paths);
   for (size_t i = 0 ; i < paths.size() ; ++i) {
-    EXPECT_STREQ(paths[i].c_str(), temp_paths_1[i].c_str());
+    EXPECT_STREQ(paths[i].first.c_str(), temp_paths_1[i].first.c_str());
+    EXPECT_EQ(paths[i].second, temp_paths_1[i].second);
   }
   paths.clear();
 
-  std::string path_2("/foo/bar/{:id}");
-  std::vector<std::string> temp_paths_2 = {"foo", "bar", "{:id}"};
+  std::string path_2("/foo/bar/<id>");
+  std::vector<nlink::net::http::Routing::SplitedPath> temp_paths_2 =
+    {{"foo", false}, {"bar", false}, {"<id>", true}};
   nlink::net::http::SplitPathBySlash(path_2, &paths);
   for (size_t i = 0 ; i < paths.size() ; ++i) {
-    EXPECT_STREQ(paths[i].c_str(), temp_paths_2[i].c_str());
+    EXPECT_STREQ(paths[i].first.c_str(), temp_paths_2[i].first.c_str());
+    EXPECT_EQ(paths[i].second, temp_paths_2[i].second);
   }
 }
 
@@ -44,55 +48,69 @@ class RoutingHandler {
  public:
   virtual void Root() = 0;
   virtual void Foo() = 0;
-  virtual void FooBar() = 0;
+  virtual void FooParam() = 0;
+  virtual void FooBarBaz() = 0;
 };
 
 class RoutingHandlerMock : public RoutingHandler {
  public:
   MOCK_METHOD0(Root, void());
   MOCK_METHOD0(Foo, void());
-  MOCK_METHOD0(FooBar, void());
+  MOCK_METHOD0(FooParam, void());
+  MOCK_METHOD0(FooBarBaz, void());
 };
 
 TEST(regist_handler, Rounting) {
   RoutingHandlerMock mock_handler;
   nlink::net::http::Routing routing;
+  std::function<void()> routing_handler = {};
 
+  // test path /
   std::string root_path("/");
-  auto routing_handler_0 = routing.Route(root_path);
-  EXPECT_FALSE(routing_handler_0);
+  routing_handler = routing.Route(root_path);
+  EXPECT_FALSE(routing_handler);
 
   routing.RegistHandler(
     root_path, std::bind(&RoutingHandlerMock::Root, &mock_handler));
 
-  auto routing_handler_1 = routing.Route(root_path);
-  EXPECT_TRUE(routing_handler_1);
+  routing_handler = routing.Route(root_path);
+  EXPECT_TRUE(routing_handler);
   EXPECT_CALL(mock_handler, Root()).Times(1);
-  routing_handler_1();
+  routing_handler();
 
+  // test path /foo
   std::string foo_path("/foo");
   routing.RegistHandler(
     foo_path, std::bind(&RoutingHandlerMock::Foo, &mock_handler));
 
-  auto routing_handler_2 = routing.Route(foo_path);
-  EXPECT_TRUE(routing_handler_2);
+  routing_handler = routing.Route(foo_path);
+  EXPECT_TRUE(routing_handler);
   EXPECT_CALL(mock_handler, Foo()).Times(1);
-  routing_handler_2();
+  routing_handler();
 
-  std::string foo_bar_path("/foo/bar");
+  // test path /foo/<test_id>
+  std::string foo_param_path("/foo/<test_id>");
   routing.RegistHandler(
-    foo_bar_path, std::bind(&RoutingHandlerMock::FooBar, &mock_handler));
+    foo_param_path,
+    std::bind(&RoutingHandlerMock::FooParam, &mock_handler));
 
-  auto routing_handler_3 = routing.Route(foo_bar_path);
-  EXPECT_TRUE(routing_handler_3);
-  EXPECT_CALL(mock_handler, FooBar()).Times(1);
-  routing_handler_3();
+  std::string foo_id_path("/foo/my_id");
+  routing_handler = routing.Route(foo_id_path);
+  EXPECT_TRUE(routing_handler);
+  EXPECT_CALL(mock_handler, FooParam()).Times(1);
+  routing_handler();
 
-  std::string foo_test_path("/foo/test");
-  auto routing_handler_4 = routing.Route(foo_test_path);
-  EXPECT_FALSE(routing_handler_4);
+  // test path /foo/bar/baz
+  std::string foo_bar_baz_path("/foo/bar/baz");
+  routing.RegistHandler(
+    foo_bar_baz_path, std::bind(&RoutingHandlerMock::FooBarBaz, &mock_handler));
 
-  std::string foo_bar_test_path("/foo/bar/test");
-  auto routing_handler_5 = routing.Route(foo_bar_test_path);
-  EXPECT_FALSE(routing_handler_5);
+  routing_handler = routing.Route(foo_bar_baz_path);
+  EXPECT_TRUE(routing_handler);
+  EXPECT_CALL(mock_handler, FooBarBaz()).Times(1);
+  routing_handler();
+
+  std::string foo_id_baz_path("/foo/my_id/baz");
+  routing_handler = routing.Route(foo_id_baz_path);
+  EXPECT_TRUE(routing_handler);
 }

@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <utility>
 #include <functional>
 
 #include "link/net/base/uri.h"
@@ -25,19 +26,21 @@ namespace http {
 
 class Routing {
  public:
+  using SplitedPath = std::pair<std::string, bool>;
+
   struct RoutingNode {
     using SubRoutingNodeMap =
       std::map<std::string, std::unique_ptr<RoutingNode>>;
 
     RoutingNode(
       const std::string& node_path,
-      std::function<void()> node_handler = {},
-      bool is_parameter_path = false);
+      bool is_parameter_path = false,
+      std::function<void()> node_handler = {});
 
     std::string path;
+    bool is_parameter;
     std::function<void()> handler;
     SubRoutingNodeMap sub_nodes;
-    bool is_parameter;
   };
 
   Routing();
@@ -48,28 +51,26 @@ class Routing {
     std::function<void()> handler);
 
   std::function<void()> Route(const std::string& path);
-  
 
  private:
   void RegistHandlerInternal(
-    std::vector<std::string>* splited_path,
+    std::vector<SplitedPath>* splited_path,
     std::unique_ptr<RoutingNode>* current_node,
     std::function<void()> handler);
 
   RoutingNode* SearchRoutingNode(
-    std::vector<std::string>* splited_path,
+    std::vector<SplitedPath>* splited_path,
     std::unique_ptr<RoutingNode>* current_nodez);
 
-  std::unique_ptr<RoutingNode> CreateNewRoutingNode(
-    const std::string& path,
-    std::function<void()> handler = {});
+  std::unique_ptr<RoutingNode>* FindParameterPathOnSubModules(
+    RoutingNode::SubRoutingNodeMap& sub_nodes);
 
   std::unique_ptr<RoutingNode> root_;
 };
 
 void SplitPathBySlash(
   const std::string& origin,
-  std::vector<std::string>* splited_path);
+  std::vector<Routing::SplitedPath>* splited_path);
 
 }  // namespace http
 }  // namespace net
