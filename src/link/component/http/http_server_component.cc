@@ -59,8 +59,7 @@ void HttpServerComponent::Close() {
 
 void HttpServerComponent::Route(
   const std::string& path,
-  HttpComponent::ResponseHandler handler) {
-
+  net::http::handler::ResponseHandler handler) {
 }
 
 void HttpServerComponent::InternalAcceptHandler(

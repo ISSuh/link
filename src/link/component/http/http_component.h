@@ -18,11 +18,6 @@ namespace nlink {
 namespace component {
 
 class HttpComponent : public LinkComponent {
- public:
-  using RequsetHandler = std::function<void(const net::http::Response&)>;
-  using ResponseHandler =
-    std::function<void(const net::http::Request&, net::http::Request*)>;
-
  protected:
   explicit HttpComponent(
     base::ComponentChannelController* channel_controller);

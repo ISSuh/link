@@ -29,7 +29,7 @@ class ExampleHttpServer {
   void RegistRoute();
 
  private:
-  void User(const nlink::net::http::Request&, nlink::net::http::Request*);
+  void User(const nlink::net::http::Request&, nlink::net::http::Response*);
 
   nlink::component::HttpServerComponent* server_component_;
 };

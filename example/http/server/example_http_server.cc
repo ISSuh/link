@@ -37,11 +37,11 @@ void ExampleHttpServer::CloseServer() {
 void ExampleHttpServer::RegistRoute() {
   server_component_->Route(
     "/user",
-    [this](const net::http::Request& request, net::http::Request* response) {
+    [this](const net::http::Request& request, net::http::Response* response) {
       this->User(request, response);
     });
 }
 
 void ExampleHttpServer::User(
-  const net::http::Request& request, net::http::Request* response) {
+  const net::http::Request& request, net::http::Response* response) {
 }

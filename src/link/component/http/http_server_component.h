@@ -12,8 +12,8 @@
 
 #include "link/base/macro.h"
 #include "link/base/task/task_runner.h"
-#include "link/net/http/request.h"
-#include "link/net/http/response.h"
+#include "link/net/http/handler.h"
+#include "link/net/http/routeing.h"
 #include "link/io/socket/server.h"
 #include "link/component/ipc/socket/socket_component.h"
 #include "link/component/http/http_component.h"
@@ -34,7 +34,7 @@ class HttpServerComponent : public HttpComponent {
 
   void Route(
     const std::string& path,
-    HttpComponent::ResponseHandler handler);
+    net::http::handler::ResponseHandler handler);
 
  private:
   explicit HttpServerComponent(
@@ -54,6 +54,7 @@ class HttpServerComponent : public HttpComponent {
   SocketComponent::Handler::ReadHandler read_handler_;
   SocketComponent::Handler::WriteHandler write_handler_;
 
+  net::http::Routing routing_;
   DISAALOW_COPY_AND_ASSIGN(HttpServerComponent);
 };
 

@@ -14,11 +14,7 @@
 #include <utility>
 #include <functional>
 
-#include "link/net/base/uri.h"
-#include "link/net/http/method.h"
-#include "link/net/http/status_code.h"
-#include "link/net/http/version.h"
-#include "link/net/http/header.h"
+#include "link/net/http/handler.h"
 
 namespace nlink {
 namespace net {
@@ -35,11 +31,11 @@ class Routing {
     RoutingNode(
       const std::string& node_path,
       bool is_parameter_path = false,
-      std::function<void()> node_handler = {});
+      handler::ResponseHandler node_handler = {});
 
     std::string path;
     bool is_parameter;
-    std::function<void()> handler;
+    handler::ResponseHandler handler;
     SubRoutingNodeMap sub_nodes;
   };
 
@@ -48,22 +44,22 @@ class Routing {
 
   void RegistHandler(
     const std::string& path,
-    std::function<void()> handler);
+    handler::ResponseHandler handler);
 
-  std::function<void()> Route(const std::string& path);
+  handler::ResponseHandler Route(const std::string& path) const;
 
  private:
   void RegistHandlerInternal(
     std::vector<SplitedPath>* splited_path,
-    std::unique_ptr<RoutingNode>* current_node,
-    std::function<void()> handler);
+    const std::unique_ptr<RoutingNode>& current_node,
+    handler::ResponseHandler handler);
 
   RoutingNode* SearchRoutingNode(
     std::vector<SplitedPath>* splited_path,
-    std::unique_ptr<RoutingNode>* current_nodez);
+    const std::unique_ptr<RoutingNode>& current_nodez) const;
 
-  std::unique_ptr<RoutingNode>* FindParameterPathOnSubModules(
-    RoutingNode::SubRoutingNodeMap& sub_nodes);
+  const std::unique_ptr<RoutingNode>* FindParameterPathOnSubModules(
+    const RoutingNode::SubRoutingNodeMap& sub_nodes) const;
 
   std::unique_ptr<RoutingNode> root_;
 };

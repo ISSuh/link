@@ -48,7 +48,7 @@ void SplitPathBySlash(
 Routing::RoutingNode::RoutingNode(
   const std::string& node_path,
   bool is_parameter_path,
-  std::function<void()> node_handler)
+  handler::ResponseHandler node_handler)
   : path(node_path),
     is_parameter(is_parameter_path),
     handler(node_handler),
@@ -63,7 +63,7 @@ Routing::~Routing() = default;
 
 void Routing::RegistHandler(
   const std::string& path,
-  std::function<void()> handler) {
+  handler::ResponseHandler handler) {
   if (0 == path.compare(kRootPath)) {
     root_->path = path;
     root_->handler = handler;
@@ -73,10 +73,10 @@ void Routing::RegistHandler(
   std::vector<SplitedPath> splited_path;
   SplitPathBySlash(path, &splited_path);
 
-  RegistHandlerInternal(&splited_path, &root_, handler);
+  RegistHandlerInternal(&splited_path, root_, handler);
 }
 
-std::function<void()> Routing::Route(const std::string& path) {
+handler::ResponseHandler Routing::Route(const std::string& path) const {
   if (0 == path.compare(kRootPath)) {
     return root_->handler;
   }
@@ -84,7 +84,7 @@ std::function<void()> Routing::Route(const std::string& path) {
   std::vector<SplitedPath> splited_path;
   SplitPathBySlash(path, &splited_path);
 
-  Routing::RoutingNode* node = SearchRoutingNode(&splited_path, &root_);
+  Routing::RoutingNode* node = SearchRoutingNode(&splited_path, root_);
   if (nullptr == node) {
     return {};
   }
@@ -93,10 +93,10 @@ std::function<void()> Routing::Route(const std::string& path) {
 
 void Routing::RegistHandlerInternal(
   std::vector<Routing::SplitedPath>* splited_path,
-  std::unique_ptr<Routing::RoutingNode>* current_node,
-  std::function<void()> handler) {
+  const std::unique_ptr<Routing::RoutingNode>& current_node,
+  handler::ResponseHandler handler) {
   if (splited_path->empty()) {
-    (*current_node)->handler = handler;
+    current_node->handler = handler;
     return;
   }
 
@@ -105,58 +105,61 @@ void Routing::RegistHandlerInternal(
   bool is_parameter_path = current_item.second;
   splited_path->erase(splited_path->begin());
 
+  const std::unique_ptr<Routing::RoutingNode>* next_node = nullptr;
   Routing::RoutingNode::SubRoutingNodeMap& sub_modules =
-    (*current_node)->sub_nodes;
-
-  std::unique_ptr<Routing::RoutingNode>* netx_node = nullptr;
-  std::unique_ptr<Routing::RoutingNode>* parameter_path_node =
-    FindParameterPathOnSubModules(sub_modules);
-  if (nullptr != parameter_path_node) {
-    netx_node = parameter_path_node;
-  } else {
-    if (sub_modules.find(current_path) == sub_modules.end()) {
+    current_node->sub_nodes;
+  if (sub_modules.find(current_path) == sub_modules.end()) {
+    const std::unique_ptr<Routing::RoutingNode>* parameter_path_node =
+      FindParameterPathOnSubModules(sub_modules);
+    if (is_parameter_path && (nullptr != parameter_path_node)) {
+      next_node = parameter_path_node;
+    } else {
       std::unique_ptr<Routing::RoutingNode> node =
-        std::make_unique<Routing::RoutingNode>(current_path, is_parameter_path);
+        std::make_unique<Routing::RoutingNode>(
+          current_path, is_parameter_path);
       sub_modules.insert({current_path, std::move(node)});
     }
-
-    netx_node = &(sub_modules.at(current_path));
   }
 
-  RegistHandlerInternal(splited_path, netx_node, handler);
+  if (nullptr == next_node) {
+    next_node = &(sub_modules.at(current_path));
+  }
+
+  RegistHandlerInternal(splited_path, *next_node, handler);
 }
 
 Routing::RoutingNode* Routing::SearchRoutingNode(
   std::vector<Routing::SplitedPath>* splited_path,
-  std::unique_ptr<Routing::RoutingNode>* current_node) {
+  const std::unique_ptr<Routing::RoutingNode>& current_node) const {
   if (splited_path->empty()) {
-    return (*current_node).get();
+    return current_node.get();
   }
 
   Routing::SplitedPath current_item = *splited_path->begin();
   std::string current_path = current_item.first;
   splited_path->erase(splited_path->begin());
 
-  std::unique_ptr<Routing::RoutingNode>* netx_node = nullptr;
+  const std::unique_ptr<Routing::RoutingNode>* next_node = nullptr;
   Routing::RoutingNode::SubRoutingNodeMap& sub_modules =
-    (*current_node)->sub_nodes;
+    current_node->sub_nodes;
   if (sub_modules.find(current_path) == sub_modules.end()) {
-    std::unique_ptr<Routing::RoutingNode>* parameter_path_node =
+    const std::unique_ptr<Routing::RoutingNode>* parameter_path_node =
       FindParameterPathOnSubModules(sub_modules);
     if (nullptr == parameter_path_node) {
       return nullptr;
     }
-    netx_node = parameter_path_node;
+    next_node = parameter_path_node;
   } else {
-    netx_node = &(sub_modules.at(current_path));
+    next_node = &(sub_modules.at(current_path));
   }
 
-  return SearchRoutingNode(splited_path, netx_node);
+  return SearchRoutingNode(splited_path, *next_node);
 }
 
-std::unique_ptr<Routing::RoutingNode>* Routing::FindParameterPathOnSubModules(
-  Routing::RoutingNode::SubRoutingNodeMap& sub_nodes) {
-  for (auto& item : sub_nodes) {
+const std::unique_ptr<Routing::RoutingNode>*
+Routing::FindParameterPathOnSubModules(
+  const Routing::RoutingNode::SubRoutingNodeMap& sub_nodes) const {
+  for (const auto& item : sub_nodes) {
     auto* node = &(item.second);
     bool is_parameter = item.second->is_parameter;
     if (is_parameter) {
