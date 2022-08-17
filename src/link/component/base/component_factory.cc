@@ -29,11 +29,5 @@ TcpServerComponent* ComponentFctaory::CreateTcpServerComponent(
     channel_controller_.get(), task_runner, handlers);
 }
 
-template <typename ComponentType>
-ComponentType* ComponentFctaory::CreateHttpComponent(
-  base::TaskRunner* task_runner) {
-  return ComponentType::CreateComponent(channel_controller_.get(), task_runner);
-}
-
 }  // namespace component
 }  // namespace nlink

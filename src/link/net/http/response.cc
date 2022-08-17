@@ -74,7 +74,7 @@ const std::string Response::Serialize() const {
   stream << VersionToString(version_) << ' '
          << status_code_num_string << ' '
          << HttpStatusCodeToString(status_)
-         << VersionToString(version_)  << kCRLF;
+         << kCRLF;
 
   stream << header_.Serialize();
   stream << kCRLF;

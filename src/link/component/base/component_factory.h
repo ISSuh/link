@@ -35,15 +35,15 @@ class ComponentFctaory {
   template <typename ComponentType>
   ComponentType* CreateHttpComponent(base::TaskRunner* task_runner);
 
-  HttpClientComponent* CreateHttpClientComponent(
-    base::TaskRunner* task_runner);
-
-  HttpServerComponent* CreateHttpServerComponent(
-    base::TaskRunner* task_runner);
-
  private:
   std::shared_ptr<base::ComponentChannelController> channel_controller_;
 };
+
+template <typename ComponentType>
+ComponentType* ComponentFctaory::CreateHttpComponent(
+  base::TaskRunner* task_runner) {
+  return ComponentType::CreateComponent(channel_controller_.get(), task_runner);
+}
 
 }  // namespace component
 }  // namespace nlink

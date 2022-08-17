@@ -11,6 +11,7 @@
 #include "link/base/logging.h"
 #include "link/base/buffer.h"
 #include "link/io/socket/socket_factory.h"
+#include "link/net/http/request_parser.h"
 
 namespace nlink {
 namespace component {
@@ -60,6 +61,7 @@ void HttpServerComponent::Close() {
 void HttpServerComponent::Route(
   const std::string& path,
   net::http::handler::ResponseHandler handler) {
+  routing_.RegistHandler(path, handler);
 }
 
 void HttpServerComponent::InternalAcceptHandler(
@@ -72,6 +74,21 @@ void HttpServerComponent::InternalCloseHandler(
 
 void HttpServerComponent::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+  if (buffer.IsEmpty()) {
+    return;
+  }
+
+  net::http::Response response;
+  net::http::Request request = net::http::RequestParser::Parse(buffer);
+  auto url  = request.RequestUri();
+  if (!url.HasPath()) {
+    return;
+  }
+
+  auto handler = routing_.Route(url.Path());
+  if (handler) {
+    handler(request, &response);
+  }
 }
 
 void HttpServerComponent::InternalWriteHandler(size_t length) {

@@ -4,12 +4,14 @@
  *
  */
 
-#include <gtest/gtest.h>
+#include <string>
 
-// Demonstrate some basic assertions.
-TEST(HelloTest, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
+#include <link/net/base/uri.h>
+
+using namespace nlink;
+
+TEST(Parse, Url) {
 }
