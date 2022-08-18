@@ -12,11 +12,25 @@
 namespace nlink {
 namespace net {
 
-uint16_t kInvalidPort = 0;
-uint16_t kDefalutHttpPort = 80;
-uint16_t kDefalutHttpsPort = 443;
+const uint16_t kInvalidPort = 0;
+const uint16_t kDefalutHttpPort = 80;
+const uint16_t kDefalutHttpsPort = 443;
 
-Uri::UserInfo ParseUserInfo(const std::string& user_info_string) {
+const char* kSchemeDelimiter = "://";
+const size_t kSchemeDelimiterSize = 3;
+const char kCredentialsDelimiter = '@';
+const size_t kCredentialsDelimiterSize = 1;
+const char kQueryDelimiter = '?';
+const size_t kQueryDelimiterSize = 1;
+const char kFragmentDelimiter = '#';
+const size_t kFragmentDelimiterSize = 1;
+const char kColon = ':';
+const size_t kColonSize = 1;
+const char kSlash = '/';
+const size_t kkSlashSize = 1;
+
+std::pair<std::string, std::string> ParseUserInfo(
+  const std::string& user_info_string) {
   if (user_info_string.empty()) {
     return {};
   }
@@ -52,12 +66,41 @@ std::pair<std::string, uint16_t> SeparateHostAndPort(
     port_string = host_string.substr(pos+1, host_string.size()-1);
   }
 
+
+  if (!std::all_of(
+      port_string.begin(), port_string.end(), ::isdigit)) {
+    return {"", 0};
+  }
+
   uint16_t port = 0;
   int32_t temp = std::stoi(port_string);
   if (0 < temp || temp < 65535) {
     port = temp;
   }
   return {host, port};
+}
+
+Uri::Authority ParseAuthority(const std::string& authority_str) {
+  std::string host_str("");
+  Uri::Authority authority;
+  size_t user_info_pos = authority_str.find(kCredentialsDelimiter);
+  if (std::string::npos != user_info_pos) {
+    std::string user_info_str = authority_str.substr(0, user_info_pos);
+    auto user_info = ParseUserInfo(user_info_str);
+
+    authority.user = user_info.first;
+    authority.password = user_info.second;
+
+    host_str =
+      authority_str.substr(user_info_pos + kCredentialsDelimiterSize);
+  } else {
+    host_str = authority_str;
+  }
+
+  auto host_with_port = SeparateHostAndPort(host_str);
+  authority.host = host_with_port.first;
+  authority.port = host_with_port.second;
+  return authority;
 }
 
 std::vector<Uri::Query> ParseQueries(const std::string& queries_string) {
@@ -67,69 +110,140 @@ std::vector<Uri::Query> ParseQueries(const std::string& queries_string) {
   const char assign_tocken = '=';
 
   size_t pos =  queries_str.find(and_tocken, 0);
-  while (pos != std::string::npos) {
-    std::string key;
-    std::string value;
-    size_t query_pos = queries_str.find(assign_tocken, pos);
-    if (std::string::npos == query_pos) {
-      break;
-    } else {
-      key = queries_str.substr(0, query_pos);
-      value = queries_str.substr(query_pos+1, pos);
-      queries.emplace_back(key, value);
+  if (pos == std::string::npos) {
+      std::string key;
+      std::string value;
+      size_t query_pos = queries_str.find(assign_tocken, 0);
+      if (std::string::npos != query_pos) {
+        key = queries_str.substr(0, query_pos);
+        value = queries_str.substr(query_pos+1, pos);
+        queries.emplace_back(key, value);
+      }
+  } else {
+    while (pos != std::string::npos) {
+      std::string key;
+      std::string value;
+      size_t query_pos = queries_str.find(assign_tocken, pos);
+      if (std::string::npos == query_pos) {
+        break;
+      } else {
+        key = queries_str.substr(0, query_pos);
+        value = queries_str.substr(query_pos+1, pos);
+        queries.emplace_back(key, value);
+      }
+
+      queries_str.erase(0, pos + 1);
+
+      pos =  queries_str.find(and_tocken);
     }
-
-    queries_str.erase(0, pos + 1);
-
-    pos =  queries_str.find(and_tocken);
   }
+
   return queries;
 }
 
+Uri::Authority::Authority()
+  : user(""), password(""), host(""), port(0u) {
+}
+
+Uri::Authority::Authority(
+  const std::string& user_str,
+  const std::string& password_str,
+  const std::string& host_str,
+  uint16_t port_num)
+    : user(user_str), password(password_str), host(host_str), port(port_num) {
+}
+
 Uri Uri::Parse(const std::string& uri_string) {
-  network::uri parse_uri(uri_string);
+  std::string splited_uri("");
+  size_t pos = 0;
 
-  const std::string scheme = parse_uri.scheme().to_string();
-  const std::string user_info_string = parse_uri.user_info().to_string();
-  Uri::UserInfo user_info = ParseUserInfo(user_info_string);
-
-  const std::string host = parse_uri.host().to_string();
-  const std::string port_string = parse_uri.port().to_string();
-  int32_t port = 0;
-  if (port_string.empty()) {
-    if (scheme == "http") {
-      port = kDefalutHttpPort;
-    } else if (scheme == "https") {
-      port = kDefalutHttpsPort;
-    } else {
-      port = kInvalidPort;
-    }
-  } else {
-    port = std::stoi(port_string);
-    if (port <= 0 || 65535 < port) {
-      port = kInvalidPort;
-    }
+  if (uri_string.empty()) {
+    return Uri();
   }
 
-  std::string path = parse_uri.path().to_string();
-  if (path.empty()) {
-    path = "/";
+  // parse scheme
+  size_t scheme_pos = uri_string.find(kSchemeDelimiter);
+  if (std::string::npos == scheme_pos) {
+    return Uri();
   }
 
-  const std::string queries_string = parse_uri.query().to_string();
-  std::vector<Uri::Query> queries = ParseQueries(queries_string);
+  std::string scheme = uri_string.substr(0, scheme_pos);
 
-  const std::string fragment = parse_uri.fragment().to_string();
+  pos = scheme_pos + kSchemeDelimiterSize;
+  splited_uri = uri_string.substr(pos);
 
-  return Uri(scheme, user_info, host, static_cast<uint16_t>(port),
-    path, queries, fragment);
+  if (splited_uri.empty()) {
+    return Uri();
+  }
+
+  // parse authority
+  size_t authority_pos = splited_uri.find(kSlash);
+  if (std::string::npos == authority_pos) {
+    authority_pos = splited_uri.size();
+  }
+
+  std::string authority_str = splited_uri.substr(0, authority_pos);
+  Uri::Authority authority = ParseAuthority(authority_str);
+  if (authority.host.empty()) {
+    return Uri();
+  }
+
+  pos = authority_pos + kkSlashSize;
+  if (pos >= splited_uri.size()) {
+    return Uri(scheme, authority);
+  }
+
+  // parse path
+  splited_uri = splited_uri.substr(pos);
+
+  size_t path_pos = splited_uri.find(kQueryDelimiter);
+  if (std::string::npos == path_pos) {
+    path_pos = splited_uri.size();
+  }
+
+  std::string path_str = splited_uri.substr(0, path_pos);
+  pos = path_pos + kQueryDelimiterSize;
+
+  if (pos >= splited_uri.size()) {
+    return Uri(scheme, authority, path_str);
+  }
+
+  // parse query
+  splited_uri = splited_uri.substr(pos);
+
+  size_t query_pos = splited_uri.find(kFragmentDelimiter);
+  if (std::string::npos == query_pos) {
+    query_pos = splited_uri.size();
+  }
+
+  std::string query_str = splited_uri.substr(0, query_pos);
+  pos = query_pos + kFragmentDelimiterSize;
+  auto query = ParseQueries(query_str);
+
+  // parse fragment;
+  if (pos >= splited_uri.size()) {
+    return Uri(scheme, authority, path_str, query, "");
+  }
+
+  splited_uri = splited_uri.substr(pos);
+  std::string fragment_str = splited_uri.substr(0, query_pos);
+  return Uri(scheme, authority, path_str, query, fragment_str);
 }
 
 Uri::Uri()
-  : scheme_(""),
-    user_info_({}),
-    host_(""),
-    port_(0),
+  : is_valid_(false),
+    scheme_(""),
+    authority_({}),
+    path_(""),
+    queries_(),
+    fragment_("") {
+}
+
+Uri::Uri(const std::string& scheme,
+    const Uri::Authority& authority)
+  : is_valid_(true),
+    scheme_(scheme),
+    authority_(authority),
     path_(""),
     queries_(),
     fragment_("") {
@@ -137,42 +251,25 @@ Uri::Uri()
 
 Uri::Uri(
   const std::string& scheme,
-  const std::string& host)
-  : scheme_(scheme),
-  user_info_({}),
-  path_(""),
-  queries_(),
-  fragment_("") {
-  auto hostAndPort = SeparateHostAndPort(host);
-  host_ = hostAndPort.first;
-  port_ = hostAndPort.second;
+  const Uri::Authority& authority,
+  const std::string& path)
+  : is_valid_(true),
+    scheme_(scheme),
+    authority_(authority),
+    path_(path),
+    queries_(),
+    fragment_("") {
 }
 
 Uri::Uri(
   const std::string& scheme,
-  const std::string& host,
-  const std::string& path)
-  : scheme_(scheme),
-    user_info_({}),
-    path_(path),
-    queries_(),
-    fragment_("") {
-  auto hostAndPort = SeparateHostAndPort(host);
-  host_ = hostAndPort.first;
-  port_ = hostAndPort.second;
-}
-
-Uri::Uri(const std::string& scheme,
-  UserInfo user_info,
-  const std::string& host,
-  uint16_t port,
+  Uri::Authority authority,
   const std::string& path,
   std::vector<Query> queries,
   const std::string& fragment)
-  : scheme_(scheme),
-    user_info_(user_info),
-    host_(host),
-    port_(port),
+  : is_valid_(true),
+    scheme_(scheme),
+    authority_(authority),
     path_(path),
     queries_(queries),
     fragment_(fragment) {
@@ -210,77 +307,86 @@ const std::string Uri::Serialize() {
     uri.append(PortToString());
   }
 
-  uri.append(Path());
+  if (HasPath()) {
+    uri.append("/");
+    uri.append(Path());
 
-  if (HasQuery()) {
-    uri.append(MakeQueryString());
-  }
+    if (HasQuery()) {
+      uri.append("?");
+      uri.append(MakeQueryString());
+    }
 
-  if (HasFragment()) {
-    uri.append("#");
-    uri.append(Fragment());
+    if (HasFragment()) {
+      uri.append("#");
+      uri.append(Fragment());
+    }
   }
 
   return uri;
 }
 
 bool Uri::IsEmpty() const {
-  return scheme_.empty() && host_.empty();
+  return !is_valid_ ||
+          (scheme_.empty() && authority_.host.empty());
 }
 
 bool Uri::HasScheme() const {
-  return !scheme_.empty();
+  return is_valid_ && !scheme_.empty();
 }
 
 bool Uri::HasUserName() const {
-  return !user_info_.name.empty();
+  return is_valid_ && !authority_.user.empty();
 }
 
 bool Uri::HasPassword() const {
-  return !user_info_.password.empty();
+  return is_valid_ && !authority_.password.empty();
 }
 
 bool Uri::HasHost() const {
-  return !host_.empty();
+  return is_valid_ && !authority_.host.empty();
 }
 
 bool Uri::HasPort() const {
-  return  0 < port_ && port_ <= 65535;
+  return  is_valid_ && 0 < authority_.port && authority_.port < 65535;
 }
 
 bool Uri::HasPath() const {
-  return !path_.empty();
+  return is_valid_ && !path_.empty();
 }
 
 bool Uri::HasQuery() const {
-  return !queries_.empty();
+  return is_valid_ && !queries_.empty();
 }
 
 bool Uri::HasFragment() const {
-  return !fragment_.empty();
+  return is_valid_ && !fragment_.empty();
 }
 
 const std::string Uri::Scheme() const {
-  return scheme_;
+  return is_valid_ ? scheme_ : "";
 }
 
 const std::string Uri::UserName() const {
-  return user_info_.name;
+  return is_valid_ ? authority_.user : "";
 }
 
 const std::string Uri::Password() const {
-  return user_info_.password;
+  return is_valid_ ? authority_.password : "";
 }
 
 const std::string Uri::Host() const {
-  return host_;
+  return is_valid_ ? authority_.host : "";
 }
 
 uint16_t Uri::Port() const {
-  return port_;
+  return is_valid_ ? authority_.port : 0u;
 }
 
 const std::string Uri::HostAndPortIfHasPort() const {
+  if (!is_valid_) {
+    return "";
+  }
+
   if (!HasPort()) {
     return Host();
   }
@@ -288,21 +394,26 @@ const std::string Uri::HostAndPortIfHasPort() const {
 }
 
 const std::string Uri::Path() const {
-  return path_;
+  return is_valid_ ? path_ : "";
 }
 
 const std::string Uri::QueryString() const {
-  return MakeQueryString();
+  return is_valid_ ? MakeQueryString() : "";
 }
 
 const std::string Uri::Fragment() const {
-  return fragment_;
+  return is_valid_ ? fragment_ : "";
 }
 
 const std::string Uri::PathWithQueryAndFragment() const {
+  if (is_valid_) {
+    return "";
+  }
+
   std::string path_with_query_fragmnet(path_);
 
   if (!queries_.empty()) {
+    path_with_query_fragmnet.append("?");
     path_with_query_fragmnet.append(MakeQueryString());
   }
 
@@ -314,26 +425,16 @@ const std::string Uri::PathWithQueryAndFragment() const {
   return path_with_query_fragmnet;
 }
 
-// bool Uri::ParseScheme(const std::string& uri_string) {
-  
-// }
-
-// bool Uri::ParseHost(const std::string& uri_string) {
-
-// }
-
 bool Uri::PortValidCheck() const {
-  return  0 < port_ && port_ < 65535;
+  return  0 < authority_.port && authority_.port < 65535;
 }
 
 const std::string Uri::PortToString() const {
-  return std::to_string(port_);
+  return std::to_string(authority_.port);
 }
 
 const std::string Uri::MakeQueryString() const {
   std::string query_str;
-  query_str.append("?");
-
   auto iter = queries_.begin();
   while (iter != queries_.end()) {
     query_str.append(iter->first);

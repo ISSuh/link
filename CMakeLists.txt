@@ -64,7 +64,6 @@ set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
 set(LINK_THIRD_PARTY_LIST
   json
   spdlog
-  uri
 )
 
 if(LINK_WITH_ASIO)
@@ -87,7 +86,6 @@ endforeach()
 
 set(LINK_THIRDPARTY_LIBS
   spdlog
-  network-uri
 )
 
 #-------------------------------------------------------------------------------

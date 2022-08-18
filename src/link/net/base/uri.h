@@ -18,23 +18,30 @@ class Uri {
  public:
   using Query = std::pair<std::string, std::string>;
 
-  struct UserInfo {
-    std::string name;
+  struct Authority {
+    Authority();
+    Authority(
+      const std::string& user_str,
+      const std::string& password_str,
+      const std::string& host_str,
+      uint16_t port_num);
+
+    std::string user;
     std::string password;
+    std::string host;
+    uint16_t port;
   };
 
   static Uri Parse(const std::string& uri_string);
 
   Uri();
   Uri(const std::string& scheme,
-      const std::string& host);
+      const Uri::Authority& authority);
   Uri(const std::string& scheme,
-      const std::string& host,
+      const Uri::Authority& authority,
       const std::string& path);
   Uri(const std::string& scheme,
-      UserInfo user_info,
-      const std::string& host,
-      uint16_t port,
+      Authority authority,
       const std::string& path,
       std::vector<Query> queries,
       const std::string& fragment);
@@ -65,20 +72,13 @@ class Uri {
   const std::string PathWithQueryAndFragment() const;
 
  private:
-  // bool ParseScheme(const std::string& uri_string);
-  // bool ParseHost(const std::string& uri_string);
-  // void ParseUserInfo(const std::string& user_info_string);
-  // void ParsePath();
-  // void ParseFragment();
-
   bool PortValidCheck() const;
   const std::string PortToString() const;
   const std::string MakeQueryString() const;
 
+  bool is_valid_;
   std::string scheme_;
-  UserInfo user_info_;
-  std::string host_;
-  uint16_t port_;
+  Authority authority_;
   std::string path_;
   std::vector<Query> queries_;
   std::string fragment_;
