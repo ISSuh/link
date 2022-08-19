@@ -15,8 +15,80 @@
 namespace nlink {
 namespace base {
 
-const int64_t kNanosecondsPerMicrosecond = 1000;
-const int64_t kMicrosecondsPerMillisecond = 1000;
+constexpr const int64_t kNanosecondsPerMicrosecond = 1000;
+constexpr const int64_t kMicrosecondsPerMillisecond = 1000;
+
+class Time;
+
+TimeTick TimeTick::FromMilliseconds(int64_t ms) {
+  return TimeTick::From(ms, kMicrosecondsPerMillisecond);
+}
+
+TimeTick TimeTick::Now() {
+  return TimeTick::From(Time::InMicrosecond(), 1);
+}
+
+TimeTick TimeTick::From(int64_t value, int64_t offset) {
+  return TimeTick(value * offset);
+}
+
+TimeTick::TimeTick()
+  : tick_(0) {
+}
+
+TimeTick::TimeTick(int64_t us)
+  : tick_(us) {
+}
+
+TimeTick::~TimeTick() = default;
+
+int64_t TimeTick::Tick() const {
+  return tick_;
+}
+
+TimeTick TimeTick::operator+(TimeTick other) const {
+  return TimeTick(tick_ + other.tick_);
+}
+
+TimeTick TimeTick::operator-(TimeTick other) const {
+  return TimeTick(tick_ - other.tick_);
+}
+
+TimeTick& TimeTick::operator+=(TimeTick other) {
+  return *this = (*this + other);
+}
+
+TimeTick& TimeTick::operator-=(TimeTick other) {
+  return *this = (*this - other);
+}
+
+TimeTick TimeTick::operator-() const {
+  return TimeTick(-tick_);
+}
+
+bool TimeTick::operator==(TimeTick other) const {
+  return tick_ == other.tick_;
+}
+
+bool TimeTick::operator!=(TimeTick other) const {
+  return tick_ != other.tick_;
+}
+
+bool TimeTick::operator<(TimeTick other) const {
+  return tick_ < other.tick_;
+}
+
+bool TimeTick::operator<=(TimeTick other) const {
+  return tick_ <= other.tick_;
+}
+
+bool TimeTick::operator>(TimeTick other) const {
+  return tick_ > other.tick_;
+}
+
+bool TimeTick::operator>=(TimeTick other) const {
+  return tick_ >= other.tick_;
+}
 
 int64_t Time::InNanosecond() {
     auto now = std::chrono::system_clock::now();
@@ -59,15 +131,55 @@ std::string Time::CurrentTimeToDateStr() {
   return date_str_stream.str();
 }
 
-TimeTick::TimeTick()
-  : tick_(0) {
+Time Time::Now() {
+  return Time(Time::InMicrosecond());
 }
 
-TimeTick::TimeTick(int64_t us)
-  : tick_(us) {
+Time::Time()
+  : time_tick_(0) {
 }
 
-TimeTick::~TimeTick() = default;
+Time::Time(int64_t us)
+  : time_tick_(us) {
+}
+
+Time::Time(TimeTick tick)
+  : time_tick_(tick) {
+}
+
+Time::~Time() = default;
+
+Time Time::operator+(Time other) const {
+  return Time(time_tick_ + other.time_tick_);
+}
+
+Time Time::operator-(Time other) const {
+  return Time(time_tick_ - other.time_tick_);
+}
+
+bool Time::operator==(Time other) const {
+  return time_tick_ == other.time_tick_;
+}
+
+bool Time::operator!=(Time other) const {
+  return time_tick_ != other.time_tick_;
+}
+
+bool Time::operator<(Time other) const {
+  return time_tick_ < other.time_tick_;
+}
+
+bool Time::operator<=(Time other) const {
+  return time_tick_ <= other.time_tick_;
+}
+
+bool Time::operator>(Time other) const {
+  return time_tick_ > other.time_tick_;
+}
+
+bool Time::operator>=(Time other) const {
+  return time_tick_ >= other.time_tick_;
+}
 
 }  // namespace base
 }  // namespace nlink

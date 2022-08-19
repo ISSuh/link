@@ -16,7 +16,7 @@
 
 using namespace nlink;
 
-TEST(Parse_path, Rounting) {
+TEST(Rounting, Parse_path) {
   std::vector<net::http::Routing::SplitedPath> paths;
 
   std::string empty_path("");
@@ -70,7 +70,7 @@ class RoutingHandlerMock : public RoutingHandler {
     FooParamBaz, void(const net::http::Request&, net::http::Response*));
 };
 
-TEST(regist_handler, Rounting) {
+TEST(Rounting, regist_handler) {
   net::http::Request dummy_request;
   net::http::Response dummy_response;
 

@@ -11,7 +11,7 @@
 #include "link/base/logging.h"
 #include "link/io/socket/socket_factory.h"
 #include "link/net/base/uri.h"
-#include "link/net/http/response_parser.h"
+#include "link/net/http/parser.h"
 
 namespace nlink {
 namespace component {
@@ -128,7 +128,7 @@ void HttpClientComponent::DoFetch(
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
   net::Uri uri = net::Uri::Parse(url_string);
-  if (!uri.HasScheme() || !uri.HasHost() || !uri.HasPort()) {
+  if (!uri.HasScheme() || !uri.HasHost()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
                << uri.Serialize();
     return;
@@ -145,7 +145,7 @@ void HttpClientComponent::DoFetchWithBody(
   const std::string& body,
   RequestHanelder handler) {
   net::Uri uri = net::Uri::Parse(url_string);
-  if (!uri.HasScheme() || !uri.HasHost() || !uri.HasPort()) {
+  if (!uri.HasScheme() || !uri.HasHost()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
                << uri.Serialize();
     return;
@@ -216,7 +216,7 @@ void HttpClientComponent::InternalReadHandler(
     return;
   }
 
-  net::http::Response response = net::http::ResponseParser::Parse(buffer);
+  net::http::Response response = net::http::Parser::ParseResponse(buffer);
   if (!request_handler) {
     return;
   }

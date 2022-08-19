@@ -40,7 +40,7 @@ void ExampleHttpClientModule::Run() {
   http_client_.Post(path_for_post, "application/json", body);
   WaitingForResponse();
 
-  handle_.Shutdown();
+  // handle_.Shutdown();
 }
 
 void ExampleHttpClientModule::Shutdown() {

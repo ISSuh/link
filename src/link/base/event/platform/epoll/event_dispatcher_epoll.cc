@@ -61,6 +61,8 @@ void EventDispatcherEpoll::RegistEventChannelContoller(
         });
 
   event_channel_controller_ = channel_controller;
+
+  running_.store(true);
 }
 
 void EventDispatcherEpoll::Dispatch() {

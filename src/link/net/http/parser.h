@@ -15,6 +15,7 @@
 #include "link/net/http/status_code.h"
 #include "link/net/http/header.h"
 #include "link/net/http/request.h"
+#include "link/net/http/response.h"
 
 namespace nlink {
 namespace net {
@@ -40,6 +41,12 @@ class Parser {
     PARSE_DONE,
     PARSE_ERROR,
   };
+
+  static Request ParseRequest(
+    const base::Buffer& buffer, bool is_https = false);
+
+  static Response ParseResponse(
+    const base::Buffer& buffer, bool is_https = false);
 };
 
 Method ParseMethod(

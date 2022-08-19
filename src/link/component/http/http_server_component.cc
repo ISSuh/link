@@ -11,7 +11,7 @@
 #include "link/base/logging.h"
 #include "link/base/buffer.h"
 #include "link/io/socket/socket_factory.h"
-#include "link/net/http/request_parser.h"
+#include "link/net/http/parser.h"
 
 namespace nlink {
 namespace component {
@@ -79,7 +79,7 @@ void HttpServerComponent::InternalReadHandler(
   }
 
   net::http::Response response;
-  net::http::Request request = net::http::RequestParser::Parse(buffer);
+  net::http::Request request = net::http::Parser::ParseRequest(buffer);
   auto url  = request.RequestUri();
   if (!url.HasPath()) {
     return;

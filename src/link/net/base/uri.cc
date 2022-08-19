@@ -80,7 +80,26 @@ std::pair<std::string, uint16_t> SeparateHostAndPort(
   return {host, port};
 }
 
-Uri::Authority ParseAuthority(const std::string& authority_str) {
+uint16_t UseDefaultPortIfAvaliabe(const std::string& scheme) {
+  uint16_t default_port = 0;
+
+  std::string lower_scheme(scheme);
+  std::transform(
+    lower_scheme.begin(), lower_scheme.end(), lower_scheme.begin(),
+      [](unsigned char c){ return std::tolower(c); });
+
+  if ("http" == lower_scheme) {
+    default_port = 80u;
+  } else if ("http" == lower_scheme) {
+    default_port = 443u;
+  } else {
+    default_port = 0u;
+  }
+  return default_port;
+}
+
+Uri::Authority ParseAuthority(
+  const std::string& scheme, const std::string& authority_str) {
   std::string host_str("");
   Uri::Authority authority;
   size_t user_info_pos = authority_str.find(kCredentialsDelimiter);
@@ -100,6 +119,7 @@ Uri::Authority ParseAuthority(const std::string& authority_str) {
   auto host_with_port = SeparateHostAndPort(host_str);
   authority.host = host_with_port.first;
   authority.port = host_with_port.second;
+
   return authority;
 }
 
@@ -183,7 +203,7 @@ Uri Uri::Parse(const std::string& uri_string) {
   }
 
   std::string authority_str = splited_uri.substr(0, authority_pos);
-  Uri::Authority authority = ParseAuthority(authority_str);
+  Uri::Authority authority = ParseAuthority(scheme, authority_str);
   if (authority.host.empty()) {
     return Uri();
   }
@@ -379,7 +399,14 @@ const std::string Uri::Host() const {
 }
 
 uint16_t Uri::Port() const {
-  return is_valid_ ? authority_.port : 0u;
+  if (!is_valid_) {
+    return 0u;
+  }
+
+  if (0u == authority_.port) {
+    return UseDefaultPortIfAvaliabe(scheme_);
+  }
+  return authority_.port;
 }
 
 const std::string Uri::HostAndPortIfHasPort() const {
@@ -406,11 +433,11 @@ const std::string Uri::Fragment() const {
 }
 
 const std::string Uri::PathWithQueryAndFragment() const {
-  if (is_valid_) {
+  if (!is_valid_) {
     return "";
   }
 
-  std::string path_with_query_fragmnet(path_);
+  std::string path_with_query_fragmnet = "/" + Path();
 
   if (!queries_.empty()) {
     path_with_query_fragmnet.append("?");

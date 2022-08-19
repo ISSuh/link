@@ -13,6 +13,39 @@
 namespace nlink {
 namespace base {
 
+class TimeTick {
+ public:
+  static constexpr const int64_t kNanosecondsPerMicrosecond = 1000;
+  static constexpr const int64_t kMicrosecondsPerMillisecond = 1000;
+
+  static TimeTick FromMilliseconds(int64_t ms);
+  static TimeTick Now();
+
+  TimeTick();
+  explicit TimeTick(int64_t us);
+  ~TimeTick();
+
+  int64_t Tick() const;
+
+  TimeTick operator+(TimeTick other) const;
+  TimeTick operator-(TimeTick other) const;
+  TimeTick& operator+=(TimeTick other);
+  TimeTick& operator-=(TimeTick other);
+  TimeTick operator-() const;
+  bool operator==(TimeTick other) const;
+  bool operator!=(TimeTick other) const;
+  bool operator<(TimeTick other) const;
+  bool operator<=(TimeTick other) const;
+  bool operator>(TimeTick other) const;
+  bool operator>=(TimeTick other) const;
+
+ private:
+  static TimeTick From(int64_t value, int64_t offset);
+
+  // microseconds
+  int64_t tick_;
+};
+
 class Time {
  public:
   static int64_t InNanosecond();
@@ -21,74 +54,25 @@ class Time {
   static int64_t InSecond();
 
   static std::string CurrentTimeToDateStr();
-};
 
-class TimeTick {
- public:
-  static const int64_t kNanosecondsPerMicrosecond = 1000;
-  static const int64_t kMicrosecondsPerMillisecond = 1000;
+  static Time Now();
 
-  TimeTick();
-  explicit TimeTick(int64_t us);
-  ~TimeTick();
+  Time();
+  explicit Time(int64_t us);
+  explicit Time(TimeTick tick);
+  ~Time();
 
-  static TimeTick FromMilliseconds(int64_t ms) {
-    return From(ms, kMicrosecondsPerMillisecond);
-  }
-
-  // should change type of tick_ to int64
-  // need check std::numeric_limits<int64_t>::max() of std::numeric_limits<int64_t>::min()
-  TimeTick operator+(TimeTick other) const {
-    return TimeTick(tick_ + other.tick_);
-  }
-
-  TimeTick operator-(TimeTick other) const {
-    return TimeTick(tick_ - other.tick_);
-  }
-
-  TimeTick& operator+=(TimeTick other) {
-    return *this = (*this + other);
-  }
-
-  TimeTick& operator-=(TimeTick other) {
-    return *this = (*this - other);
-  }
-
-  TimeTick operator-() const {
-    return TimeTick(-tick_);
-  }
-
-  bool operator==(TimeTick other) const {
-    return tick_ == other.tick_;
-  }
-
-  bool operator!=(TimeTick other) const {
-    return tick_ != other.tick_;
-  }
-
-  bool operator<(TimeTick other) const {
-    return tick_ < other.tick_;
-  }
-
-  bool operator<=(TimeTick other) const {
-    return tick_ <= other.tick_;
-  }
-
-  bool operator>(TimeTick other) const {
-    return tick_ > other.tick_;
-  }
-
-  bool operator>=(TimeTick other) const {
-    return tick_ >= other.tick_;
-  }
+  Time operator+(Time other) const;
+  Time operator-(Time other) const;
+  bool operator==(Time other) const;
+  bool operator!=(Time other) const;
+  bool operator<(Time other) const;
+  bool operator<=(Time other) const;
+  bool operator>(Time other) const;
+  bool operator>=(Time other) const;
 
  private:
-  static TimeTick From(int64_t value, int64_t offset) {
-    return TimeTick(value * offset);
-  }
-
-  // microseconds
-  int64_t tick_;
+  TimeTick time_tick_;
 };
 
 }  // namespace base
