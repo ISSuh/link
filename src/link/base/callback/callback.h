@@ -7,6 +7,7 @@
 #ifndef LINK_BASE_CALLBACK_CALLBACK_H_
 #define LINK_BASE_CALLBACK_CALLBACK_H_
 
+#include <memory>
 #include <functional>
 #include <utility>
 

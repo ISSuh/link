@@ -37,7 +37,7 @@ TimeTick::TimeTick()
 }
 
 TimeTick::TimeTick(int64_t us)
-  : tick_(us) {
+  : tick_(us < 0 ? 0 : us) {
 }
 
 TimeTick::~TimeTick() = default;

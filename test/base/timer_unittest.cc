@@ -60,10 +60,6 @@ TEST(Timer, timer_test) {
   WaitForTimer(&timer);
 
   auto tick = after_tick - before_tick;
-  std::cout << before_tick.Tick() << " / "
-            << after_tick.Tick() << " / "
-            << tick.Tick() << std::endl;
-
   EXPECT_GE(tick.Tick(), 1000);
 
   task_manager->StopAllRunner();

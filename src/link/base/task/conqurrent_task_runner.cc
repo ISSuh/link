@@ -30,7 +30,10 @@ void ConcurrentTaskRunner::PostDelayTask(
   LOG(TRACE) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    queue_.push(Task(task_callback, delay));
+
+    TimeTick desired_run_time =
+      base::TimeTick::Now() + delay;
+    queue_.emplace(task_callback, desired_run_time);
   }
   cv_.notify_one();
 }
@@ -95,9 +98,15 @@ Task ConcurrentTaskRunner::NextTask() {
     return Task();
   }
 
-  Task task = queue_.front();
-  queue_.pop();
+  Task task = queue_.top();
 
+  TimeTick now = TimeTick::Now();
+  if (task.desired_run_time > now) {
+    return Task();
+  } else {
+    std::lock_guard<std::mutex> lock(mutex_);
+    queue_.pop();
+  }
   return task;
 }
 

@@ -7,6 +7,7 @@ message("Build Link base Test")
 #-------------------------------------------------------------------------------
 
 set(BASE_UNITTESTS
+  ${CMAKE_CURRENT_SOURCE_DIR}/task_runner_unittest.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/timer_unittest.cc
 )
 

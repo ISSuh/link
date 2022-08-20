@@ -4,6 +4,8 @@
  *
  */
 
+#include <iostream>
+
 #include "link/base/timer.h"
 
 namespace nlink {
@@ -34,6 +36,7 @@ void Timer::Start(TaskCallback task, TimeTick delay) {
     desired_run_time_ = TimeTick();
   }
 
+  running_ = true;
   ScheduleUserTask();
 }
 
@@ -42,8 +45,6 @@ void Timer::Stop() {
 }
 
 void Timer::ScheduleUserTask() {
-  running_ = true;
-
   task_runner_->PostTask(
     [this](){ this->OnScheduleUserTaskInvoked(); });
 }
@@ -54,7 +55,7 @@ void Timer::OnScheduleUserTaskInvoked() {
   }
 
   TimeTick now = TimeTick::Now();
-  if (desired_run_time_ < now) {
+  if (desired_run_time_ > now) {
     ScheduleUserTask();
     return;
   }

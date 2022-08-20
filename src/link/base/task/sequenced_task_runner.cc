@@ -23,8 +23,13 @@ SequencedTaskRunner::~SequencedTaskRunner() = default;
 void SequencedTaskRunner::PostDelayTask(
   const TaskCallback& task_callback, TimeTick delay) {
   LOG(TRACE) << "[" << label() << "] " << __func__;
-  std::lock_guard<std::mutex> lock(mutex_);
-  queue_.push(Task(task_callback, delay));
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+
+    TimeTick desired_run_time =
+      base::TimeTick::Now() + delay;
+    queue_.emplace(task_callback, desired_run_time);
+  }
   cv_.notify_all();
 }
 
@@ -74,15 +79,20 @@ void SequencedTaskRunner::OnDidFinishTask() {
 
 Task SequencedTaskRunner::NextTask() {
   LOG(TRACE) << "[" << label() << "] " << __func__;
-  std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
     return Task();
   }
 
-  Task task = queue_.front();
-  queue_.pop();
+  Task task = queue_.top();
 
+  TimeTick now = TimeTick::Now();
+  if (task.desired_run_time > now) {
+    return Task();
+  } else {
+    std::lock_guard<std::mutex> lock(mutex_);
+    queue_.pop();
+  }
   return task;
 }
 

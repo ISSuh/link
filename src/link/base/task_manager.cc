@@ -218,7 +218,8 @@ TaskRunner* TaskManager::CreateConqurrentTaskRunner(
     return dynamic_cast<TaskRunner*>(runners.at(label).get());
   }
 
-  LOG(INFO) << __func__ << " - Create new Conqurrent Runner : " << label;
+  LOG(INFO) << __func__ << " - Create new Sequenced Runner : "
+                        << group << "/" << label;
 
   std::unique_ptr<TaskRunnerProxy> runner =
     std::unique_ptr<TaskRunnerProxy>(new ConcurrentTaskRunner(label, num));
