@@ -130,14 +130,12 @@ TEST(ConcurrentTaskRunner, run_task_test) {
 
   task_runner->PostTask(
     [&]() {
-      std::cout << "func task1" << std::endl;
       mock_task.Task1();
       finished_task_num.fetch_add(1);
     });
 
   task_runner->PostTask(
     [&]() {
-      std::cout << "func task2" << std::endl;
       mock_task.Task2(0);
       finished_task_num.fetch_add(1);
     });

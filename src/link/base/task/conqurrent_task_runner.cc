@@ -104,7 +104,6 @@ Task ConcurrentTaskRunner::NextTask() {
   if (task.desired_run_time > now) {
     return Task();
   } else {
-    std::lock_guard<std::mutex> lock(mutex_);
     queue_.pop();
   }
   return task;
