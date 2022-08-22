@@ -2,9 +2,18 @@ project(link_component)
 
 message("Build Link component")
 
-FILE(GLOB component_base ${LINK_COMPONENT_PATH}/base/*.cc)
-FILE(GLOB socket_component ${LINK_COMPONENT_PATH}/ipc/socket/*.cc)
-FILE(GLOB http_component ${LINK_COMPONENT_PATH}/http/*.cc)
+file(GLOB component_base
+  ${LINK_COMPONENT_PATH}/base/*.cc
+)
+
+file(GLOB socket_component
+  ${LINK_COMPONENT_PATH}/ipc/socket/*.cc
+)
+
+file(GLOB http_component
+  ${LINK_COMPONENT_PATH}/http/*.cc
+  ${LINK_COMPONENT_PATH}/http/server/*.cc
+)
 
 add_library(${LINK_COMPONENT_NAME}
  OBJECT

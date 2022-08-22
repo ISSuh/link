@@ -30,70 +30,26 @@ HttpServerComponent::HttpServerComponent(
   base::TaskRunner* task_runner)
   : HttpComponent(channel_controller),
     task_runner_(task_runner),
-    server_(io::SocketFactory::CreateTcpServer(task_runner)) {
-  LinkComponent::AttachChannelsToController(server_.get());
-
-  server_->RegistIOHandler(
-    [this](const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-      this->InternalReadHandler(buffer, session);
-    },
-    [this](size_t length) {
-      this->InternalWriteHandler(length);
-    });
+    http_server_(std::make_unique<HttpServer>(task_runner)) {
+  LinkComponent::AttachChannelsToController(http_server_->ServerContext());
 }
 
 HttpServerComponent::~HttpServerComponent() = default;
 
 void HttpServerComponent::Open(const std::string& address, int32_t port) {
-  server_->Listen(io::IpEndPoint(address, port),
-    [this](std::shared_ptr<io::Session> session) {
-      this->InternalAcceptHandler(session);
-    },
-    [this](std::shared_ptr<io::Session> session) {
-      this->InternalCloseHandler(session);
-    });
+  io::IpEndPoint endpoint(address, port);
+  http_server_->Open(endpoint);
 }
 
 void HttpServerComponent::Close() {
-  server_->Close();
+  http_server_->Close();
 }
 
 void HttpServerComponent::Route(
   const std::string& path,
   net::http::handler::ResponseHandler handler) {
-  routing_.RegistHandler(path, handler);
+  http_server_->Route(path, handler);
 }
-
-void HttpServerComponent::InternalAcceptHandler(
-  std::shared_ptr<io::Session> session) {
-}
-
-void HttpServerComponent::InternalCloseHandler(
-  std::shared_ptr<io::Session> session) {
-}
-
-void HttpServerComponent::InternalReadHandler(
-  const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-  if (buffer.IsEmpty()) {
-    return;
-  }
-
-  net::http::Response response;
-  net::http::Request request = net::http::Parser::ParseRequest(buffer);
-  auto url  = request.RequestUri();
-  if (!url.HasPath()) {
-    return;
-  }
-
-  auto handler = routing_.Route(url.Path());
-  if (handler) {
-    handler(request, &response);
-  }
-}
-
-void HttpServerComponent::InternalWriteHandler(size_t length) {
-}
-
 
 }  // namespace component
 }  // namespace nlink

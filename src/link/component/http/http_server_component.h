@@ -17,6 +17,7 @@
 #include "link/io/socket/server.h"
 #include "link/component/ipc/socket/socket_component.h"
 #include "link/component/http/http_component.h"
+#include "link/component/http/server/http_server.h"
 
 namespace nlink {
 namespace component {
@@ -42,19 +43,9 @@ class HttpServerComponent : public HttpComponent {
     base::TaskRunner* task_runner);
   virtual ~HttpServerComponent();
 
-  void InternalAcceptHandler(std::shared_ptr<io::Session> session);
-  void InternalCloseHandler(std::shared_ptr<io::Session> session);
-  void InternalReadHandler(
-    const base::Buffer& buffer, std::shared_ptr<io::Session> session);
-  void InternalWriteHandler(size_t length);
-
   base::TaskRunner* task_runner_;
-  std::unique_ptr<io::Server> server_;
-  SocketComponent::Handler::CloseHandler close_handler_;
-  SocketComponent::Handler::ReadHandler read_handler_;
-  SocketComponent::Handler::WriteHandler write_handler_;
+  std::unique_ptr<HttpServer> http_server_;
 
-  net::http::Routing routing_;
   DISAALOW_COPY_AND_ASSIGN(HttpServerComponent);
 };
 
