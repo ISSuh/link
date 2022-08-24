@@ -39,6 +39,9 @@ void ChannelController::DetatchCahnnel(EventChannel* channel) {
 
 void ChannelController::DispatchEvent(const Event& event) {
   int32_t descriptor = event.Descriptor();
+  if (channel_map_.find(descriptor) == channel_map_.end()) {
+    return;
+  }
   EventChannel* channel = channel_map_.at(descriptor);
   channel->HandleEvent(event);
 }

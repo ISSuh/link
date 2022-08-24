@@ -24,7 +24,7 @@ constexpr const int32_t kDefaultEvnetSize = 1024;
 const int32_t kDefaultTimeOut = 100;
 
 EventDispatcherEpoll* EventDispatcherEpoll::CreateEventDispatcher() {
-  Descriptor epoll_fd = epoll_create(kDefaultEvnetSize);
+  Descriptor epoll_fd = epoll_create1(0);
   if (epoll_fd < 0) {
     close(epoll_fd);
     return nullptr;
@@ -130,7 +130,6 @@ Event::Type EventDispatcherEpoll::HandleEventType(
 
 void EventDispatcherEpoll::Stop() {
   running_.store(true);
-  
 }
 
 void EventDispatcherEpoll::OnAttachChannel(
@@ -139,7 +138,7 @@ void EventDispatcherEpoll::OnAttachChannel(
 
   epoll_event event;
   // event.data.ptr = channel;
-  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP)| (EPOLLET | EPOLLONESHOT);
+  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET);
   event.data.fd = descriptor;
 
   int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_ADD, descriptor, &event);
@@ -158,7 +157,7 @@ void EventDispatcherEpoll::OnUpdatedChannel(
   int32_t descriptor, EventChannel* channel) {
   epoll_event event;
   // event.data.ptr = channel;
-  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET | EPOLLONESHOT);
+  event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET);
   event.data.fd = descriptor;
 
   int32_t res = epoll_ctl(epoll_descriptor_, EPOLL_CTL_MOD, descriptor, &event);

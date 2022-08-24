@@ -205,6 +205,7 @@ const std::string ParseBody(
   const std::string& message, size_t* current_pos, Parser::ParseState* state) {
   size_t remained_size = message.size() - *current_pos;
   if (*current_pos >= message.size()) {
+    *state = Parser::ParseState::PARSE_DONE;
     return "";
   }
 

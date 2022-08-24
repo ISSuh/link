@@ -166,9 +166,9 @@ void TcpSocketSession::InternalWriteHandler(
   std::shared_ptr<base::Buffer> buffer,
   size_t clumulative_trasmission_size,
   int32_t writed_size) {
-  // LOG(INFO) << __func__ << " - "
-  //           << " trasmission_size : " << clumulative_trasmission_size
-  //           << ", writed_size : " << writed_size;
+  LOG(INFO) << __func__ << " - "
+            << " trasmission_size : " << clumulative_trasmission_size
+            << ", writed_size : " << writed_size;
 
   if (0 > writed_size) {
     task_runner_->PostTask(

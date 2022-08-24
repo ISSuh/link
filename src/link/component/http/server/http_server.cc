@@ -6,10 +6,12 @@
 
 #include "link/component/http/server/http_server.h"
 
+#include "link/base/logging.h"
 #include "link/io/socket/socket_factory.h"
 #include "link/net/http/parser.h"
 #include "link/net/http/request.h"
 #include "link/net/http/response.h"
+#include "link/component/http/server/http_util.h"
 
 namespace nlink {
 namespace component {
@@ -63,6 +65,7 @@ void HttpServer::InternalCloseHandler(
 
 void HttpServer::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+  LOG(INFO) << __func__ << " - buffer size : " << buffer.Size();
   if (buffer.IsEmpty()) {
     return;
   }
@@ -75,9 +78,15 @@ void HttpServer::InternalReadHandler(
   }
 
   auto handler = routing_.Route(url.Path());
-  if (handler) {
+  if (!handler) {
+    response = http::Default404Error();
+  } else {
     handler(request, &response);
   }
+
+  std::shared_ptr<base::Buffer> response_buffer =
+    std::make_shared<base::Buffer>(response.Serialize());
+  session->Write(response_buffer);
 }
 
 void HttpServer::InternalWriteHandler(size_t length) {

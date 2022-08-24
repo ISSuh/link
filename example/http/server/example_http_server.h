@@ -16,6 +16,16 @@
 #include <link/component/http/http_server_component.h>
 #include <link/component/http/http_component.h>
 
+class TestHandler {
+ public:
+  void HelloWorld(
+    const nlink::net::http::Request&, nlink::net::http::Response*);
+  void User(const nlink::net::http::Request&, nlink::net::http::Response*);
+
+ private:
+  uint64_t user_id_;
+};
+
 class ExampleHttpServer {
  public:
   ExampleHttpServer(
@@ -29,9 +39,8 @@ class ExampleHttpServer {
   void RegistRoute();
 
  private:
-  void User(const nlink::net::http::Request&, nlink::net::http::Response*);
-
   nlink::component::HttpServerComponent* server_component_;
+  TestHandler test_handler_;
 };
 
 #endif  // EXAMPLE_HTTP_SERVER_EXAMPLE_HTTP_SERVER_H_

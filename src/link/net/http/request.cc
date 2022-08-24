@@ -48,8 +48,8 @@ Request::Request(
     uri_(uri),
     header_(header),
     body_(body) {
-  header_.Set("Host", uri_.HostAndPortIfHasPort());
-  header_.Set("Accept", "*/*");
+  // header_.Set("Host", uri_.HostAndPortIfHasPort());
+  // header_.Set("Accept", "*/*");
 }
 
 Request::~Request() = default;

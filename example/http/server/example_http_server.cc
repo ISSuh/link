@@ -12,6 +12,20 @@
 
 using namespace nlink;
 
+void TestHandler::HelloWorld(
+  const nlink::net::http::Request& request,
+  nlink::net::http::Response* response) {
+  LOG(INFO) << "TestHandler::HelloWorld - \n"
+            << request.Serialize();
+}
+
+void TestHandler::User(
+  const nlink::net::http::Request& request,
+  nlink::net::http::Response* response) {
+  LOG(INFO) << "TestHandler::User - \n"
+            << request.Serialize();
+}
+
 ExampleHttpServer::ExampleHttpServer(
     nlink::base::TaskRunner* task_runner,
     nlink::handle::LinkHandle* handle)
@@ -28,6 +42,8 @@ ExampleHttpServer::~ExampleHttpServer() = default;
 
 void ExampleHttpServer::OpenServer(const std::string& address, int32_t port) {
   server_component_->Open(address, port);
+
+  RegistRoute();
 }
 
 void ExampleHttpServer::CloseServer() {
@@ -36,12 +52,14 @@ void ExampleHttpServer::CloseServer() {
 
 void ExampleHttpServer::RegistRoute() {
   server_component_->Route(
-    "/user",
-    [this](const net::http::Request& request, net::http::Response* response) {
-      this->User(request, response);
+    "/helloworld",
+    [&](const net::http::Request& request, net::http::Response* response) {
+      test_handler_.HelloWorld(request, response);
     });
-}
 
-void ExampleHttpServer::User(
-  const net::http::Request& request, net::http::Response* response) {
+  server_component_->Route(
+    "/user/<id>",
+    [&](const net::http::Request& request, net::http::Response* response) {
+      test_handler_.User(request, response);
+    });
 }

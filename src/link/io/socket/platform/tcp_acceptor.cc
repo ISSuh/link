@@ -108,14 +108,15 @@ void TcpAcceptor::CreateNewSessionAndRegist(
   handler::AcceptHandler handler) {
   is_connected_ = true;
 
-  socket_create_callback_(peer_socket->Descriptor(), false);
-
+  int32_t descriptor = peer_socket->Descriptor();
   std::shared_ptr<Session> session =
     std::make_shared<TcpSocketSession>(task_runner_, std::move(peer_socket));
 
   if (handler) {
     handler(session);
   }
+
+  socket_create_callback_(descriptor, false);
 }
 
 }  // namespace io

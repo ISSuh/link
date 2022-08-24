@@ -18,8 +18,7 @@ constexpr const char kHeaderDelm = ':';
 
 HttpHeader::HttpHeader()
   : header_fields_({
-    {"User-Agent", "nLink   0.0.1"},
-    {"Connection", "Close"}}) {
+    {"User-Agent", "nLink   0.0.1"}}) {
 }
 
 HttpHeader::~HttpHeader() = default;
@@ -29,7 +28,7 @@ void HttpHeader::Set(const std::pair<std::string, std::string>& header) {
 }
 
 void HttpHeader::Set(const std::string& key, const std::string& value) {
-  header_fields_.insert({key, value});
+  header_fields_[key] = value;
 }
 
 bool HttpHeader::ParseAndSet(const std::string& header_str) {

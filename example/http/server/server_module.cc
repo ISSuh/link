@@ -17,18 +17,16 @@ void ExampleHttpServerModule::Init() {
 
 void ExampleHttpServerModule::Run() {
   LOG(INFO) << "ExampleHttpServerModule::Run";
-  std::string address;
   int32_t port;
-  GetArgument("address", &address);
   GetArgument("port", &port);
 
   handle::LinkHandle handle;
   handle.Initialize();
 
   ExampleHttpServer http_server(GetTaskRunner(), &handle);
-  http_server.OpenServer(address, port);
+  http_server.OpenServer("0.0.0.0", port);
 
-  LOG(INFO) << "Open Example Http Server(" << address << ":" << port << ")";
+  LOG(INFO) << "Open Example Http Server(0.0.0.0:" << port << ")";
 
   handle.Run();
 

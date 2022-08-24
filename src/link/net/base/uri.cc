@@ -221,7 +221,7 @@ Uri Uri::Parse(const std::string& uri_string) {
     path_pos = splited_uri.size();
   }
 
-  std::string path_str = splited_uri.substr(0, path_pos);
+  std::string path_str = "/" + splited_uri.substr(0, path_pos);
   pos = path_pos + kQueryDelimiterSize;
 
   if (pos >= splited_uri.size()) {
@@ -328,7 +328,6 @@ const std::string Uri::Serialize() {
   }
 
   if (HasPath()) {
-    uri.append("/");
     uri.append(Path());
 
     if (HasQuery()) {
@@ -437,7 +436,7 @@ const std::string Uri::PathWithQueryAndFragment() const {
     return "";
   }
 
-  std::string path_with_query_fragmnet = "/" + Path();
+  std::string path_with_query_fragmnet = Path();
 
   if (!queries_.empty()) {
     path_with_query_fragmnet.append("?");

@@ -1,0 +1,19 @@
+{
+  "node_name": "http_example",
+  "log_level": "debug",
+  "modules": [
+    {
+      "module_name": "TestHttpServer",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/http/libhttpserver_example.so",
+      "module": {
+        "class_name": "ExampleHttpServerModule",
+        "arguments": {
+          "port": 33669
+        },
+        "configure": {
+          "threading": false
+        }
+      }
+    }
+  ]
+}
