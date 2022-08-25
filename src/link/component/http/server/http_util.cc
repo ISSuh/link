@@ -19,16 +19,16 @@ namespace http {
 net::http::Response Default404Error() {
   std::stringstream body_stream;
   body_stream << "<html>" << '\n';
-  body_stream << "<head>" << '\n';
-  body_stream << "</head>" << '\n';
-  body_stream << "<body>" << '\n';
-  body_stream << "<p>404 not found</p>" << '\n';
-  body_stream << "</body>" << '\n';
+  body_stream << "  <head>" << '\n';
+  body_stream << "  </head>" << '\n';
+  body_stream << "  <body>" << '\n';
+  body_stream << "    <p>404 not found</p>" << '\n';
+  body_stream << "  </body>" << '\n';
   body_stream << "</html>" << '\n';
 
   net::http::HttpHeader header;
   header.Set("Content-Type", "text/html");
-  header.Set("Content-Length", std::to_string(body_stream.str().size()));
+  header.Set("Content-Length", body_stream.str().size());
 
   return net::http::Response(
     net::http::HttpStatusCode::NOT_FOUND,

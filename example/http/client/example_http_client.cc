@@ -59,7 +59,7 @@ void ExampleHttpClient::Post(
 
 void ExampleHttpClient::GetHandler(const net::http::Response& response) {
   auto header = response.Header();
-  auto body = response.Body();
+  std::string body = response.Body();
 
   LOG(INFO) << "[ExampleHttpClient::PostHandler] \n"
             << "header size : " << header.Serialize().size()

@@ -6,12 +6,12 @@ message("Build Link IO Test")
 # Build unit test
 #-------------------------------------------------------------------------------
 
-set(IO_BASE_UNITTESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/base/io_address_unittest.cc
+file(GLOB io_base_unittests
+  ${CMAKE_CURRENT_SOURCE_DIR}/base/*.cc
 )
 
 add_executable(${PROJECT_NAME}
-  ${IO_BASE_UNITTESTS}
+  ${io_base_unittests}
 )
 
 target_include_directories(${PROJECT_NAME}

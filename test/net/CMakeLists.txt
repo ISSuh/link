@@ -6,13 +6,17 @@ message("Build Link Test")
 # Build unit test
 #-------------------------------------------------------------------------------
 
-set(NET_BASE_UNITTESTS
-  ${PROJECT_SOURCE_DIR}/base/url_unittest.cc
-  ${PROJECT_SOURCE_DIR}/http/routing_unittest.cc
+file(GLOB net_base_unittests
+  ${PROJECT_SOURCE_DIR}/base/*.cc
+)
+
+file(GLOB net_http_unittests
+  ${PROJECT_SOURCE_DIR}/http/*.cc
 )
 
 add_executable(${PROJECT_NAME}
-  ${NET_BASE_UNITTESTS}
+  ${net_base_unittests}
+  ${net_http_unittests}
 )
 
 target_include_directories(${PROJECT_NAME}

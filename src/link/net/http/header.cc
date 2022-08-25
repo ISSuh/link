@@ -7,6 +7,7 @@
 #include "link/net/http/header.h"
 
 #include <sstream>
+#include <algorithm>
 
 #include "link/base/logging.h"
 
@@ -15,23 +16,35 @@ namespace net {
 namespace http {
 
 constexpr const char kHeaderDelm = ':';
+constexpr const size_t kHeaderDelmSize = 1;
+constexpr const char kSpace = ' ';
+constexpr const size_t kSpaceSize = 1;
+
+std::string ToLowerKey(const std::string& key) {
+  std::string lower_key(key);
+  std::transform(
+    lower_key.begin(), lower_key.end(), lower_key.begin(), ::tolower);
+  return lower_key;
+}
 
 HttpHeader::HttpHeader()
   : header_fields_({
-    {"User-Agent", "nLink   0.0.1"}}) {
+    {"user-agent", "nLink 0.0.1"}}) {
 }
 
 HttpHeader::~HttpHeader() = default;
 
-void HttpHeader::Set(const std::pair<std::string, std::string>& header) {
-  header_fields_.insert(header);
-}
-
 void HttpHeader::Set(const std::string& key, const std::string& value) {
-  header_fields_[key] = value;
+  std::string lower_key = ToLowerKey(key);
+  header_fields_[lower_key] = value;
 }
 
-bool HttpHeader::ParseAndSet(const std::string& header_str) {
+void HttpHeader::Set(const std::string& key, int32_t value) {
+  std::string lower_key = ToLowerKey(key);
+  header_fields_[lower_key] = std::to_string(value);
+}
+
+bool HttpHeader::Set(const std::string& header_str) {
   if (header_str.empty()) {
     return false;
   }
@@ -46,42 +59,50 @@ bool HttpHeader::ParseAndSet(const std::string& header_str) {
     return false;
   }
 
-  const size_t space_size = 1;
-  const std::string key = header_str.substr(0, pos);
-  const std::string value =
-    header_str.substr(pos + 1 + space_size, header_str.size());
+  if (header_str[pos + 1] != ' ') {
+    return false;
+  }
 
-  Set(key, value);
+  size_t key_pos = pos;
+  size_t value_pos = pos + kHeaderDelmSize + kSpaceSize;
+  if (value_pos >= header_str.size()) {
+    return false;
+  }
+
+  const std::string key = header_str.substr(0, key_pos);
+  const std::string value =
+    header_str.substr(value_pos, header_str.size());
+
+  std::string lower_key = ToLowerKey(key);
+  Set(lower_key, value);
   return true;
 }
 
 const std::string HttpHeader::Serialize() const {
+  const char* CRLF = "\r\n";
   std::stringstream stream;
   for (const auto& header : header_fields_) {
     const std::string& key = header.first;
     const std::string& value = header.second;
 
-    if (key.empty() || value.empty()) {
-      continue;
-    }
-
     stream << key;
-    stream << ": ";
+    stream << kHeaderDelm << kSpace;
     stream << value;
-    stream << "\r\n";
+    stream << CRLF;
   }
   return stream.str();
 }
 
-bool HttpHeader::Empty() const {
-  return header_fields_.empty();
+size_t HttpHeader::Size() const {
+  return header_fields_.size();
 }
 
 const std::string HttpHeader::Find(const std::string& key) const {
-  if (header_fields_.find(key) == header_fields_.end()) {
+  std::string lower_key = ToLowerKey(key);
+  if (header_fields_.find(lower_key) == header_fields_.end()) {
     return "";
   }
-  return header_fields_.at(key);
+  return header_fields_.at(lower_key);
 }
 
 

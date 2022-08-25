@@ -8,7 +8,7 @@
 #define LINK_NET_HTTP_HEADER_H_
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <utility>
 
 namespace nlink {
@@ -20,17 +20,17 @@ class HttpHeader {
   HttpHeader();
   ~HttpHeader();
 
-  void Set(const std::pair<std::string, std::string>& header);
   void Set(const std::string& key, const std::string& value);
-  bool ParseAndSet(const std::string& header_str);
+  void Set(const std::string& key, int32_t value);
+  bool Set(const std::string& header_str);
 
   const std::string Serialize() const;
 
-  bool Empty() const;
+  size_t Size() const;
   const std::string Find(const std::string& key) const;
 
  private:
-  std::map<std::string, std::string> header_fields_;
+  std::unordered_map<std::string, std::string> header_fields_;
 };
 
 }  // namespace http

@@ -6,13 +6,12 @@ message("Build Link base Test")
 # Build unit test
 #-------------------------------------------------------------------------------
 
-set(BASE_UNITTESTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/task_runner_unittest.cc
-  ${CMAKE_CURRENT_SOURCE_DIR}/timer_unittest.cc
+file(GLOB base_unittests
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
 )
 
 add_executable(${PROJECT_NAME}
-  ${BASE_UNITTESTS}
+  ${base_unittests}
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -191,7 +191,7 @@ void ParseHeaders(
       break;
     }
 
-    if (!headers->ParseAndSet(header_str)) {
+    if (headers->Set(header_str)) {
       *state = Parser::ParseState::PARSE_ERROR;
       return;
     }
