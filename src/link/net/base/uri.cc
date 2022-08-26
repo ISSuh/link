@@ -295,7 +295,7 @@ Uri::Uri(
     fragment_(fragment) {
 }
 
-const std::string Uri::Serialize() {
+const std::string Uri::Serialize() const {
   std::string uri;
 
   if (!HasScheme()) {
@@ -344,7 +344,7 @@ const std::string Uri::Serialize() {
   return uri;
 }
 
-bool Uri::IsEmpty() const {
+bool Uri::Empty() const {
   return !is_valid_ ||
           (scheme_.empty() && authority_.host.empty());
 }
@@ -449,6 +449,17 @@ const std::string Uri::PathWithQueryAndFragment() const {
   }
 
   return path_with_query_fragmnet;
+}
+
+const std::string Uri::QueryParam(const std::string& key) const {
+  for (const auto& query : queries_) {
+    std::string query_key = query.first;
+    std::string query_value = query.second;
+    if (key == query_key) {
+      return query_value;
+    }
+  }
+  return "";
 }
 
 bool Uri::PortValidCheck() const {

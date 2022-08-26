@@ -28,8 +28,7 @@ std::string ToLowerKey(const std::string& key) {
 }
 
 HttpHeader::HttpHeader()
-  : header_fields_({
-    {"user-agent", "nLink 0.0.1"}}) {
+  : header_fields_() {
 }
 
 HttpHeader::~HttpHeader() = default;
@@ -91,6 +90,10 @@ const std::string HttpHeader::Serialize() const {
     stream << CRLF;
   }
   return stream.str();
+}
+
+bool HttpHeader::Empty() const {
+  return header_fields_.empty();
 }
 
 size_t HttpHeader::Size() const {

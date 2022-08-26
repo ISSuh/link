@@ -22,9 +22,10 @@ class Request {
  public:
   struct RequestLine {
     RequestLine();
+    RequestLine(Method http_method, const Uri& http_uri);
     RequestLine(
       Method http_method,
-      const Uri& http_uri ,
+      const Uri& http_uri,
       Version http_version);
 
     Method method;
@@ -33,19 +34,13 @@ class Request {
   };
 
   Request();
-
-  Request(Method method, Uri uri, Version version = Version::HTTP_1_1);
-  Request(
-    Method method, Uri uri, const HttpHeader& header);
-  Request(
-    Method method, Uri uri, const HttpHeader& header, const std::string& body);
-  Request(
-    Method method, Uri uri, Version version,
-    const HttpHeader& header, const std::string& body);
-
   explicit Request(RequestLine request_line);
   Request(
     RequestLine request_line, const HttpHeader& header);
+  Request(
+    RequestLine request_line,
+    const HttpHeader& header,
+    const std::string& body);
   Request(
     RequestLine request_line,
     const HttpHeader& header,
@@ -54,11 +49,23 @@ class Request {
 
   ~Request();
 
-  Uri RequestUri() const;
+  bool IsValid() const;
+  const std::string Serialize() const;
 
-  HttpHeader Header() const;
+  Method ReqeustMethod() const;
+  Version HttpVersion() const;
+
+  const Uri RequestUri() const;
+  const std::string UriOrigin() const;
+  const std::string Path() const;
+
+  bool HasQuery() const;
+  const std::string FindQueryParam(const std::string key) const;
+
+  const HttpHeader Header() const;
   void SetHeaderItem(const std::string& key, const std::string& value);
   void SetHeaderItem(const std::string& key, int32_t value);
+  const std::string FindHeaderItem(const std::string key) const;
 
   const std::string Body() const;
   void SetBody(const std::string& content, const std::string& content_type);
@@ -67,15 +74,8 @@ class Request {
   size_t ContentLength() const;
   const std::string ContentType() const;
 
-  const std::string Serialize() const;
-
  private:
   RequestLine request_line_;
-
-  Version version_;
-  Method method_;
-  Uri uri_;
-
   HttpHeader header_;
   std::string body_;
 };

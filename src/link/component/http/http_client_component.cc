@@ -53,8 +53,10 @@ void HttpClientComponent::Post(
   const std::string& body,
   RequestHanelder handler) {
   net::http::HttpHeader header;
-  header.Set("Content-Type", content_type);
-  Post(url_string, header, body, handler);
+  header.Set("content-type", content_type);
+  header.Set("content-length", body.size());
+  DoFetchWithBody(
+    net::http::Method::POST, url_string, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Post(
@@ -62,8 +64,24 @@ void HttpClientComponent::Post(
   const net::http::HttpHeader& header,
   const std::string& body,
   RequestHanelder handler) {
+  const std::string content_type = header.Find("content-type");
+  const std::string content_length = header.Find("content-length");
+
+  if (content_type.empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Post] invalid content_type on header. "
+               << content_type;
+    return;
+  }
+
+  if (content_length.empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Post] "
+               << "invalid content_length on header. "
+               << content_length;
+    return;
+  }
+
   DoFetchWithBody(
-    net::http::Method::POST, url_string, header, body, handler);
+    net::http::Method::POST, url_string, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Put(
@@ -72,8 +90,10 @@ void HttpClientComponent::Put(
   const std::string& body,
   RequestHanelder handler) {
   net::http::HttpHeader header;
-  header.Set("Content-Type", content_type);
-  Post(url_string, header, body, handler);
+  header.Set("content-type", content_type);
+  header.Set("content-length", body.size());
+  DoFetchWithBody(
+    net::http::Method::PUT, url_string, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Put(
@@ -81,8 +101,24 @@ void HttpClientComponent::Put(
   const net::http::HttpHeader& header,
   const std::string& body,
   RequestHanelder handler) {
+  const std::string content_type = header.Find("content-type");
+  const std::string content_length = header.Find("content-length");
+
+  if (content_type.empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Put] invalid content_type on header. "
+               << content_type;
+    return;
+  }
+
+  if (content_length.empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Put] "
+               << "invalid content_length on header. "
+               << content_length;
+    return;
+  }
+
   DoFetchWithBody(
-    net::http::Method::PUT, url_string, header, body, handler);
+    net::http::Method::PUT, url_string, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Delete(
@@ -113,7 +149,7 @@ void HttpClientComponent::Fetch(
     case net::http::Method::POST:
     case net::http::Method::PUT:
       DoFetchWithBody(
-        method, url_string, header, body, handler);
+        method, url_string, header, body, content_type, handler);
       break;
     default:
       LOG(WARNING) << "[HttpClientComponent::Fetch] unsupport method. "
@@ -134,7 +170,8 @@ void HttpClientComponent::DoFetch(
     return;
   }
 
-  net::http::Request request(method, uri, header);
+  net::http::Request::RequestLine request_line = {method, uri};
+  net::http::Request request(request_line, header);
   CreateIOClientAndConnet(request, handler);
 }
 
@@ -143,6 +180,7 @@ void HttpClientComponent::DoFetchWithBody(
   const std::string& url_string,
   const net::http::HttpHeader& header,
   const std::string& body,
+  const std::string& content_type,
   RequestHanelder handler) {
   net::Uri uri = net::Uri::Parse(url_string);
   if (!uri.HasScheme() || !uri.HasHost()) {
@@ -151,7 +189,14 @@ void HttpClientComponent::DoFetchWithBody(
     return;
   }
 
-  net::http::Request request(method, uri, header, body);
+  if (content_type.empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid content_type. "
+               << content_type;
+    return;
+  }
+
+  net::http::Request::RequestLine request_line = {method, uri};
+  net::http::Request request(request_line, header, body, content_type);
   CreateIOClientAndConnet(request, handler);
 }
 

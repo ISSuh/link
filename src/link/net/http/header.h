@@ -26,6 +26,7 @@ class HttpHeader {
 
   const std::string Serialize() const;
 
+  bool Empty() const;
   size_t Size() const;
   const std::string Find(const std::string& key) const;
 

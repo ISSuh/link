@@ -76,12 +76,10 @@ TEST(HttpHeader, serialize_header) {
     std::string content_type =
       "content-type: application/javascript; charset=utf-8";
     std::string content_length = "content-length: 620";
-    std::string default_user_agent = "user-agent: nLink 0.0.1";
     std::string content_encoding = "content-encoding: br";
 
     stream << content_type << CRLF;
     stream << content_length << CRLF;
-    stream << default_user_agent << CRLF;
     stream << content_encoding << CRLF;
 
     net::http::HttpHeader header;

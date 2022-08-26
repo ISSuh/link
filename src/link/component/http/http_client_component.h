@@ -94,6 +94,7 @@ class HttpClientComponent : public HttpComponent {
     const std::string& path,
     const net::http::HttpHeader& header,
     const std::string& body,
+    const std::string& content_type,
     RequestHanelder handler);
 
   void CreateIOClientAndConnet(

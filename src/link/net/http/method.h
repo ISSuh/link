@@ -14,6 +14,7 @@ namespace net {
 namespace http {
 
 enum class Method {
+  INVALID,
   GET,
   HEAD,
   POST,
@@ -21,8 +22,7 @@ enum class Method {
   DELETE,
   CONNECT,
   OPTIONS,
-  TRACE,
-  INVALID
+  TRACE
 };
 
 const std::string MethodToString(Method method);

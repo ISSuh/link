@@ -277,7 +277,9 @@ Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
   std::string scheme = is_https ? "https" : "http";
   Uri::Authority authority = {"", "", host, 0};
   Uri uri(scheme, authority, path);
-  return Request(method, uri, version, header, body);
+
+  Request::RequestLine request_line = {method, uri, version};
+  return Request(request_line, header, body);
 }
 
 Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {

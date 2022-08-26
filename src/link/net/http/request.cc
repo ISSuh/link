@@ -27,7 +27,13 @@ HttpHeader CreateDefaultHeader() {
 }
 
 Request::RequestLine::RequestLine()
-  : RequestLine(Method::GET, Uri(), Version::HTTP_1_1) {
+  : RequestLine(Method::INVALID, Uri()) {
+}
+
+Request::RequestLine::RequestLine(
+  Method http_method,
+  const Uri& http_uri)
+  : RequestLine(http_method, http_uri, Version::INVALID) {
 }
 
 Request::RequestLine::RequestLine(
@@ -40,31 +46,7 @@ Request::RequestLine::RequestLine(
 }
 
 Request::Request()
-  : Request(Method::INVALID, Uri()) {
-}
-
-Request::Request(Method method, Uri uri, Version version)
-  : Request(method, uri, version, CreateDefaultHeader(), "") {
-}
-
-Request::Request(
-  Method method, Uri uri, const HttpHeader& header)
-  : Request(method, uri, Version::HTTP_1_1, header, "") {
-}
-
-Request::Request(
-  Method method, Uri uri, const HttpHeader& header, const std::string& body)
-  : Request(method, uri, Version::HTTP_1_1, header, body) {
-}
-
-Request::Request(
-  Method method, Uri uri, Version version,
-  const HttpHeader& header, const std::string& body)
-  : version_(version),
-    method_(method),
-    uri_(uri),
-    header_(header),
-    body_(body) {
+  : Request(RequestLine()) {
 }
 
 Request::Request(RequestLine request_line)
@@ -74,6 +56,15 @@ Request::Request(RequestLine request_line)
 Request::Request(
   RequestLine request_line, const HttpHeader& header)
   : Request(request_line, header, "", "") {
+}
+
+Request::Request(
+  RequestLine request_line,
+  const HttpHeader& header,
+  const std::string& body)
+  : request_line_(request_line),
+    header_(header),
+    body_(body) {
 }
 
 Request::Request(
@@ -92,11 +83,55 @@ Request::Request(
 
 Request::~Request() = default;
 
-Uri Request::RequestUri() const {
-  return uri_;
+bool Request::IsValid() const {
+  if (Method::INVALID == request_line_.method) {
+    return false;
+  }
+
+  if (Version::INVALID == request_line_.version) {
+    return false;
+  }
+
+  if (request_line_.uri.Empty()) {
+    return false;
+  }
+
+  return true;
 }
 
-HttpHeader Request::Header() const {
+const std::string Request::Serialize() const {
+  std::stringstream stream;
+  stream << MethodToString(request_line_.method) << ' '
+         << request_line_.uri.PathWithQueryAndFragment() << ' '
+         << VersionToString(request_line_.version)  << kCRLF;
+
+  stream << header_.Serialize();
+  stream << kCRLF;
+  stream << body_;
+  return stream.str();
+}
+
+const Uri Request::RequestUri() const {
+  return request_line_.uri;
+}
+
+const std::string Request::UriOrigin() const {
+  return request_line_.uri.Serialize();
+}
+
+const std::string Request::Path() const {
+  return request_line_.uri.Path();
+}
+
+Method Request::ReqeustMethod() const {
+  return request_line_.method;
+}
+
+Version Request::HttpVersion() const {
+  return request_line_.version;
+}
+
+const HttpHeader Request::Header() const {
   return header_;
 }
 
@@ -106,6 +141,10 @@ void Request::SetHeaderItem(const std::string& key, const std::string& value) {
 
 void Request::SetHeaderItem(const std::string& key, int32_t value) {
   header_.Set(key, value);
+}
+
+const std::string Request::FindHeaderItem(const std::string key) const {
+  return header_.Find(key);
 }
 
 const std::string Request::Body() const {
@@ -137,16 +176,12 @@ const std::string Request::ContentType() const {
   return content_type;
 }
 
-const std::string Request::Serialize() const {
-  std::stringstream stream;
-  stream << MethodToString(method_) << ' '
-         << uri_.PathWithQueryAndFragment() << ' '
-         << VersionToString(version_)  << kCRLF;
+bool Request::HasQuery() const {
+  return request_line_.uri.HasQuery();
+}
 
-  stream << header_.Serialize();
-  stream << kCRLF;
-  stream << body_;
-  return stream.str();
+const std::string Request::FindQueryParam(const std::string key) const {
+  return uri.QueryParam(key);
 }
 
 }  // namespace http

@@ -113,20 +113,20 @@ TEST(Url, parse_uri_string_fail) {
   // without scheme
   uri_str = "www.google.com";
   uri = net::Uri::Parse(uri_str);
-  EXPECT_TRUE(uri.IsEmpty());
+  EXPECT_TRUE(uri.Empty());
 
   // invalid scheme delimeter
   uri_str = "http:/www.google.com";
   uri = net::Uri::Parse(uri_str);
-  EXPECT_TRUE(uri.IsEmpty());
+  EXPECT_TRUE(uri.Empty());
 
   // without host
   uri_str = "http://";
   uri = net::Uri::Parse(uri_str);
-  EXPECT_TRUE(uri.IsEmpty());
+  EXPECT_TRUE(uri.Empty());
 
   // invalid port
   uri_str = "http://localhost:80tt";
   uri = net::Uri::Parse(uri_str);
-  EXPECT_TRUE(uri.IsEmpty());
+  EXPECT_TRUE(uri.Empty());
 }

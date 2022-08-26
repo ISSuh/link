@@ -46,9 +46,9 @@ class Uri {
       std::vector<Query> queries,
       const std::string& fragment);
 
-  const std::string Serialize();
+  const std::string Serialize() const;
 
-  bool IsEmpty() const;
+  bool Empty() const;
 
   bool HasScheme() const;
   bool HasUserName() const;
@@ -70,6 +70,8 @@ class Uri {
   const std::string Fragment() const;
 
   const std::string PathWithQueryAndFragment() const;
+
+  const std::string QueryParam(const std::string& key) const;
 
  private:
   bool PortValidCheck() const;
