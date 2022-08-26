@@ -35,35 +35,66 @@ HttpClientComponent::HttpClientComponent(
 HttpClientComponent::~HttpClientComponent() = default;
 
 void HttpClientComponent::Get(
-  const std::string& path, RequestHanelder handler) {
+  const std::string& uri_string, RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   net::http::HttpHeader default_header;
-  Get(path, default_header, handler);
+  default_header.Set("host", uri.Host());
+  default_header.Set("accept", "*/*");
+  default_header.Set("user-agent", "nlink/0.0.1");
+  DoFetch(net::http::Method::GET, uri, default_header, handler);
 }
 
 void HttpClientComponent::Get(
-  const std::string& url_string,
+  const std::string& uri_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
-  DoFetch(net::http::Method::GET, url_string, header, handler);
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (!uri.HasScheme() || !uri.HasHost()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
+  DoFetch(net::http::Method::GET, uri, header, handler);
 }
 
 void HttpClientComponent::Post(
-  const std::string& url_string,
+  const std::string& uri_string,
   const std::string& content_type,
   const std::string& body,
   RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Post] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   net::http::HttpHeader header;
   header.Set("content-type", content_type);
   header.Set("content-length", body.size());
   DoFetchWithBody(
-    net::http::Method::POST, url_string, header, body, content_type, handler);
+    net::http::Method::POST, uri, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Post(
-  const std::string& url_string,
+  const std::string& uri_string,
   const net::http::HttpHeader& header,
   const std::string& body,
   RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Post] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   const std::string content_type = header.Find("content-type");
   const std::string content_length = header.Find("content-length");
 
@@ -81,26 +112,40 @@ void HttpClientComponent::Post(
   }
 
   DoFetchWithBody(
-    net::http::Method::POST, url_string, header, body, content_type, handler);
+    net::http::Method::POST, uri, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Put(
-  const std::string& url_string,
+  const std::string& uri_string,
   const std::string& content_type,
   const std::string& body,
   RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Put] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   net::http::HttpHeader header;
   header.Set("content-type", content_type);
   header.Set("content-length", body.size());
   DoFetchWithBody(
-    net::http::Method::PUT, url_string, header, body, content_type, handler);
+    net::http::Method::PUT, uri, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Put(
-  const std::string& url_string,
+  const std::string& uri_string,
   const net::http::HttpHeader& header,
   const std::string& body,
   RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Put] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   const std::string content_type = header.Find("content-type");
   const std::string content_length = header.Find("content-length");
 
@@ -118,38 +163,59 @@ void HttpClientComponent::Put(
   }
 
   DoFetchWithBody(
-    net::http::Method::PUT, url_string, header, body, content_type, handler);
+    net::http::Method::PUT, uri, header, body, content_type, handler);
 }
 
 void HttpClientComponent::Delete(
-  const std::string& url_string, RequestHanelder handler) {
+  const std::string& uri_string, RequestHanelder handler) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   net::http::HttpHeader default_header;
-  Delete(url_string, default_header, handler);
+  DoFetch(net::http::Method::DELETE, uri, default_header, handler);
 }
 
 void HttpClientComponent::Delete(
-  const std::string& url_string,
+  const std::string& uri_string,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
-  DoFetch(net::http::Method::DELETE, url_string, header, handler);
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
+  DoFetch(net::http::Method::DELETE, uri, header, handler);
 }
 
 void HttpClientComponent::Fetch(
   net::http::Method method,
-  const std::string& url_string,
+  const std::string& uri_string,
   RequestHanelder handler,
   const net::http::HttpHeader& header,
   const std::string& content_type,
   const std::string& body) {
+  net::Uri uri = net::Uri::Parse(uri_string);
+  if (uri.Empty()) {
+    LOG(ERROR) << "[HttpClientComponent::Fetch] invalid url. "
+               << uri.Serialize();
+    return;
+  }
+
   switch (method) {
     case net::http::Method::GET:
     case net::http::Method::DELETE:
-      DoFetch(method, url_string, header, handler);
+      DoFetch(method, uri, header, handler);
       break;
     case net::http::Method::POST:
     case net::http::Method::PUT:
       DoFetchWithBody(
-        method, url_string, header, body, content_type, handler);
+        method, uri, header, body, content_type, handler);
       break;
     default:
       LOG(WARNING) << "[HttpClientComponent::Fetch] unsupport method. "
@@ -160,35 +226,28 @@ void HttpClientComponent::Fetch(
 
 void HttpClientComponent::DoFetch(
   net::http::Method method,
-  const std::string& url_string,
+  const net::Uri& uri,
   const net::http::HttpHeader& header,
   RequestHanelder handler) {
-  net::Uri uri = net::Uri::Parse(url_string);
-  if (!uri.HasScheme() || !uri.HasHost()) {
-    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
-               << uri.Serialize();
+  net::http::Request::RequestLine request_line =
+    {method, uri, net::http::Version::HTTP_1_1};
+  net::http::Request request(request_line, header);
+  if (!request.IsValid()) {
+    LOG(ERROR) << "[HttpClientComponent::Get] invalid requese."
+               << request.Serialize();
     return;
   }
 
-  net::http::Request::RequestLine request_line = {method, uri};
-  net::http::Request request(request_line, header);
   CreateIOClientAndConnet(request, handler);
 }
 
 void HttpClientComponent::DoFetchWithBody(
   net::http::Method method,
-  const std::string& url_string,
+  const net::Uri& uri,
   const net::http::HttpHeader& header,
   const std::string& body,
   const std::string& content_type,
   RequestHanelder handler) {
-  net::Uri uri = net::Uri::Parse(url_string);
-  if (!uri.HasScheme() || !uri.HasHost()) {
-    LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
-               << uri.Serialize();
-    return;
-  }
-
   if (content_type.empty()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid content_type. "
                << content_type;

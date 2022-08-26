@@ -14,18 +14,6 @@ namespace nlink {
 namespace net {
 namespace http {
 
-    Method method;
-    Uri uri;
-    Version version;
-
-HttpHeader CreateDefaultHeader() {
-  HttpHeader header;
-  header.Set("User-Agent", "nLink 0.0.1");
-  header.Set("Connection", "Close");
-
-  return header;
-}
-
 Request::RequestLine::RequestLine()
   : RequestLine(Method::INVALID, Uri()) {
 }
@@ -181,7 +169,7 @@ bool Request::HasQuery() const {
 }
 
 const std::string Request::FindQueryParam(const std::string key) const {
-  return uri.QueryParam(key);
+  return request_line_.uri.QueryParam(key);
 }
 
 }  // namespace http

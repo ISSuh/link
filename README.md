@@ -1,56 +1,64 @@
 # nLink
 
-## ToDo
+## project in development
 
+## micro service framework
+Implement module based micro service framework.
+
+## architecture
+
+### nlink framework
+![framework_architecture](./doc/asset/framework_architecture.png)
+
+### modlue
+
+## todo
 
 ### Documents
-  - Architecture 및 design 문서 작성
-  - 각 API 문서 작성
-  - 가이드 문서 작성
+  - Write architecture and design document
+  - Write api document
 
 ### Build
-  - 전반적인 CMake 스크립트 정리
-  - Platform 별 빌드 구조 구현
-  - Define 적용 
-
+  - Restruct CMake srtipt
+  - Implement build structure by platform
 ### Implement
-  - 각종 버그 수정
-  - 임시 구현으로 raw pointer 로 구현된 member와 parameter를 smart pointer로 수정
+  - Fix some bug
+  - Fix raw pointer to smart pointer on some implement
 
 ##### Base
-  - Callback, Bind 이 꼭 필요한지 검토
-  - task runner 개선
-  - Logger 구조 검토
-  - Base64, GZIP, XML 과 같은 utility 구현 혹은 적용
+  - Review whether Callback and Bind is absolutely necessary
+  - Restruct task runner
+  - Review structure of Logger
+  - Implement some utility about Base64, GZIP, XML, etc...
 
 ##### Handle
-  - Handle이 꼭 필요한지 검토
+  - Review whether Handle is absolutely necessary
 
 ##### Module
-  - module remove 시 memory leak 개선 
+  - Fix memory leak when remove module
  
 ##### IO
-  - ~~ASIO 제거~~
-  - ~~Socket pending write, read 처리~~
-  - ~~Socket 의 callback, buffer 등 copy 되지 않도록 처리~~
-  - ~~IP 대신 Domain Name 으로 접속가능하도록 개선~~
-  - Openssl 적용
-  - Shared Memory 구현
-  - Pipe 구현
+  - ~~Remove ASIO~~
+  - ~~Process pending write, read on socket~~
+  - ~~Implement non copy callback, buffer on socket~~
+  - ~~Restruct access using domain name~~
+  - Implement openssl
+  - Implement shared memory
+  - Implement pipe, named pipe
 
 ##### Net
-  - HTTPS 구현
-  - HTTP 개선
-  - URI parse 구현 및 개선
-  - ORM 구현
+  - Restruct HTTP
+  - Implement HTTP chunk stream
+  - ~~Implement and restruct URI parser~~
+  - Implement ORM
 
 ##### Component
-  - ~~task runner 적용~~
-  - Shared Memory IPC, Pipe IPC component 구현
+  - ~~Adjust task runner~~
+  - Implement shared memory IPC, pipe IPC component
 
 ##### Node
-  - Module Running을 위한 middleware 구현 필요
+  - Implement middleware for module running
 
 ### Test
-  - google test를 통한 테스트 환경 적용
-  - 각 구현별 테스트코드 작성
+  - ~~Implement test envirnoment using google test~~
+  - Implement test code

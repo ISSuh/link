@@ -1,0 +1,20 @@
+{
+  "node_name": "http_example",
+  "log_level": "debug",
+  "modules": [
+    {
+      "module_name": "TestHttpClient",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/http/libhttpclient_example.so",
+      "module": {
+        "class_name": "ExampleHttpClientModule",
+        "arguments": {
+          "path_for_get": "http://anglesharp.azurewebsites.net/Chunked",
+          "path_for_post": "http://postman-echo.com/post"
+        },
+        "configure": {
+          "threading": false
+        }
+      }
+    }
+  ]
+}

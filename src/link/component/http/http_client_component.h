@@ -37,41 +37,41 @@ class HttpClientComponent : public HttpComponent {
 
   void Get(const std::string& path, RequestHanelder handler);
   void Get(
-    const std::string& path,
+    const std::string& uri_string,
     const net::http::HttpHeader& header,
     RequestHanelder handler);
 
   void Post(
-    const std::string& path,
+    const std::string& uri_string,
     const std::string& content_type,
     const std::string& body,
     RequestHanelder handler);
   void Post(
-    const std::string& path,
+    const std::string& uri_string,
     const net::http::HttpHeader& header,
     const std::string& body,
     RequestHanelder handler);
 
   void Put(
-    const std::string& path,
+    const std::string& uri_string,
     const std::string& content_type,
     const std::string& body,
     RequestHanelder handler);
   void Put(
-    const std::string& path,
+    const std::string& uri_string,
     const net::http::HttpHeader& header,
     const std::string& body,
     RequestHanelder handler);
 
-  void Delete(const std::string& path, RequestHanelder handler);
+  void Delete(const std::string& uri_string, RequestHanelder handler);
   void Delete(
-    const std::string& path,
+    const std::string& uri_string,
     const net::http::HttpHeader& header,
     RequestHanelder handler);
 
   void Fetch(
     net::http::Method method,
-    const std::string& path,
+    const std::string& uri_string,
     RequestHanelder handler,
     const net::http::HttpHeader& header = net::http::HttpHeader(),
     const std::string& content_type = "",
@@ -85,13 +85,13 @@ class HttpClientComponent : public HttpComponent {
 
   void DoFetch(
     net::http::Method method,
-    const std::string& path,
+    const net::Uri& uri,
     const net::http::HttpHeader& header,
     RequestHanelder handler);
 
   void DoFetchWithBody(
     net::http::Method method,
-    const std::string& path,
+    const net::Uri& uri,
     const net::http::HttpHeader& header,
     const std::string& body,
     const std::string& content_type,

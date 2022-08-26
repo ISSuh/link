@@ -36,8 +36,8 @@ void ExampleHttpClientModule::Run() {
     {"Quantity", 1},
     {"Price", 10.0}};
 
-  std::string body(json.dump(4));
-  http_client_.Post(path_for_post, "application/json", body);
+  // std::string body(json.dump(4));
+  // http_client_.Post(path_for_post, "application/json", body);
   WaitingForResponse();
 
   // handle_.Shutdown();
