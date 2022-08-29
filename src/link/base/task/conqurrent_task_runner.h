@@ -32,7 +32,7 @@ class ConcurrentTaskRunner final : public TaskRunnerProxy {
 
   // TaksRunner
   void PostDelayTask(
-    const TaskCallback& task_callback, TimeTick delay) override;
+    TaskCallback task_callback, TimeTick delay) override;
 
   // TaksRunnerProxy
   void StopRunner() override;

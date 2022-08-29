@@ -13,6 +13,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
+#include "link/base/callback/callback.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/io/base/ip_endpoint.h"
@@ -26,7 +27,7 @@ namespace io {
 
 class TcpSocketClient : public Client {
  public:
-  using EventTaskQueue = std::queue<std::function<void()>>;
+  using EventTaskQueue = std::queue<base::TaskCallback>;
 
   explicit TcpSocketClient(base::TaskRunner* task_runner);
   virtual ~TcpSocketClient();

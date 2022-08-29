@@ -9,7 +9,6 @@
 #include <utility>
 #include <cstring>
 
-#include "link/base/callback/bind.h"
 #include "link/base/logging.h"
 #include "link/io/base/io_error.h"
 
@@ -81,7 +80,7 @@ void TcpSocket::Accept(
 }
 
 void TcpSocket::Connect(
-  const IpEndPoint& address, base::CompletionCallback&& callback) {
+  const IpEndPoint& address, base::CompletionCallback callback) {
   SockaddrStorage storage;
   if (!address.ToSockAddr(storage.addr, &storage.addr_len)) {
     LOG(INFO) << "TcpSocket::Connect - fail convert addr to sockaddr";
@@ -114,8 +113,8 @@ void TcpSocket::Read(
   base::Buffer* buffer, base::CompletionCallback callback) {
   socket_->Read(
     buffer,
-    [this, &buffer, callback](int32_t res) {
-      this->ReadCompleted(buffer, callback, res);
+    [this, &buffer, read_cb = std::move(callback)](int32_t res) {
+      this->ReadCompleted(buffer, std::move(read_cb), res);
     });
 }
 
@@ -135,13 +134,11 @@ int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
 
 void TcpSocket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
-  int32_t res = socket_->Write(
+  socket_->Write(
     buffer,
-    [this, callback](int32_t res) {
-      this->WriteCompleted(std::move(callback), res);
+    [this, read_cb = std::move(callback)](int32_t res) {
+      this->WriteCompleted(std::move(read_cb), res);
     });
-
-  WriteCompleted(callback, res);
 }
 
 void TcpSocket::WriteCompleted(
@@ -151,8 +148,8 @@ void TcpSocket::WriteCompleted(
 
 int32_t TcpSocket::HandleWriteCompleted(int32_t res) {
   if (res < 0) {
-    LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
-               << std::strerror(NLINK_ERRNO);
+    // LOG(ERROR) << "[TcpSocket::HandleWriteCompleted] socket write fail."
+    //            << std::strerror(NLINK_ERRNO);
   }
   return res;
 }

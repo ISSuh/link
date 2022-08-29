@@ -26,14 +26,14 @@ ConcurrentTaskRunner::ConcurrentTaskRunner(const std::string& label, size_t num)
 ConcurrentTaskRunner::~ConcurrentTaskRunner() = default;
 
 void ConcurrentTaskRunner::PostDelayTask(
-  const TaskCallback& task_callback, TimeTick delay) {
+  TaskCallback task_callback, TimeTick delay) {
   LOG(TRACE) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
     TimeTick desired_run_time =
       base::TimeTick::Now() + delay;
-    queue_.emplace(task_callback, desired_run_time);
+    queue_.emplace(std::move(task_callback), desired_run_time);
   }
   cv_.notify_one();
 }
@@ -95,18 +95,18 @@ Task ConcurrentTaskRunner::NextTask() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   if (queue_.empty()) {
-    return Task();
+    return std::move(Task());
   }
 
-  Task task = queue_.top();
+  const Task& task = std::move(queue_.top());
 
   TimeTick now = TimeTick::Now();
-  if (task.desired_run_time > now) {
-    return Task();
+  if (task.Timestamp() > now) {
+    return std::move(Task());
   } else {
     queue_.pop();
   }
-  return task;
+  return std::move(task);
 }
 
 bool ConcurrentTaskRunner::CanWakeUp(uint64_t id) {

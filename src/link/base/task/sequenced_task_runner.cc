@@ -6,6 +6,8 @@
 
 #include "link/base/task/sequenced_task_runner.h"
 
+#include <utility>
+
 #include "link/base/logging.h"
 
 namespace nlink {
@@ -21,26 +23,31 @@ SequencedTaskRunner::SequencedTaskRunner(const std::string& label)
 SequencedTaskRunner::~SequencedTaskRunner() = default;
 
 void SequencedTaskRunner::PostDelayTask(
-  const TaskCallback& task_callback, TimeTick delay) {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  TaskCallback task_callback, TimeTick delay) {
+  LOG(INFO) << "[" << label() << "] " << __func__;
   {
     std::lock_guard<std::mutex> lock(mutex_);
 
     TimeTick desired_run_time =
       base::TimeTick::Now() + delay;
-    queue_.emplace(task_callback, desired_run_time);
+
+    // TaskCallback callback(
+    //   std::move(task_callback), desired_run_time);
+
+    queue_.emplace(std::move(task_callback), desired_run_time);
   }
+  LOG(INFO) << "[" << label() << "] " << __func__ << " - after";
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::StopRunner() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
   running_ = false;
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::WiatForTerminateWorkers() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return;
   }
@@ -48,7 +55,7 @@ void SequencedTaskRunner::WiatForTerminateWorkers() {
 }
 
 std::vector<uint64_t> SequencedTaskRunner::WorkersIdLists() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return std::vector<uint64_t>();
   }
@@ -60,40 +67,41 @@ bool SequencedTaskRunner::IsRunning() {
 }
 
 void SequencedTaskRunner::OnStartWorker(uint64_t id) {
-  LOG(TRACE) << "[" << label() << "] "
+  LOG(INFO) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnTerminateWorker(uint64_t id) {
-  LOG(TRACE) << "[" << label() << "] "
+  LOG(INFO) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnStartTask() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
 }
 
 void SequencedTaskRunner::OnDidFinishTask() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
 }
 
 Task SequencedTaskRunner::NextTask() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
+  LOG(INFO) << "[" << label() << "] " << __func__;
 
   if (queue_.empty()) {
     return Task();
   }
 
   Task task = queue_.top();
-
   TimeTick now = TimeTick::Now();
-  if (task.desired_run_time > now) {
+
+  if (task.Timestamp() > now) {
+    queue_.push(std::move(task));
     return Task();
   } else {
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.pop();
   }
-  return task;
+  return std::move(task);
 }
 
 bool SequencedTaskRunner::CanWakeUp(uint64_t id) {

@@ -25,8 +25,8 @@ class TaskRunner {
     CONCURRENT
   };
 
-  virtual void PostTask(const TaskCallback& callback);
-  virtual void PostDelayTask(const TaskCallback& callback, TimeTick delay) = 0;
+  virtual void PostTask(TaskCallback callback);
+  virtual void PostDelayTask(TaskCallback callback, TimeTick delay) = 0;
 
  protected:
   TaskRunner();

@@ -4,7 +4,7 @@
  *
  */
 
-#include <iostream>
+#include <utility>
 
 #include "link/base/timer.h"
 
@@ -28,7 +28,7 @@ void Timer::Start(TaskCallback task, TimeTick delay) {
     return;
   }
 
-  user_task_ = task;
+  user_task_ = std::move(task);
 
   if (delay > TimeTick::FromMilliseconds(0)) {
     desired_run_time_ = TimeTick::Now() + delay;

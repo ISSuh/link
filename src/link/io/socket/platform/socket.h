@@ -43,7 +43,7 @@ class Socket {
   int32_t Close();
 
   void Read(base::Buffer* buffuer, base::CompletionCallback callback);
-  int32_t Write(base::Buffer* buffer, base::CompletionCallback callback);
+  void Write(base::Buffer* buffer, base::CompletionCallback callback);
 
   int32_t GetPeerAddress(SockaddrStorage* address) const;
   bool IsConnected() const;
@@ -64,12 +64,6 @@ class Socket {
   std::unique_ptr<SockaddrStorage> peer_address_;
 
   bool waiting_connect_ = false;
-
-  std::unique_ptr<base::Buffer> pending_read_buffer_;
-  base::CompletionCallback peding_read_callback_;
-
-  std::unique_ptr<base::Buffer> pending_write_buffer_;
-  base::CompletionCallback peding_write_callback_;
 
   DISAALOW_COPY_AND_ASSIGN(Socket)
 };

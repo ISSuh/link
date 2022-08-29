@@ -127,10 +127,10 @@ void TcpSocketClient::HandlerWriteEvent() {
     return;
   }
 
-  auto callback = wrtie_task_queue_.front();
+  base::TaskCallback callback = std::move(wrtie_task_queue_.front());
   wrtie_task_queue_.pop();
 
-  task_runner_->PostTask(callback);
+  task_runner_->PostTask(std::move(callback));
 }
 
 void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {

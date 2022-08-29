@@ -51,10 +51,12 @@ void TcpConnector::DoConnect(handler::ConnectHandler handler) {
 
   ++try_connection_count_;
 
-  socket_->Connect(address_,
-    [this, handler](int32_t err) mutable {
+  base::CompletionCallback connect_callback =
+    [this, handler](int32_t err) {
       this->InternalConnectHnadler(std::move(handler), err);
-    });
+    };
+
+  socket_->Connect(address_, std::move(connect_callback));
 }
 
 void TcpConnector::PostConnectTask(handler::ConnectHandler handler) {

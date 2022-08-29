@@ -13,7 +13,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <link/base/callback/test_callback.h>
+#include <link/base/callback/callback.h>
 
 using namespace nlink;
 
@@ -58,7 +58,7 @@ TEST(Callback, make_callback) {
   }
 
   UserCallbacksMock callback_mock;
-  
+
   {
     base::Callback<void()> callback = [&]() {
       callback_mock.Callback1();
