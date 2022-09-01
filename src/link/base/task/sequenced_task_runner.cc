@@ -91,17 +91,16 @@ Task SequencedTaskRunner::NextTask() {
     return Task();
   }
 
-  Task task = queue_.top();
   TimeTick now = TimeTick::Now();
-
-  if (task.Timestamp() > now) {
-    queue_.push(std::move(task));
+  if (queue_.top().Timestamp() > now) {
     return Task();
   } else {
     std::lock_guard<std::mutex> lock(mutex_);
+    Task task = std::move(queue_.top());
     queue_.pop();
+    return std::move(task);
   }
-  return std::move(task);
+  return Task();
 }
 
 bool SequencedTaskRunner::CanWakeUp(uint64_t id) {
