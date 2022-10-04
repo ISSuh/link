@@ -28,24 +28,7 @@ Response::StatusLine::StatusLine(
 }
 
 Response::Response()
-  : Response(HttpStatusCode::NOT_FOUND) {
-}
-
-Response::Response(HttpStatusCode status, Version version)
-  : Response(status, version, HttpHeader(), "") {
-}
-
-Response::Response(HttpStatusCode status, const HttpHeader& header)
-  : Response(status, Version::HTTP_1_1, header, "") {
-}
-
-Response::Response(
-  HttpStatusCode status, Version version,
-  const HttpHeader& header, const std::string& body)
-  : status_(status),
-    version_(version),
-    header_(header),
-    body_(body) {
+  : Response(StatusLine()) {
 }
 
 Response::Response(StatusLine status_line)
@@ -117,12 +100,12 @@ const std::string Response::ContentType() const {
 
 const std::string Response::Serialize() const {
   const std::string status_code_num_string = std::to_string(
-    static_cast<int32_t>(status_));
+    static_cast<int32_t>(status_line_.status));
 
   std::stringstream stream;
-  stream << VersionToString(version_) << ' '
+  stream << VersionToString(status_line_.version) << ' '
          << status_code_num_string << ' '
-         << HttpStatusCodeToString(status_)
+         << HttpStatusCodeToString(status_line_.status)
          << kCRLF;
 
   stream << header_.Serialize();

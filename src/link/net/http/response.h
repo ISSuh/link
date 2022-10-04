@@ -34,13 +34,6 @@ class Response {
   };
 
   Response();
-
-  explicit Response(HttpStatusCode status, Version version = Version::HTTP_1_1);
-  Response(HttpStatusCode status, const HttpHeader& header);
-  Response(
-    HttpStatusCode status, Version version,
-    const HttpHeader& header, const std::string& body);
-
   explicit Response(StatusLine status_line);
   Response(StatusLine status_line, const HttpHeader& header);
   Response(
@@ -66,11 +59,6 @@ class Response {
 
  private:
   StatusLine status_line_;
-
-  HttpStatusCode status_;
-  std::string path_;
-  Version version_;
-
   HttpHeader header_;
   std::string body_;
 };

@@ -70,12 +70,22 @@ void HttpServer::InternalReadHandler(
     return;
   }
 
-  net::http::Response response;
   net::http::Request request = net::http::Parser::ParseRequest(buffer);
+  if (!request.IsValid()) {
+    return;
+  }
+
   auto url  = request.RequestUri();
   if (!url.HasPath()) {
     return;
   }
+
+  net::http::Response::StatusLine status_line(
+    net::http::HttpStatusCode::ACCEPTED,
+    url.Path(),
+    request.HttpVersion());
+
+  net::http::Response response(status_line);
 
   auto handler = routing_.Route(url.Path());
   if (!handler) {
@@ -83,6 +93,8 @@ void HttpServer::InternalReadHandler(
   } else {
     handler(request, &response);
   }
+
+  LOG(INFO) << __func__ << " - response : " << response.Serialize();
 
   std::shared_ptr<base::Buffer> response_buffer =
     std::make_shared<base::Buffer>(response.Serialize());

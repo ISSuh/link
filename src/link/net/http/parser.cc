@@ -101,7 +101,7 @@ const std::string ParseStatusReason(
   size_t size = pos - *current_pos;
   const std::string reason = message.substr(*current_pos, size);
   if (reason.empty()) {
-    LOG(WARNING) << "[ParseStatusReason] invalid status reason. ";
+    LOG(WARNING) << "[ParseStatusReason] invalid status reason.";
     *state = Parser::ParseState::PARSE_ERROR;
     return "";
   }
@@ -185,13 +185,15 @@ void ParseHeaders(
   std::stringstream stream(message.substr(*current_pos, remained_size));
   std::string header_str("");
   size_t pos = *current_pos;
-  while (std::getline(stream, header_str, kLF)) {
-    pos += header_str.size() + kCRorLFSize;
+
+  while (std::getline(stream, header_str, kCR)) {
+    pos += header_str.size() + kCRLFSize + kCRLFSize;
     if (header_str.size() == kCRorLFSize) {
       break;
     }
 
-    if (headers->Set(header_str)) {
+    LOG(ERROR) << "[ParseHeaders] header - " << header_str;
+    if (!headers->Set(header_str)) {
       *state = Parser::ParseState::PARSE_ERROR;
       return;
     }
