@@ -96,9 +96,9 @@ Task SequencedTaskRunner::NextTask() {
     return Task();
   } else {
     std::lock_guard<std::mutex> lock(mutex_);
-    Task task = std::move(queue_.top());
+    // const Task task = std::move(queue_.top());
     queue_.pop();
-    return std::move(task);
+    // return std::move(task);
   }
   return Task();
 }

@@ -22,6 +22,7 @@ class TimeTick {
   static TimeTick Now();
 
   TimeTick();
+  TimeTick(const TimeTick& tick);
   explicit TimeTick(int64_t us);
   ~TimeTick();
 

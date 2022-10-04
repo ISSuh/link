@@ -36,6 +36,10 @@ TimeTick::TimeTick()
   : tick_(0) {
 }
 
+TimeTick::TimeTick(const TimeTick& tick)
+  : tick_(tick.tick_) {
+}
+
 TimeTick::TimeTick(int64_t us)
   : tick_(us < 0 ? 0 : us) {
 }

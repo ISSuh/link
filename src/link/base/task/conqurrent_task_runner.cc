@@ -102,11 +102,11 @@ Task ConcurrentTaskRunner::NextTask() {
 
   TimeTick now = TimeTick::Now();
   if (task.Timestamp() > now) {
-    return std::move(Task());
+    // return std::move(Task());
   } else {
     queue_.pop();
   }
-  return std::move(task);
+  // return std::move(task);
 }
 
 bool ConcurrentTaskRunner::CanWakeUp(uint64_t id) {

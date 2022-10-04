@@ -40,6 +40,7 @@ void WaitForTask(
 }
 
 TEST(SequencedTaskRunner, run_task_test) {
+  std::cout << "run_task_test" << std::endl;
   std::shared_ptr<base::TaskManager> task_manager
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
@@ -55,6 +56,7 @@ TEST(SequencedTaskRunner, run_task_test) {
 
   task_runner->PostTask(
     [&]() {
+      std::cout << "run task!" << std::endl;
       mock_task.Task1();
       finished_task_num.fetch_add(1);
     });
