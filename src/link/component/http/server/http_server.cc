@@ -81,7 +81,7 @@ void HttpServer::InternalReadHandler(
   }
 
   net::http::Response::StatusLine status_line(
-    net::http::HttpStatusCode::ACCEPTED,
+    net::http::HttpStatusCode::OK,
     url.Path(),
     request.HttpVersion());
 
@@ -89,12 +89,10 @@ void HttpServer::InternalReadHandler(
 
   auto handler = routing_.Route(url.Path());
   if (!handler) {
-    response = http::Default404Error();
+    response = http::Default404Error(url.Path());
   } else {
     handler(request, &response);
   }
-
-  LOG(INFO) << __func__ << " - response : " << response.Serialize();
 
   std::shared_ptr<base::Buffer> response_buffer =
     std::make_shared<base::Buffer>(response.Serialize());

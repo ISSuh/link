@@ -338,7 +338,11 @@ Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {
     }
   }
 
-  return Response(status, version, header, body);
+  Response::StatusLine status_line(status, "", version);
+  if (body.empty()) {
+    return Response(status_line, header);
+  }
+  return Response(status_line, header, body);
 }
 
 }  // namespace http

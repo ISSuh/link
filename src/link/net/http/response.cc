@@ -43,6 +43,15 @@ Response::Response(
 Response::Response(
   StatusLine status_line,
   const HttpHeader& header,
+  const std::string& body)
+  : status_line_(status_line),
+    header_(header),
+    body_(body) {
+}
+
+Response::Response(
+  StatusLine status_line,
+  const HttpHeader& header,
   const std::string& body,
   const std::string& content_type)
   : status_line_(status_line),

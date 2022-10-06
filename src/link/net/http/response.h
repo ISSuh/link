@@ -39,6 +39,10 @@ class Response {
   Response(
     StatusLine status_line,
     const HttpHeader& header,
+    const std::string& body);
+  Response(
+    StatusLine status_line,
+    const HttpHeader& header,
     const std::string& body,
     const std::string& content_type);
 

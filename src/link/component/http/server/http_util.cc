@@ -16,7 +16,7 @@ namespace nlink {
 namespace component {
 namespace http {
 
-net::http::Response Default404Error() {
+net::http::Response Default404Error(const std::string& path) {
   std::stringstream body_stream;
   body_stream << "<html>" << '\n';
   body_stream << "  <head>" << '\n';
@@ -30,11 +30,10 @@ net::http::Response Default404Error() {
   header.Set("Content-Type", "text/html");
   header.Set("Content-Length", body_stream.str().size());
 
+  net::http::Response::StatusLine status_line(
+    net::http::HttpStatusCode::NOT_FOUND, path, net::http::Version::HTTP_1_1);
   return net::http::Response(
-    net::http::HttpStatusCode::NOT_FOUND,
-    net::http::Version::HTTP_1_1,
-    header,
-    body_stream.str());
+    status_line, header, body_stream.str());
 }
 
 }  // namespace http

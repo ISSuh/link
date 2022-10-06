@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "link/base/logging.h"
+#include "link/base/json_wrapper.h"
 
 using namespace nlink;
 
@@ -17,6 +18,11 @@ void TestHandler::HelloWorld(
   nlink::net::http::Response* response) {
   LOG(INFO) << "TestHandler::HelloWorld - \n"
             << request.Serialize();
+
+  base::Json test;
+  test["id"] = "hello";
+
+  response->SetBody(test.dump(), "application/json");
 }
 
 void TestHandler::User(
@@ -24,6 +30,8 @@ void TestHandler::User(
   nlink::net::http::Response* response) {
   LOG(INFO) << "TestHandler::User - \n"
             << request.Serialize();
+
+  response->SetBody("1", "text/plain");
 }
 
 ExampleHttpServer::ExampleHttpServer(
