@@ -8,6 +8,7 @@
 #include <gmock/gmock.h>
 
 #include <link/base/task/task.h>
+#include <link/base/task/task_queue.h>
 #include <link/base/time.h>
 
 using namespace nlink;
@@ -113,15 +114,15 @@ TEST(Task, task_queue) {
       std::move(callback1),
       base::TimeTick::Now() + base::TimeTick::FromMilliseconds(10000));
 
-    queue.push(std::move(temp_task1));
+    queue.Push(std::move(temp_task1));
 
     base::Task temp_task2(
       std::move(callback2),
       base::TimeTick::Now());
 
-    queue.push(std::move(temp_task2));
+    queue.Push(std::move(temp_task2));
 
-    EXPECT_EQ(2, queue.size());
+    EXPECT_EQ(2, queue.Size());
 
     testing::Expectation expect_task2 =
       EXPECT_CALL(callback_mock, TaskCallback2(testing::_)).Times(1);
@@ -129,16 +130,16 @@ TEST(Task, task_queue) {
     testing::Expectation expect_task1 =
       EXPECT_CALL(callback_mock, TaskCallback1()).Times(1).After(expect_task2);
 
-    const base::Task& task2 = queue.top();
-    queue.pop();
+    base::Task task2 = std::move(queue.Top());
+    queue.Pop();
     EXPECT_TRUE(task2.Runable());
     task2.Run();
 
-    const base::Task& task1 = queue.top();
+    base::Task task1 = std::move(queue.Top());
+    queue.Pop();
     EXPECT_TRUE(task1.Runable());
     task1.Run();
-    queue.pop();
 
-    EXPECT_TRUE(queue.empty());
+    EXPECT_TRUE(queue.Empty());
   }
 }

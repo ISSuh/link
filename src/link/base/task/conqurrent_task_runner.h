@@ -11,10 +11,11 @@
 #include <map>
 #include <string>
 #include <memory>
-#include <queue>
+#include <atomic>
 #include <mutex>
 #include <condition_variable>
 
+#include "link/base/task/task_queue.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_executor.h"
 #include "link/base/callback/callback.h"
@@ -55,7 +56,7 @@ class ConcurrentTaskRunner final : public TaskRunnerProxy {
   std::map<uint64_t, std::unique_ptr<TaskExecutor>> executors_;
   TaskQueue queue_;
 
-  bool running_;
+  std::atomic_bool running_;
   std::condition_variable cv_;
   std::mutex mutex_;
 };

@@ -20,25 +20,23 @@ class Task {
  public:
   Task();
   Task(TaskCallback tasl_callback, TimeTick time);
-  Task(Task&& other) = default;
+  Task(Task&& other);
   virtual ~Task();
-
-  Task(const Task& other) = default;
 
   const TimeTick Timestamp() const;
   bool Runable() const;
   void Run() const;
 
-  Task& operator=(Task&& other) = default;
+  Task& operator=(Task&& other);
   bool operator<(const Task& other) const;
+
+  Task(const Task& other) = delete;
+  Task& operator=(const Task& other) = delete;
 
  private:
   TaskCallback callback_;
   TimeTick desired_run_time_;
 };
-
-using TaskQueue =
-  std::priority_queue<Task, std::vector<Task>>;
 
 }  // namespace base
 }  // namespace nlink

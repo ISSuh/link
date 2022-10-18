@@ -28,6 +28,7 @@ class TimeTick {
 
   int64_t Tick() const;
 
+  TimeTick& operator=(TimeTick other);
   TimeTick operator+(TimeTick other) const;
   TimeTick operator-(TimeTick other) const;
   TimeTick& operator+=(TimeTick other);

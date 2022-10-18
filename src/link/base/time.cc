@@ -50,6 +50,11 @@ int64_t TimeTick::Tick() const {
   return tick_;
 }
 
+TimeTick& TimeTick::operator=(TimeTick other) {
+  tick_ = other.tick_;
+  return *this;
+}
+
 TimeTick TimeTick::operator+(TimeTick other) const {
   return TimeTick(tick_ + other.tick_);
 }

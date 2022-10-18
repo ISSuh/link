@@ -28,22 +28,17 @@ ConcurrentTaskRunner::~ConcurrentTaskRunner() = default;
 void ConcurrentTaskRunner::PostDelayTask(
   TaskCallback task_callback, TimeTick delay) {
   LOG(TRACE) << "[" << label() << "] " << __func__;
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
 
-    TimeTick desired_run_time =
-      base::TimeTick::Now() + delay;
-    queue_.emplace(std::move(task_callback), desired_run_time);
-  }
+  TimeTick desired_run_time = base::TimeTick::Now() + delay;
+  Task task(std::move(task_callback), desired_run_time);
+  queue_.Push(std::move(task));
+
   cv_.notify_one();
 }
 
 void ConcurrentTaskRunner::StopRunner() {
   LOG(TRACE) << "[" << label() << "] " << __func__;
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    running_ = false;
-  }
+  running_.store(false);
   cv_.notify_all();
 }
 
@@ -69,7 +64,7 @@ std::vector<uint64_t> ConcurrentTaskRunner::WorkersIdLists() {
 }
 
 bool ConcurrentTaskRunner::IsRunning() {
-  return running_;
+  return running_.load();
 }
 
 void ConcurrentTaskRunner::OnStartWorker(uint64_t id) {
@@ -91,31 +86,28 @@ void ConcurrentTaskRunner::OnDidFinishTask() {
 }
 
 Task ConcurrentTaskRunner::NextTask() {
-  LOG(TRACE) << "[" << label() << "] " << __func__;
-  std::lock_guard<std::mutex> lock(mutex_);
+  LOG(TRACE) << "[" << label() << "] " << __func__
+            << " - " << queue_.Size() << " / " << this;
+  std::unique_lock<std::mutex> lock(mutex_);
 
-  if (queue_.empty()) {
-    return std::move(Task());
+  if (queue_.Empty()) {
+    return Task();
   }
-
-  const Task& task = std::move(queue_.top());
 
   TimeTick now = TimeTick::Now();
-  if (task.Timestamp() > now) {
-    // return std::move(Task());
-  } else {
-    queue_.pop();
+  if (queue_.TimeOnTop() < now) {
+    Task task = std::move(queue_.Top());
+    queue_.Pop();
+    return task;
   }
-  // return std::move(task);
+  return Task();
 }
 
 bool ConcurrentTaskRunner::CanWakeUp(uint64_t id) {
   {
-    LOG(TRACE) << "[" << label() << "] " << __func__
-               << IsRunning() << " / " << queue_.empty();
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [&](){
-        return !IsRunning() || !queue_.empty();
+        return !IsRunning() || !queue_.Empty();
     });
   }
   return IsRunning();

@@ -24,30 +24,23 @@ SequencedTaskRunner::~SequencedTaskRunner() = default;
 
 void SequencedTaskRunner::PostDelayTask(
   TaskCallback task_callback, TimeTick delay) {
-  LOG(INFO) << "[" << label() << "] " << __func__;
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 
-    TimeTick desired_run_time =
-      base::TimeTick::Now() + delay;
+  TimeTick desired_run_time = base::TimeTick::Now() + delay;
+  Task task(std::move(task_callback), desired_run_time);
+  queue_.Push(std::move(task));
 
-    // TaskCallback callback(
-    //   std::move(task_callback), desired_run_time);
-
-    queue_.emplace(std::move(task_callback), desired_run_time);
-  }
-  LOG(INFO) << "[" << label() << "] " << __func__ << " - after";
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::StopRunner() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
-  running_ = false;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
+  running_.store(false);
   cv_.notify_all();
 }
 
 void SequencedTaskRunner::WiatForTerminateWorkers() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return;
   }
@@ -55,7 +48,7 @@ void SequencedTaskRunner::WiatForTerminateWorkers() {
 }
 
 std::vector<uint64_t> SequencedTaskRunner::WorkersIdLists() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
   if (executor_ == nullptr) {
     return std::vector<uint64_t>();
   }
@@ -63,42 +56,39 @@ std::vector<uint64_t> SequencedTaskRunner::WorkersIdLists() {
 }
 
 bool SequencedTaskRunner::IsRunning() {
-  return running_;
+  return running_.load();
 }
 
 void SequencedTaskRunner::OnStartWorker(uint64_t id) {
-  LOG(INFO) << "[" << label() << "] "
+  LOG(TRACE) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnTerminateWorker(uint64_t id) {
-  LOG(INFO) << "[" << label() << "] "
+  LOG(TRACE) << "[" << label() << "] "
                        << __func__ << " - id : " << id;
 }
 
 void SequencedTaskRunner::OnStartTask() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 }
 
 void SequencedTaskRunner::OnDidFinishTask() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 }
 
 Task SequencedTaskRunner::NextTask() {
-  LOG(INFO) << "[" << label() << "] " << __func__;
+  LOG(TRACE) << "[" << label() << "] " << __func__;
 
-  if (queue_.empty()) {
+  if (queue_.Empty()) {
     return Task();
   }
 
   TimeTick now = TimeTick::Now();
-  if (queue_.top().Timestamp() > now) {
-    return Task();
-  } else {
-    std::lock_guard<std::mutex> lock(mutex_);
-    // const Task task = std::move(queue_.top());
-    queue_.pop();
-    // return std::move(task);
+  if (queue_.TimeOnTop() < now) {
+    Task task = std::move(queue_.Top());
+    queue_.Pop();
+    return task;
   }
   return Task();
 }
@@ -107,7 +97,7 @@ bool SequencedTaskRunner::CanWakeUp(uint64_t id) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [&](){
-        return !IsRunning() || !queue_.empty();
+        return !IsRunning() || !queue_.Empty();
     });
     lock.unlock();
   }

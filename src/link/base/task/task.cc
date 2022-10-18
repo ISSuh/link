@@ -23,10 +23,10 @@ Task::Task(TaskCallback tasl_callback, TimeTick time)
 //     desired_run_time_(other.desired_run_time_) {
 // }
 
-// Task::Task(Task&& other)
-//   : callback_(std::move(other.callback_)),
-//     desired_run_time_(other.desired_run_time_) {
-// }
+Task::Task(Task&& other)
+  : callback_(std::move(other.callback_)),
+    desired_run_time_(other.desired_run_time_) {
+}
 
 Task::~Task() = default;
 
@@ -44,15 +44,15 @@ void Task::Run() const {
   }
 }
 
-// Task& Task::operator=(Task&& other) {
-//   if (&other == this) {
-//     return *this;
-//   }
+Task& Task::operator=(Task&& other) {
+  if (&other == this) {
+    return *this;
+  }
 
-//   callback_ = std::move(other.callback_);
-//   desired_run_time_ = other.desired_run_time_;
-//   return *this;
-// }
+  callback_ = std::move(other.callback_);
+  desired_run_time_ = other.desired_run_time_;
+  return *this;
+}
 
 bool Task::operator<(const Task& other) const {
   return desired_run_time_ > other.desired_run_time_;

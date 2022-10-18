@@ -92,6 +92,7 @@ TEST(SequencedTaskRunner, run_delayed_task_test) {
 
   task_runner->PostDelayTask(
     [&]() {
+      std::cout << "run task3!" << std::endl;
       mock_task.Task3(10, false);
       finished_task_num.fetch_add(1);
     },
@@ -99,6 +100,7 @@ TEST(SequencedTaskRunner, run_delayed_task_test) {
 
   task_runner->PostDelayTask(
     [&]() {
+      std::cout << "run task2!" << std::endl;
       mock_task.Task2(5);
       finished_task_num.fetch_add(1);
     },
@@ -106,6 +108,7 @@ TEST(SequencedTaskRunner, run_delayed_task_test) {
 
   task_runner->PostTask(
     [&]() {
+      std::cout << "run task1!" << std::endl;
       mock_task.Task1();
       finished_task_num.fetch_add(1);
     });
@@ -122,7 +125,8 @@ TEST(ConcurrentTaskRunner, run_task_test) {
 
   base::TaskRunner* task_runner =
     task_manager->CreateTaskRunner(
-      "test", "concurrent_task", base::TaskRunner::Type::CONCURRENT, 2);
+      "test", "ConcurrentTaskRunner-run_task_test",
+      base::TaskRunner::Type::CONCURRENT, 2);
 
   UserTaskkMock mock_task;
   std::atomic_int32_t finished_task_num(0);
@@ -132,12 +136,14 @@ TEST(ConcurrentTaskRunner, run_task_test) {
 
   task_runner->PostTask(
     [&]() {
+      std::cout << "run task1!" << std::endl;
       mock_task.Task1();
       finished_task_num.fetch_add(1);
     });
 
   task_runner->PostTask(
     [&]() {
+      std::cout << "run task2!" << std::endl;
       mock_task.Task2(0);
       finished_task_num.fetch_add(1);
     });
@@ -154,7 +160,8 @@ TEST(ConcurrentTaskRunner, run_delayed_task_test) {
 
   base::TaskRunner* task_runner =
     task_manager->CreateTaskRunner(
-      "test", "concurrent_task", base::TaskRunner::Type::CONCURRENT, 3);
+      "test", "ConcurrentTaskRunner-run_delayed_task_test",
+      base::TaskRunner::Type::CONCURRENT, 3);
 
   UserTaskkMock mock_task;
   std::atomic_int32_t finished_task_num(0);
@@ -173,6 +180,7 @@ TEST(ConcurrentTaskRunner, run_delayed_task_test) {
 
   task_runner->PostDelayTask(
     [&]() {
+      std::cout << "run task3!" << std::endl;
       mock_task.Task3(10, false);
       finished_task_num.fetch_add(1);
     },
@@ -180,6 +188,7 @@ TEST(ConcurrentTaskRunner, run_delayed_task_test) {
 
   task_runner->PostDelayTask(
     [&]() {
+      std::cout << "run task2!" << std::endl;
       mock_task.Task2(5);
       finished_task_num.fetch_add(1);
     },
@@ -187,6 +196,7 @@ TEST(ConcurrentTaskRunner, run_delayed_task_test) {
 
   task_runner->PostTask(
     [&]() {
+      std::cout << "run task1!" << std::endl;
       mock_task.Task1();
       finished_task_num.fetch_add(1);
     });
