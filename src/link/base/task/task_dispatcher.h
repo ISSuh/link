@@ -28,12 +28,12 @@ class TaskDispatcher {
   void PostTask(
     const std::string& group,
     const std::string& label,
-    const TaskCallback& task);
+    TaskCallback task);
 
   void PostDelayTask(
     const std::string& group,
     const std::string& label,
-    const TaskCallback& task,
+    TaskCallback task,
     TimeTick delay);
 
  private:

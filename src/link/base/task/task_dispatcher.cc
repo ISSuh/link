@@ -6,6 +6,8 @@
 
 #include "link/base/task/task_dispatcher.h"
 
+#include <utility>
+
 #include "link/base/task/task_runner.h"
 #include "link/base/logging.h"
 
@@ -21,21 +23,21 @@ TaskDispatcher::~TaskDispatcher() = default;
 void TaskDispatcher::PostTask(
   const std::string& group,
   const std::string& label,
-  const TaskCallback& task) {
-  PostDelayTask(group, label, task, TimeTick());
+  TaskCallback task) {
+  PostDelayTask(group, label, std::move(task), TimeTick());
 }
 
 void TaskDispatcher::PostDelayTask(
   const std::string& group,
   const std::string& label,
-  const TaskCallback& task,
+  TaskCallback task,
   TimeTick delay) {
   TaskRunner* runner = manager_->GetTaskRunner(group, label);
   if (runner == nullptr) {
     return;
   }
 
-  runner->PostDelayTask(task, delay);
+  runner->PostDelayTask(std::move(task), delay);
 }
 
 }  // namespace base

@@ -6,6 +6,8 @@
 
 #include "link/base/task/task_executor.h"
 
+#include <utility>
+
 #include "link/base/task/task.h"
 #include "link/base/logging.h"
 #include "link/base/thread.h"
@@ -49,12 +51,12 @@ void TaskExecutor::StartWorker() {
 void TaskExecutor::Work() {
   while (delegate_->CanWakeUp(id_)) {
     Task task = delegate_->NextTask();
-    if (!task.callback) {
+    if (!task.Runable()) {
       continue;
     }
 
     delegate_->OnStartTask();
-    task.callback();
+    task.Run();
     delegate_->OnDidFinishTask();
   }
 }

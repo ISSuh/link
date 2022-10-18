@@ -42,9 +42,9 @@ void TcpSocketSession::Close() {
       this->DoClose();
     };
 
-  task_queue_.push(task);
+  task_queue_.push(std::move(task));
   if (1 == task_queue_.size()) {
-    task_runner_->PostTask(task);
+    task_runner_->PostTask(std::move(task));
   }
 }
 
@@ -60,9 +60,9 @@ void TcpSocketSession::Read() {
       this->DoRead(buffer);
     };
 
-  task_queue_.push(task);
+  task_queue_.push(std::move(task));
   if (1 == task_queue_.size()) {
-    task_runner_->PostTask(task);
+    DoNextProcess();
   }
 }
 
@@ -71,21 +71,15 @@ void TcpSocketSession::Write(std::shared_ptr<base::Buffer> buffer) {
     return;
   }
 
-  auto task = [this, buffer]() {
+  auto task =
+    [this, buffer]() {
       this->DoWrite(buffer, 0);
     };
 
-  task_queue_.push(task);
+  task_queue_.push(std::move(task));
   if (1 == task_queue_.size()) {
-    task_runner_->PostTask(task);
+    DoNextProcess();
   }
-}
-
-void TcpSocketSession::FinishCurrentProcess() {
-  if (task_queue_.empty()) {
-    return;
-  }
-  task_queue_.pop();
 }
 
 void TcpSocketSession::DoNextProcess() {
@@ -93,10 +87,10 @@ void TcpSocketSession::DoNextProcess() {
     return;
   }
 
-  auto task = task_queue_.front();
+  auto task = std::move(task_queue_.front());
   task_queue_.pop();
 
-  task_runner_->PostTask(task);
+  task_runner_->PostTask(std::move(task));
 }
 
 void TcpSocketSession::DoClose() {
@@ -189,7 +183,6 @@ void TcpSocketSession::InternalWriteHandler(
         write_handler(clumulative_trasmission_size);
       });
 
-    FinishCurrentProcess();
     DoNextProcess();
   } else {
     task_runner_->PostTask(
@@ -219,7 +212,6 @@ void TcpSocketSession::InternalReadHandler(
         read_handler(*buffer, shared_from_this());
       });
 
-    FinishCurrentProcess();
     DoNextProcess();
   } else if (-1 > size) {
     task_runner_->PostTask(

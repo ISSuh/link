@@ -22,11 +22,13 @@ class TimeTick {
   static TimeTick Now();
 
   TimeTick();
+  TimeTick(const TimeTick& tick);
   explicit TimeTick(int64_t us);
   ~TimeTick();
 
   int64_t Tick() const;
 
+  TimeTick& operator=(TimeTick other);
   TimeTick operator+(TimeTick other) const;
   TimeTick operator-(TimeTick other) const;
   TimeTick& operator+=(TimeTick other);

@@ -38,9 +38,9 @@ EventDispatcherEpoll::EventDispatcherEpoll(
   int32_t event_size,
   int32_t timeout)
   : running_(false),
-    epoll_descriptor_(epoll_descriptor),
     event_size_(event_size),
     timeout_(timeout),
+    epoll_descriptor_(epoll_descriptor),
     event_channel_controller_(nullptr) {}
 
 EventDispatcherEpoll::~EventDispatcherEpoll() {
@@ -100,7 +100,7 @@ void EventDispatcherEpoll::DispatchOnce() {
   }
 }
 
-Event::Type EventDispatcherEpoll::HandleEventType(
+void EventDispatcherEpoll::HandleEventType(
   uint32_t event_flag, std::vector<Event::Type>* types) {
   if (event_flag & EPOLLIN) {
     LOG(INFO) << __func__ << " - EPOLLIN";

@@ -17,7 +17,7 @@ TaskRunner::TaskRunner() = default;
 
 TaskRunner::~TaskRunner() = default;
 
-void TaskRunner::PostTask(const TaskCallback& callback) {
+void TaskRunner::PostTask(TaskCallback callback) {
   PostDelayTask(std::move(callback), TimeTick());
 }
 

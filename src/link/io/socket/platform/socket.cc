@@ -228,11 +228,10 @@ int32_t Socket::DoRead(base::Buffer* buffer) {
   return size;
 }
 
-int32_t Socket::Write(
+void Socket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   int32_t res = DoWrite(buffer);
-  // callback(res);
-  return res;
+  callback(res);
 }
 
 int32_t Socket::DoWrite(base::Buffer* buffer) {

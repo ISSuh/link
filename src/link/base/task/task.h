@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <queue>
-#include <functional>
 
 #include "link/base/time.h"
 #include "link/base/callback/callback.h"
@@ -17,21 +16,27 @@
 namespace nlink {
 namespace base {
 
-struct Task {
-  Task() = default;
-  Task(const TaskCallback& tasl_callback, TimeTick time)
-    : callback(tasl_callback), desired_run_time(time) {}
-  ~Task() = default;
+class Task {
+ public:
+  Task();
+  Task(TaskCallback tasl_callback, TimeTick time);
+  Task(Task&& other);
+  virtual ~Task();
 
-  TaskCallback callback;
-  TimeTick desired_run_time;
+  const TimeTick Timestamp() const;
+  bool Runable() const;
+  void Run() const;
 
-  bool operator<(const Task& other) const {
-        return desired_run_time > other.desired_run_time;
-  }
+  Task& operator=(Task&& other);
+  bool operator<(const Task& other) const;
+
+  Task(const Task& other) = delete;
+  Task& operator=(const Task& other) = delete;
+
+ private:
+  TaskCallback callback_;
+  TimeTick desired_run_time_;
 };
-
-using TaskQueue = std::priority_queue<Task>;
 
 }  // namespace base
 }  // namespace nlink

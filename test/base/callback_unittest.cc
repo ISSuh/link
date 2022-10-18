@@ -4,16 +4,10 @@
  *
  */
 
-#include <iostream>
-#include <memory>
-#include <thread>
-#include <chrono>
-#include <atomic>
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <link/base/callback/test_callback.h>
+#include <link/base/callback/callback.h>
 
 using namespace nlink;
 
@@ -58,11 +52,11 @@ TEST(Callback, make_callback) {
   }
 
   UserCallbacksMock callback_mock;
-  
+
   {
     base::Callback<void()> callback = [&]() {
-      callback_mock.Callback1();
-    };
+        callback_mock.Callback1();
+      };
 
     EXPECT_CALL(callback_mock, Callback1());
     callback();
@@ -150,8 +144,8 @@ TEST(Callback, move_callback) {
 
   {
     base::Callback<void()> callback = [&]() {
-      callback_mock.Callback1();
-    };
+        callback_mock.Callback1();
+      };
 
     EXPECT_CALL(callback_mock, Callback1());
     callback();

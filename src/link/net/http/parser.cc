@@ -192,7 +192,6 @@ void ParseHeaders(
       break;
     }
 
-    LOG(ERROR) << "[ParseHeaders] header - " << header_str;
     if (!headers->Set(header_str)) {
       *state = Parser::ParseState::PARSE_ERROR;
       return;

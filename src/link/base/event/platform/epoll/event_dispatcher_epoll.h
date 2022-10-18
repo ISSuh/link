@@ -38,7 +38,7 @@ class EventDispatcherEpoll : public EventDispatcher {
   void Stop() override;
 
  private:
-  Event::Type HandleEventType(
+  void HandleEventType(
     uint32_t event_flag, std::vector<Event::Type>* types);
 
   void OnAttachChannel(int32_t descriptor, EventChannel* channel);

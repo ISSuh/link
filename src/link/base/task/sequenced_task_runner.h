@@ -10,10 +10,11 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <queue>
+#include <atomic>
 #include <mutex>
 #include <condition_variable>
 
+#include "link/base/task/task_queue.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_executor.h"
 #include "link/base/callback/callback.h"
@@ -31,7 +32,7 @@ class SequencedTaskRunner final : public TaskRunnerProxy {
 
   // TaksRunner
   void PostDelayTask(
-    const TaskCallback& task_callback, TimeTick delay) override;
+    TaskCallback task_callback, TimeTick delay) override;
 
   // TaksRunnerProxy
   void StopRunner() override;
@@ -53,7 +54,7 @@ class SequencedTaskRunner final : public TaskRunnerProxy {
   std::unique_ptr<TaskExecutor> executor_;
   TaskQueue queue_;
 
-  bool running_;
+  std::atomic_bool running_;
   std::condition_variable cv_;
   std::mutex mutex_;
 };

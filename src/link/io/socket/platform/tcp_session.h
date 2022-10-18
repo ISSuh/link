@@ -42,7 +42,6 @@ class TcpSocketSession
   int32_t SessionId() const override;
 
  private:
-  void FinishCurrentProcess();
   void DoNextProcess();
 
   void DoClose();
@@ -67,7 +66,7 @@ class TcpSocketSession
   handler::WriteHandler write_handler_;
   handler::CloseHandler close_handler_;
 
-  std::queue<std::function<void()>> task_queue_;
+  std::queue<base::TaskCallback> task_queue_;
 
   bool is_opend_;
 };
