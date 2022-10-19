@@ -33,9 +33,11 @@ bool TcpSocketServer::Listen(
   return acceptor_->Listen(address);
 }
 
-void TcpSocketServer::Accept(
-  handler::AcceptHandler accept_handler,
-  handler::CloseHandler close_handler) {
+void TcpSocketServer::Accept() {
+  acceptor_->Accept(
+      [this](std::shared_ptr<Session> session) {
+        this->InternalAcceptHandler(session);
+    });
 }
 
 void TcpSocketServer::Close() {
@@ -61,7 +63,7 @@ void TcpSocketServer::OpenChannel(
   if (nullptr == acceptor_) {
     acceptor_.reset(new TcpAcceptor(task_runner_,
       [this](SocketDescriptor descriptor, bool is_accept_socket_descriptor) {
-      this->RegistChannel(descriptor, is_accept_socket_descriptor);
+        this->RegistChannel(descriptor, is_accept_socket_descriptor);
       }));
   }
 }
@@ -76,11 +78,7 @@ void TcpSocketServer::HandleEvent(const base::Event& event) {
   // }
 
   if (event.Descriptor() == accept_descriptor_) {
-    acceptor_->Accept(
-      [this](std::shared_ptr<Session> session) {
-        this->InternalAcceptHandler(session);
-      });
-
+    Accept();
     return;
   }
 

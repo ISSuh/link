@@ -38,9 +38,7 @@ class TcpSocketServer : public Server {
     const IpEndPoint& address,
     handler::AcceptHandler accept_handler,
     handler::CloseHandler close_handler) override;
-  void Accept(
-    handler::AcceptHandler accept_handler,
-    handler::CloseHandler close_handler) override;
+  void Accept() override;
   void Close() override;
   void RegistIOHandler(
     handler::ReadHandler read_handler,
