@@ -7,6 +7,8 @@
 #ifndef LINK_BASE_CALLBACK_TEST_CALLBACK_H_
 #define LINK_BASE_CALLBACK_TEST_CALLBACK_H_
 
+#include <iostream>
+
 #include <memory>
 #include <utility>
 #include <type_traits>
@@ -29,8 +31,7 @@ class CallbackImpl
  public:
   template<typename Functor>
   explicit CallbackImpl(Functor&& functor)
-    : functor_(std::forward<Functor>(functor)) {
-  }
+    : functor_(std::forward<Functor>(functor)) {}
 
   R Invoke(Args&&... args) const final {
     return functor_(std::forward<Args>(args)...);
@@ -46,8 +47,7 @@ class CallbackImpl<F, void, Args...>
  public:
   template<typename Functor>
   explicit CallbackImpl(Functor&& functor)
-    : functor_(std::forward<Functor>(functor)) {
-  }
+    : functor_(std::forward<Functor>(functor)) {}
 
   void Invoke(Args&&... args) const final {
     return functor_(std::forward<Args>(args)...);
@@ -75,19 +75,22 @@ class Callback<R(Args...)> {
   Callback()
     : task_impl_(nullptr) {}
 
-  Callback(Callback&& other) = default;
+  Callback(const Callback& other) = delete;
+
+  Callback(Callback&& other)
+    : task_impl_(std::move(other.task_impl_)) {}
 
   template<typename F,
-            typename = decltype((R)(std::declval<RetunType<F>>())),
-              std::enable_if_t<!IsCallback<F>::value, F>* = nullptr>
+           typename = decltype((R)(std::declval<RetunType<F>>())),
+           std::enable_if_t<!IsCallback<F>::value, int32_t>* = nullptr>
   Callback(F&& f)
     : task_impl_(MakeTaskImpl(std::forward<F>(f))) {}
 
-  void Reset() {
+  inline void Reset() {
     task_impl_.reset();
   }
 
-  void Swap(Callback& otheer) {
+  inline void Swap(Callback& otheer) {
     std::swap(task_impl_, otheer.task_impl_);
   }
 
@@ -100,13 +103,8 @@ class Callback<R(Args...)> {
     return task_impl_->Invoke(std::forward<Args>(args)...);
   }
 
-  // Callback& operator=(Callback&& other) {
-  //   task_impl_ = std::move(other.task_impl_);
-  //   return *this;
-  // }
-
+  Callback& operator=(const Callback& other) = delete;
   Callback& operator=(Callback&& other) = default;
-
 
   explicit operator bool() const {
     return static_cast<bool>(task_impl_);
@@ -134,9 +132,8 @@ class Callback<R(Args...)> {
 
   template <typename F>
   static auto MakeTaskImpl(F&& f) {
-    using FunctorType = std::decay_t<F>;
-    using CallbackImpl_t = CallbackImpl_t<FunctorType>;
-    return std::make_unique<CallbackImpl_t>(std::forward<F>(f));
+    using FunctorType = CallbackImpl_t<std::decay_t<F>>;
+    return std::make_unique<FunctorType>(std::forward<F>(f));
   }
 
   std::unique_ptr<detail::CallbackImplBase<R, Args...>> task_impl_;

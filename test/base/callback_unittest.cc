@@ -216,3 +216,26 @@ TEST(Callback, swap_callback) {
     moved_callback();
   }
 }
+
+void PassedCallbackFucntion(base::Callback<void()> func) {
+  func();
+}
+
+TEST(Callback, nested_callback) {
+  UserCallbacksMock callback_mock;
+
+  {
+    base::Callback<void()> work = [&]() {
+      callback_mock.Callback1();
+    };
+
+    base::Callback<void()> callback = [&work]() {
+      PassedCallbackFucntion(std::move(work));
+
+      work();
+    };
+
+    EXPECT_CALL(callback_mock, Callback1());
+    callback();
+  }
+}

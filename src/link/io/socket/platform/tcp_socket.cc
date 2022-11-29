@@ -109,13 +109,14 @@ int32_t TcpSocket::Close() {
   return res;
 }
 
-void TcpSocket::Read(
-  base::Buffer* buffer, base::CompletionCallback callback) {
-  socket_->Read(
-    buffer,
-    [this, &buffer, read_cb = std::move(callback)](int32_t res) {
-      this->ReadCompleted(buffer, std::move(read_cb), res);
+void TcpSocket::Read(base::Buffer* buffer, base::CompletionCallback callback) {
+  base::CompletionCallback temp;
+  temp.Bind(
+    [this, &buffer, &callback](int32_t res) {
+      this->ReadCompleted(buffer, std::move(callback), res);
     });
+
+  socket_->Read(buffer, std::move(temp));
 }
 
 void TcpSocket::ReadCompleted(
