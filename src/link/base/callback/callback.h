@@ -12,10 +12,12 @@
 #include <memory>
 #include <utility>
 #include <type_traits>
+#include <typeinfo>
+
+std::string demangle(const char* name);
 
 namespace nlink {
 namespace base {
-
 namespace detail {
 
 template <typename R, typename... Args>
@@ -38,7 +40,7 @@ class CallbackImpl
   }
 
  private:
-  F functor_;
+  mutable F functor_;
 };
 
 template <typename F, typename... Args>
@@ -54,7 +56,7 @@ class CallbackImpl<F, void, Args...>
   }
 
  private:
-  F functor_;
+  mutable F functor_;
 };
 
 }  // namespace detail
@@ -69,22 +71,24 @@ class Callback<R(Args...)> {
   using RetunType = std::result_of_t<const F&(Args...)>;
 
   template <typename F>
-  using IsCallback = std::is_same<std::decay<F>, Callback>;
+  using IsCallback = std::is_same<typename std::decay<F>::type, Callback>;
 
  public:
   Callback()
     : task_impl_(nullptr) {}
 
   Callback(const Callback& other) = delete;
-
-  Callback(Callback&& other)
-    : task_impl_(std::move(other.task_impl_)) {}
+  Callback(Callback&& other) = default;
 
   template<typename F,
            typename = decltype((R)(std::declval<RetunType<F>>())),
            std::enable_if_t<!IsCallback<F>::value, int32_t>* = nullptr>
   Callback(F&& f)
-    : task_impl_(MakeTaskImpl(std::forward<F>(f))) {}
+    : task_impl_(nullptr) {
+      std::cout << demangle(typeid(f).name()) << " / " << demangle(typeid(*this).name()) << std::endl;
+
+      task_impl_ = MakeTaskImpl(std::forward<F>(f));
+    }
 
   inline void Reset() {
     task_impl_.reset();
@@ -101,6 +105,12 @@ class Callback<R(Args...)> {
 
   R operator()(Args... args) const {
     return task_impl_->Invoke(std::forward<Args>(args)...);
+  }
+
+  template <typename F>
+  Callback& operator=(F&& other) {
+    task_impl_ = MakeTaskImpl(std::forward<F>(other));
+    return *this;
   }
 
   Callback& operator=(const Callback& other) = delete;
