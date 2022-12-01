@@ -110,13 +110,11 @@ int32_t TcpSocket::Close() {
 }
 
 void TcpSocket::Read(base::Buffer* buffer, base::CompletionCallback callback) {
-  base::CompletionCallback temp;
-  temp.Bind(
-    [this, &buffer, &callback](int32_t res) {
-      this->ReadCompleted(buffer, std::move(callback), res);
+  socket_->Read(
+    buffer,
+    [this, &buffer, read_cb = std::move(callback)](int32_t res) mutable {
+        this->ReadCompleted(buffer, std::move(read_cb), res);
     });
-
-  socket_->Read(buffer, std::move(temp));
 }
 
 void TcpSocket::ReadCompleted(
@@ -124,7 +122,7 @@ void TcpSocket::ReadCompleted(
   callback(HandleReadCompleted(buffer, res));
 }
 
-int32_t TcpSocket::HandleReadCompleted(base::Buffer* buffer, int32_t res) {
+int32_t TcpSocket::HandleReadCompleted(base::Buffer*, int32_t res) {
   if (res < 0) {
     // LOG(ERROR) << "[TcpSocket::HandleReadCompleted] socket read fail."
     //            << std::strerror(NLINK_ERRNO);
@@ -137,8 +135,8 @@ void TcpSocket::Write(
   base::Buffer* buffer, base::CompletionCallback callback) {
   socket_->Write(
     buffer,
-    [this, read_cb = std::move(callback)](int32_t res) {
-      this->WriteCompleted(std::move(read_cb), res);
+    [this, write_cb = std::move(callback)](int32_t res) mutable {
+      this->WriteCompleted(std::move(write_cb), res);
     });
 }
 

@@ -6,9 +6,6 @@ FILE(GLOB base ${LINK_BASE_PATH}/*.cc)
 FILE(GLOB base_task ${LINK_BASE_PATH}/task/*.cc)
 FILE(GLOB base_event ${LINK_BASE_PATH}/event/*.cc)
 
-FILE(GLOB base_cb ${LINK_BASE_PATH}/callback/*.cc)
-
-
 if(LINK_WITH_ASIO)
   FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/platform/asio/*.cc)
 else()
@@ -21,8 +18,6 @@ add_library(${LINK_BASE_NAME}
   ${base_task}
   ${base_event}
   ${base_event_platform}
-
-  ${base_cb}
 )
 
 target_link_libraries(${LINK_BASE_NAME}

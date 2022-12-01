@@ -93,7 +93,7 @@ Task SequencedTaskRunner::NextTask() {
   return Task();
 }
 
-bool SequencedTaskRunner::CanWakeUp(uint64_t id) {
+bool SequencedTaskRunner::CanWakeUp(uint64_t) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     cv_.wait(lock, [&](){

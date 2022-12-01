@@ -58,7 +58,6 @@ class CallbackBase {
     return bind_state_->polymorphic_invoke_;
   }
 
-
   BindStateBase* bind_state_;
 };
 

@@ -7,14 +7,10 @@
 #ifndef LINK_BASE_CALLBACK_TEST_CALLBACK_H_
 #define LINK_BASE_CALLBACK_TEST_CALLBACK_H_
 
-#include <iostream>
-
 #include <memory>
 #include <utility>
 #include <type_traits>
 #include <typeinfo>
-
-std::string demangle(const char* name);
 
 namespace nlink {
 namespace base {
@@ -67,8 +63,13 @@ class Callback;
 template <typename R, typename... Args>
 class Callback<R(Args...)> {
  private:
-  template <typename F>
-  using RetunType = std::result_of_t<const F&(Args...)>;
+  template <typename F,
+            std::enable_if_t<std::is_const<F>::value, int32_t>* = nullptr>
+  using RetunTypeForConst = std::result_of_t<const F&(Args...)>;
+
+  template <typename F,
+            std::enable_if_t<!std::is_const<F>::value, int32_t>* = nullptr>
+  using RetunType = std::result_of_t<F&(Args...)>;
 
   template <typename F>
   using IsCallback = std::is_same<typename std::decay<F>::type, Callback>;
@@ -77,34 +78,32 @@ class Callback<R(Args...)> {
   Callback()
     : task_impl_(nullptr) {}
 
-  Callback(const Callback& other) = delete;
-  Callback(Callback&& other) = default;
+  template<typename F,
+           typename = decltype((R)(std::declval<RetunTypeForConst<F>>())),
+           std::enable_if_t<!IsCallback<F>::value, int32_t>* = nullptr>
+  Callback(const F&& f)
+    : task_impl_(MakeTaskImpl(std::forward<F>(f))) {}
 
   template<typename F,
            typename = decltype((R)(std::declval<RetunType<F>>())),
            std::enable_if_t<!IsCallback<F>::value, int32_t>* = nullptr>
   Callback(F&& f)
-    : task_impl_(nullptr) {
-      std::cout << demangle(typeid(f).name()) << " / " << demangle(typeid(*this).name()) << std::endl;
+    : task_impl_(MakeTaskImpl(std::forward<F>(f))) {}
 
-      task_impl_ = MakeTaskImpl(std::forward<F>(f));
-    }
+  Callback(const Callback& other) = delete;
+  Callback(Callback&& other) = default;
 
-  inline void Reset() {
+  void Reset() {
     task_impl_.reset();
   }
 
-  inline void Swap(Callback& otheer) {
+  void Swap(Callback& otheer) {
     std::swap(task_impl_, otheer.task_impl_);
   }
 
   template <typename F>
   void Bind(F&& f) {
     task_impl_ = MakeTaskImpl(std::forward<F>(f));
-  }
-
-  R operator()(Args... args) const {
-    return task_impl_->Invoke(std::forward<Args>(args)...);
   }
 
   template <typename F>
@@ -118,6 +117,10 @@ class Callback<R(Args...)> {
 
   explicit operator bool() const {
     return static_cast<bool>(task_impl_);
+  }
+
+  R operator()(Args... args) const {
+    return task_impl_->Invoke(std::forward<Args>(args)...);
   }
 
   friend bool operator==(std::nullptr_t, const Callback& self) {

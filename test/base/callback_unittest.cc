@@ -231,8 +231,14 @@ TEST(Callback, nested_callback) {
       callback_mock.Callback1();
     };
 
-    test = [callback = std::move(work)]() mutable {
+    base::Callback<void()> temp_callback(
+      [callback = std::move(work)]() mutable {
         PassedCallbackFucntion(std::move(callback));
+      });
+
+    test =
+      [callback = std::move(temp_callback)]() {
+        callback();
       };
   }
 
