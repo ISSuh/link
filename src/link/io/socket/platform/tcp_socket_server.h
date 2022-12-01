@@ -15,7 +15,7 @@
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
 #include "link/base/task/task_runner.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/io/base/ip_endpoint.h"
 #include "link/io/socket/server.h"
 #include "link/io/socket/acceptor.h"

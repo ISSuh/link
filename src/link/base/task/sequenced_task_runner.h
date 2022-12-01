@@ -17,7 +17,7 @@
 #include "link/base/task/task_queue.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/task/task_executor.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/time.h"
 
 namespace nlink {

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/io/socket/session.h"
 #include "link/third_party/asio/asio/ip/tcp.hpp"
 

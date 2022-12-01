@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/io/base/ip_endpoint.h"
 #include "link/io/socket/session.h"

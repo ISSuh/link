@@ -12,7 +12,7 @@
 #include <vector>
 #include <queue>
 
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/task/task_runner.h"
 #include "link/io/socket/session.h"
 #include "link/io/socket/platform/tcp_socket.h"

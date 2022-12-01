@@ -66,12 +66,12 @@ class LinkModuleImpl : public LinkModule {
   LinkModuleImpl(
     LinkModuleHandle* module_handle,
     UserModule* user_module,
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner_weak,
     const Specification& spec)
     : LinkModule(spec),
       module_handle_(module_handle),
       module_(user_module),
-      task_runner_(task_runner) {}
+      task_runner_weak_(task_runner_weak) {}
 
   virtual ~LinkModuleImpl() = default;
 
@@ -83,12 +83,12 @@ class LinkModuleImpl : public LinkModule {
  private:
   std::unique_ptr<LinkModuleHandle> module_handle_;
   std::unique_ptr<UserModule> module_;
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_weak_;
 };
 
 template <typename UserModule>
 void LinkModuleImpl<UserModule>::Initialize() {
-  module_->Initialize(task_runner_, spec_.arguments());
+  module_->Initialize(task_runner_weak_, spec_.arguments());
 }
 
 template <typename UserModule>
@@ -107,7 +107,7 @@ bool LinkModuleImpl<UserModule>::IsRunning() const {
 }
 
 LinkModulePtr LinkModule::CreateModule(
-  base::TaskRunner* task_runner,
+  std::weak_ptr<base::TaskRunner> task_runner_weak,
   ModuleClient* client,
   const Specification& spec) {
   LinkModuleHandle* module_handle = new LinkModuleHandle();
@@ -132,7 +132,7 @@ LinkModulePtr LinkModule::CreateModule(
     new LinkModuleImpl<UserModuleBase>(
       module_handle,
       factory->CreateModuleObject(spec.module_name(), client),
-      task_runner,
+      task_runner_weak,
       spec),
       &ModuleDeleter);
   return module_impl;

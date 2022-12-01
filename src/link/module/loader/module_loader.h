@@ -27,7 +27,7 @@ class ModuleLoader {
   ~ModuleLoader() = default;
 
   bool LoadModule(
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner_weak,
     ModuleClient* client,
     const Specification& spec);
   void UnLoadModule(const std::string& module_name);

@@ -20,7 +20,7 @@ LinkHandle::LinkHandle()
       std::make_shared<component::ComponentFctaory>(channel_controller_)) {
 }
 
-LinkHandle::LinkHandle(nlink::module::UserModule* user_module)
+LinkHandle::LinkHandle(nlink::module::UserModule*)
   : event_dispatcher_(nullptr),
     channel_controller_(std::make_shared<base::ChannelController>()),
     component_factory_(

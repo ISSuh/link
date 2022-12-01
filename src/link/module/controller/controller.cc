@@ -39,18 +39,25 @@ void ModuleController::LoadingModule(
     const std::string controller_task_runner_name =
       module_name + kControllerTaskRunnerNamePostfix;
 
-    base::TaskRunner* controller_task_runner =
+    std::weak_ptr<base::TaskRunner> controller_task_runner_weak =
       task_manager_->CreateTaskRunner(
         module_name, controller_task_runner_name,
         base::TaskRunner::Type::SEQUENCE, specs.size());
 
-    controller_task_runners_.insert({module_name, controller_task_runner});
+    controller_task_runners_.insert({module_name, controller_task_runner_weak});
 
-    controller_task_runners_[module_name]->PostTask(
+    std::shared_ptr<base::TaskRunner> controller_task_runner =
+      controller_task_runner_weak.lock();
+
+    if (nullptr == controller_task_runner) {
+      return;
+    }
+
+    controller_task_runner->PostTask(
       [this, spec, will_loaded_module_count,
-       status_callback, controller_task_runner]() {
+       status_callback, controller_task_runner_weak]() {
         this->LodingModuleInternal(
-          controller_task_runner, spec,
+          controller_task_runner_weak, spec,
           will_loaded_module_count, status_callback);
       });
   }
@@ -68,7 +75,15 @@ void ModuleController::RunningModule(StatusCallback status_callback) {
     LinkModule* module = loader_.GetModule(name);
     ModuleExecutor* excutor =  executors_[name].get();
 
-    controller_task_runners_[name]->PostTask(
+    std::weak_ptr<base::TaskRunner> task_runner_weak =
+      controller_task_runners_[name];
+
+    std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
+    if (nullptr == task_runner) {
+      continue;
+    }
+
+    task_runner->PostTask(
       [excutor, module]() {
         excutor->RunningModule(module);
       });
@@ -107,21 +122,23 @@ void ModuleController::TerminateModule(const std::string& module_name) {
 }
 
 void ModuleController::LodingModuleInternal(
-  base::TaskRunner* controller_task_runner,
+  std::weak_ptr<base::TaskRunner> controller_task_runner_weak,
   const Specification spec,
   size_t will_loaded_module_count,
   StatusCallback status_callback) {
   const std::string module_name = spec.module_name();
 
-  if (!CreateModuleExecutor(module_name, controller_task_runner)) {
+  if (!CreateModuleExecutor(module_name, controller_task_runner_weak)) {
     status_callback(false);
     TerminateModule(module_name);
     return;
   }
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner_weak =
     CreateWorkerTaskRunnerForModule(module_name, module_name);
-  if (!task_runner) {
+
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
+  if (nullptr == task_runner) {
     LOG(WARNING) << " Can not create task runner for module. " << module_name;
     status_callback(false);
     return;
@@ -129,7 +146,7 @@ void ModuleController::LodingModuleInternal(
 
   ModuleClient* module_client =
     dynamic_cast<ModuleClient*>(executors_.at(module_name).get());
-  if (!loader_.LoadModule(task_runner, module_client, spec)) {
+  if (!loader_.LoadModule(task_runner_weak, module_client, spec)) {
     status_callback(false);
     TerminateModule(module_name);
     return;
@@ -153,21 +170,28 @@ void ModuleController::TerminateModuleInternal(const std::string& module_name) {
     });
 }
 
-base::TaskRunner* ModuleController::CreateWorkerTaskRunnerForModule(
+std::weak_ptr<base::TaskRunner>
+ModuleController::CreateWorkerTaskRunnerForModule(
   const std::string& module_name, const std::string& task_runner_label) {
   return task_manager_->CreateTaskRunner(
     module_name, task_runner_label, base::TaskRunner::Type::SEQUENCE);
 }
 
 bool ModuleController::CreateModuleExecutor(
-  const std::string& module_name, base::TaskRunner* task_runner) {
+  const std::string& module_name,
+  std::weak_ptr<base::TaskRunner> task_runner_weak) {
   if (executors_.find(module_name) != executors_.end()) {
     LOG(WARNING) << " ModuleExecutor already exist. " << module_name;
     return false;
   }
 
-  std::unique_ptr<ModuleExecutor> executor(
-    new ModuleExecutor(task_runner, this));
+  ModuleExecutor::TerminateModuleCallback callback =
+    [this](const std::string& module_name) {
+        this->TerminateModule(module_name);
+    };
+
+  std::unique_ptr<ModuleExecutor> executor =
+    std::make_unique<ModuleExecutor>(task_runner_weak, std::move(callback));
   executors_.insert({module_name, std::move(executor)});
   return true;
 }

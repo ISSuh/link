@@ -28,13 +28,18 @@ UserModule::~UserModule() {
 }
 
 base::TaskRunner* UserModule::GetTaskRunner() const {
-  return task_runner_;
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak_.lock();
+  if (nullptr == task_runner) {
+    return nullptr;
+  }
+  return task_runner.get();
 }
 
 void UserModule::Initialize(
-  base::TaskRunner* task_runner, const base::Json& arguments) {
+  std::weak_ptr<base::TaskRunner> task_runner_weak,
+  const base::Json& arguments) {
   logger_ = base::LoggerManager::Instance()->CreateLogger(module_name_);
-  task_runner_ = task_runner;
+  task_runner_weak_ = task_runner_weak;
 
   arguments_ = arguments;
   running_state_ = true;

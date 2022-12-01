@@ -29,7 +29,7 @@ TaskManager::~TaskManager() {
   }
 }
 
-TaskRunner* TaskManager::CreateTaskRunner(
+std::weak_ptr<TaskRunner> TaskManager::CreateTaskRunner(
   const std::string& group,
   const std::string& label,
   TaskRunner::Type type,
@@ -40,7 +40,7 @@ TaskRunner* TaskManager::CreateTaskRunner(
   case TaskRunner::Type::CONCURRENT:
     return CreateConqurrentTaskRunner(group, label, num);
   default:
-    return nullptr;
+    return std::weak_ptr<TaskRunner>();
   }
 }
 
@@ -58,8 +58,8 @@ void TaskManager::WaitForTerminateTaskRunner(
     return;
   }
 
-  auto& runners = runner_groups_.at(group);
-  TaskRunnerProxy* runner = runners.at(label).get();
+  TaskRunnerMap& runners = runner_groups_.at(group);
+  std::shared_ptr<TaskRunnerProxy> runner = runners.at(label);
   if (!runner) {
     return;
   }
@@ -72,7 +72,7 @@ void TaskManager::WaitForTerminateTaskRunnerGroup(const std::string& group) {
     return;
   }
 
-  auto& runners = runner_groups_.at(group);
+  TaskRunnerMap& runners = runner_groups_.at(group);
   for (const auto& runner : runners) {
     const std::string label = runner.first;
     WaitForTerminateTaskRunner(group, label);
@@ -146,7 +146,7 @@ std::map<std::string, std::string> TaskManager::TaskRunnerLabels() const {
   std::map<std::string, std::string> labels_by_group;
   for (const auto& group : runner_groups_) {
     std::string group_name = group.first;
-    const RunnerMap& runners = group.second;
+    const TaskRunnerMap& runners = group.second;
     for (const auto& runner : runners) {
       const std::string label = runner.first;
       labels_by_group.insert({group_name, label});
@@ -158,7 +158,7 @@ std::map<std::string, std::string> TaskManager::TaskRunnerLabels() const {
 TaskManager::TaskThreadIdByLabel TaskManager::TaskThreadIds() const {
   TaskThreadIdByLabel thread_ids;
   for (const auto& group : runner_groups_) {
-    const RunnerMap& runners = group.second;
+    const TaskRunnerMap& runners = group.second;
     for (const auto& runner : runners) {
       const std::string label = runner.first;
       std::vector<uint64_t> ids_ = runner.second->WorkersIdLists();
@@ -181,7 +181,7 @@ bool TaskManager::HasTaskRunner(
     return false;
   }
 
-  auto& runners = runner_groups_.at(group);
+  const TaskRunnerMap& runners = runner_groups_.at(group);
   return runners.find(label) != runners.end();
 }
 
@@ -191,58 +191,58 @@ bool TaskManager::IsTaskRunnerRunning(
     return false;
   }
 
-  auto& runners = runner_groups_.at(group);
+  const TaskRunnerMap& runners = runner_groups_.at(group);
   return runners.at(label)->IsRunning();
 }
 
-TaskRunner* TaskManager::CreateSequencedTaskRunner(
+std::weak_ptr<TaskRunner> TaskManager::CreateSequencedTaskRunner(
   const std::string& group, const std::string& label) {
   if (HasTaskRunner(group, label)) {
-    auto& runners = runner_groups_.at(group);
-    return dynamic_cast<TaskRunner*>(runners.at(label).get());
+    const TaskRunnerMap& runners = runner_groups_.at(group);
+    return runners.at(label);
   }
 
   LOG(INFO) << __func__ << " - Create new Sequenced Runner : "
                         << group << "/" << label;
 
-  std::unique_ptr<TaskRunnerProxy> runner =
-    std::unique_ptr<TaskRunnerProxy>(new SequencedTaskRunner(label));
+  std::shared_ptr<TaskRunnerProxy> runner =
+    std::make_shared<SequencedTaskRunner>(label);
 
   return InsertRunner(std::move(runner), group, label);
 }
 
-TaskRunner* TaskManager::CreateConqurrentTaskRunner(
+std::weak_ptr<TaskRunner> TaskManager::CreateConqurrentTaskRunner(
   const std::string& group, const std::string& label, size_t num) {
   if (HasTaskRunner(group, label)) {
-    auto& runners = runner_groups_.at(group);
-    return dynamic_cast<TaskRunner*>(runners.at(label).get());
+    const TaskRunnerMap& runners = runner_groups_.at(group);
+    return runners.at(label);
   }
 
   LOG(INFO) << __func__ << " - Create new Conqurrent Runner : "
                         << group << "/" << label;
 
-  std::unique_ptr<TaskRunnerProxy> runner =
-    std::unique_ptr<TaskRunnerProxy>(new ConcurrentTaskRunner(label, num));
+  std::shared_ptr<TaskRunnerProxy> runner =
+    std::make_shared<ConcurrentTaskRunner>(label, num);
 
   return InsertRunner(std::move(runner), group, label);
 }
 
-TaskRunner* TaskManager::InsertRunner(
-  std::unique_ptr<TaskRunnerProxy> runner,
+std::weak_ptr<TaskRunner> TaskManager::InsertRunner(
+  std::shared_ptr<TaskRunnerProxy> runner,
   const std::string& group,
   const std::string& label) {
   if (HasTaskRunnerGroup(group)) {
-    auto& runners = runner_groups_.at(group);
+    TaskRunnerMap& runners = runner_groups_.at(group);
     runners.insert({label, std::move(runner)});
   } else {
-    RunnerMap runners;
+    TaskRunnerMap runners;
     runners.insert({label, std::move(runner)});
     runner_groups_.insert({group, std::move(runners)});
   }
 
   CreateLoggerForNewTaskRunner(label);
-  auto& runners = runner_groups_.at(group);
-  return dynamic_cast<TaskRunner*>(runners.at(label).get());
+  const TaskRunnerMap& runners = runner_groups_.at(group);
+  return runners.at(label);
 }
 
 TaskRunner* TaskManager::GetTaskRunner(
@@ -252,7 +252,7 @@ TaskRunner* TaskManager::GetTaskRunner(
     return nullptr;
   }
 
-  auto& runners = runner_groups_.at(group);
+  const TaskRunnerMap& runners = runner_groups_.at(group);
   return runners.at(label).get();
 }
 

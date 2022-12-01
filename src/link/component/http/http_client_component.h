@@ -14,7 +14,7 @@
 #include <functional>
 
 #include "link/base/task/task_runner.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/net/http/method.h"
 #include "link/net/http/header.h"
 #include "link/net/http/request.h"

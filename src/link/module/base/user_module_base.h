@@ -8,6 +8,7 @@
 #define LINK_MODULE_BASE_USER_MODULE_BASE_H_
 
 #include <string>
+#include <memory>
 
 #include "link/base/logging.h"
 #include "link/base/json_wrapper.h"
@@ -24,7 +25,8 @@ class UserModuleBase {
   virtual ~UserModuleBase();
 
   virtual void Initialize(
-    base::TaskRunner* task_runner, const base::Json& arguments) = 0;
+    std::weak_ptr<base::TaskRunner> task_runner_weak,
+    const base::Json& arguments) = 0;
   virtual void Process() = 0;
   virtual void Terminate() = 0;
 

@@ -11,10 +11,10 @@
 namespace nlink {
 namespace base {
 
-Timer::Timer(TaskRunner* task_runner)
+Timer::Timer(std::weak_ptr<TaskRunner> task_runner_weak)
   : running_(false),
     desired_run_time_(0),
-    task_runner_(task_runner) {
+    task_runner_weak_(task_runner_weak) {
 }
 
 Timer::~Timer() = default;
@@ -45,7 +45,12 @@ void Timer::Stop() {
 }
 
 void Timer::ScheduleUserTask() {
-  task_runner_->PostTask(
+  std::shared_ptr<TaskRunner> task_runner = task_runner_weak_.lock();
+  if (nullptr == task_runner) {
+    return;
+  }
+
+  task_runner->PostTask(
     [this](){ this->OnScheduleUserTaskInvoked(); });
 }
 

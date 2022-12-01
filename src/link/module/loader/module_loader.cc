@@ -17,7 +17,7 @@ namespace nlink {
 namespace module {
 
 bool ModuleLoader::LoadModule(
-  base::TaskRunner* task_runner,
+  std::weak_ptr<base::TaskRunner> task_runner_weak,
   ModuleClient* client,
   const Specification& spec) {
   LOG(INFO) << __func__ << " - " << spec.module_name();
@@ -28,7 +28,8 @@ bool ModuleLoader::LoadModule(
     return false;
   }
 
-  LinkModulePtr module = LinkModule::CreateModule(task_runner, client, spec);
+  LinkModulePtr module =
+    LinkModule::CreateModule(task_runner_weak, client, spec);
   if (!module) {
     return false;
   }

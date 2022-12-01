@@ -12,7 +12,7 @@
 #include <functional>
 
 #include "link/base/task/task_executor_delegate.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/time.h"
 
 namespace nlink {

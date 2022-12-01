@@ -19,7 +19,7 @@ uint64_t RandUint32() {
   return 0;
 }
 
-uint64_t RandGeneratorWithRange(uint64_t range) {
+uint64_t RandGeneratorWithRange(uint64_t) {
   return 0;
 }
 

@@ -12,7 +12,7 @@
 #include <map>
 
 #include "link/base/task_manager.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/time.h"
 
 namespace nlink {

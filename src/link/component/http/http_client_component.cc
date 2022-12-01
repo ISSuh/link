@@ -315,7 +315,7 @@ void HttpClientComponent::InternalCloseHandler(
 void HttpClientComponent::InternalReadHandler(
   RequestHanelder request_handler,
   const base::Buffer& buffer,
-  std::shared_ptr<io::Session> session) {
+  std::shared_ptr<io::Session>) {
   if (buffer.IsEmpty()) {
     return;
   }
@@ -327,7 +327,7 @@ void HttpClientComponent::InternalReadHandler(
   request_handler(response);
 }
 
-void HttpClientComponent::InternalWriteHandler(size_t length) {
+void HttpClientComponent::InternalWriteHandler(size_t) {
 }
 
 }  // namespace component

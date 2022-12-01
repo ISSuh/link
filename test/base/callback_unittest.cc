@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <link/base/callback/callback.h>
+#include <link/base/callback.h>
 
 using namespace nlink;
 

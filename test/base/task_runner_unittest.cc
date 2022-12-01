@@ -45,7 +45,7 @@ TEST(SequencedTaskRunner, run_task_test) {
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner_weak =
     task_manager->CreateTaskRunner(
       "test", "sequence_task", base::TaskRunner::Type::SEQUENCE);
 
@@ -54,6 +54,7 @@ TEST(SequencedTaskRunner, run_task_test) {
 
   EXPECT_CALL(mock_task, Task1()).Times(1);
 
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
   task_runner->PostTask(
     [&]() {
       std::cout << "run task!" << std::endl;
@@ -71,9 +72,11 @@ TEST(SequencedTaskRunner, run_delayed_task_test) {
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner_weak =
     task_manager->CreateTaskRunner(
       "test", "sequence_task", base::TaskRunner::Type::SEQUENCE);
+
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
 
   UserTaskkMock mock_task;
   std::atomic_int32_t finished_task_num(0);
@@ -123,10 +126,12 @@ TEST(ConcurrentTaskRunner, run_task_test) {
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner_weak =
     task_manager->CreateTaskRunner(
       "test", "ConcurrentTaskRunner-run_task_test",
       base::TaskRunner::Type::CONCURRENT, 2);
+
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
 
   UserTaskkMock mock_task;
   std::atomic_int32_t finished_task_num(0);
@@ -158,10 +163,12 @@ TEST(ConcurrentTaskRunner, run_delayed_task_test) {
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner_weak =
     task_manager->CreateTaskRunner(
       "test", "ConcurrentTaskRunner-run_delayed_task_test",
       base::TaskRunner::Type::CONCURRENT, 3);
+
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak.lock();
 
   UserTaskkMock mock_task;
   std::atomic_int32_t finished_task_num(0);

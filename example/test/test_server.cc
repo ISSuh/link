@@ -12,7 +12,7 @@
 #include <link/base/buffer.h>
 #include <link/base/logging.h>
 #include <link/base/logger.h>
-#include <link/base/callback/callback.h>
+#include <link/base/callback.h>
 #include <link/base/callback/bind.h>
 #include <link/base/task_manager.h>
 #include <link/base/event/event_dispatcher_factory.h>

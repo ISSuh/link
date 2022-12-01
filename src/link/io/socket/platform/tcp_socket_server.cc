@@ -138,7 +138,7 @@ void TcpSocketServer::HandleCloseEvent(SocketDescriptor descriptor) {
     });
 }
 
-void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client> client) {
+void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client>) {
 }
 
 void TcpSocketServer::InternalAcceptHandler(std::shared_ptr<Session> session) {

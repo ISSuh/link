@@ -29,7 +29,7 @@ class LinkModule {
   virtual ~LinkModule() = default;
 
   static LinkModulePtr CreateModule(
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner_weak,
     ModuleClient* client,
     const Specification& spec);
   const Specification ModuleSpecification() const;

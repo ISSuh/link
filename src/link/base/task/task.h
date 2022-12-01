@@ -11,7 +11,7 @@
 #include <queue>
 
 #include "link/base/time.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 
 namespace nlink {
 namespace base {

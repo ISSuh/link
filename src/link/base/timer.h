@@ -7,9 +7,11 @@
 #ifndef LINK_BASE_TIMER_H_
 #define LINK_BASE_TIMER_H_
 
+#include <memory>
+
 #include "link/base/time.h"
 #include "link/base/task/task.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/task/task_runner.h"
 
 namespace nlink {
@@ -17,7 +19,7 @@ namespace base {
 
 class Timer {
  public:
-  explicit Timer(TaskRunner* task_runner);
+  explicit Timer(std::weak_ptr<TaskRunner> task_runner_weak);
   ~Timer();
 
   bool IsRunning() const;
@@ -34,7 +36,7 @@ class Timer {
 
   TimeTick desired_run_time_;
 
-  TaskRunner* task_runner_;
+  std::weak_ptr<TaskRunner> task_runner_weak_;
   TaskCallback user_task_;
 };
 

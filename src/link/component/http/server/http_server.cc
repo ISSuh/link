@@ -55,12 +55,10 @@ void HttpServer::Route(
   routing_.RegistHandler(path, handler);
 }
 
-void HttpServer::InternalAcceptHandler(
-  std::shared_ptr<io::Session> session) {
+void HttpServer::InternalAcceptHandler(std::shared_ptr<io::Session>) {
 }
 
-void HttpServer::InternalCloseHandler(
-  std::shared_ptr<io::Session> session) {
+void HttpServer::InternalCloseHandler(std::shared_ptr<io::Session>) {
 }
 
 void HttpServer::InternalReadHandler(
@@ -99,7 +97,7 @@ void HttpServer::InternalReadHandler(
   session->Write(response_buffer);
 }
 
-void HttpServer::InternalWriteHandler(size_t length) {
+void HttpServer::InternalWriteHandler(size_t) {
 }
 
 }  // namespace component

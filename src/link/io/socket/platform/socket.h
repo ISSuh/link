@@ -12,7 +12,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/io/base/address_family.h"
 #include "link/io/base/sockaddr_storage.h"
 #include "link/io/socket/platform/socket_descripor.h"

@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "link/base/buffer.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/io/base/ip_endpoint.h"
 #include "link/io/socket/platform/socket.h"
 #include "link/io/socket/platform/socket_options.h"

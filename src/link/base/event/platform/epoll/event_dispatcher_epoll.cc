@@ -133,8 +133,8 @@ void EventDispatcherEpoll::Stop() {
 }
 
 void EventDispatcherEpoll::OnAttachChannel(
-  int32_t descriptor, EventChannel* channel) {
-    LOG(WARNING) << "[EventDispatcherEpoll::OnAttachChannel] fd : " << descriptor;
+  int32_t descriptor, EventChannel*) {
+  LOG(WARNING) << "[EventDispatcherEpoll::OnAttachChannel] fd : " << descriptor;
 
   epoll_event event;
   // event.data.ptr = channel;
@@ -149,12 +149,12 @@ void EventDispatcherEpoll::OnAttachChannel(
 }
 
 void EventDispatcherEpoll::OnDetachChannel(
-  int32_t descriptor, EventChannel* channel) {
+  int32_t descriptor, EventChannel*) {
   epoll_ctl(epoll_descriptor_, EPOLL_CTL_DEL, descriptor, nullptr);
 }
 
 void EventDispatcherEpoll::OnUpdatedChannel(
-  int32_t descriptor, EventChannel* channel) {
+  int32_t descriptor, EventChannel*) {
   epoll_event event;
   // event.data.ptr = channel;
   event.events = EPOLLIN | (EPOLLERR | EPOLLRDHUP) | (EPOLLET);

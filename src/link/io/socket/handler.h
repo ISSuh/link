@@ -11,7 +11,7 @@
 #include <functional>
 
 #include "link/base/buffer.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/io/socket/session.h"
 
 namespace nlink {

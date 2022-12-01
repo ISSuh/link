@@ -36,7 +36,7 @@ Response::Response(StatusLine status_line)
 }
 
 Response::Response(
-  StatusLine status_line, const HttpHeader& header)
+  StatusLine status_line, const HttpHeader&)
   : Response(status_line, HttpHeader(), "", "") {
 }
 

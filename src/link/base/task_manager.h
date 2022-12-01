@@ -25,12 +25,12 @@ class TaskDispatcher;
 class TaskManager : public std::enable_shared_from_this<TaskManager> {
  public:
   using TaskThreadIdByLabel = std::vector<std::pair<std::string, uint64_t>>;
-  using RunnerMap = std::map<std::string, std::unique_ptr<TaskRunnerProxy>>;
+  using TaskRunnerMap = std::map<std::string, std::shared_ptr<TaskRunnerProxy>>;
 
   TaskManager();
   ~TaskManager();
 
-  TaskRunner* CreateTaskRunner(
+  std::weak_ptr<TaskRunner> CreateTaskRunner(
     const std::string& group,
     const std::string& label,
     TaskRunner::Type type,
@@ -59,12 +59,12 @@ class TaskManager : public std::enable_shared_from_this<TaskManager> {
  private:
   friend TaskDispatcher;
 
-  TaskRunner* CreateSequencedTaskRunner(
+  std::weak_ptr<TaskRunner> CreateSequencedTaskRunner(
     const std::string& group, const std::string& label);
-  TaskRunner* CreateConqurrentTaskRunner(
+  std::weak_ptr<TaskRunner> CreateConqurrentTaskRunner(
     const std::string& group, const std::string& label, size_t num);
-  TaskRunner* InsertRunner(
-    std::unique_ptr<TaskRunnerProxy> runner,
+  std::weak_ptr<TaskRunner> InsertRunner(
+    std::shared_ptr<TaskRunnerProxy> runner,
     const std::string& group,
     const std::string& label);
 
@@ -72,7 +72,7 @@ class TaskManager : public std::enable_shared_from_this<TaskManager> {
     const std::string& group, const std::string& label);
   void CreateLoggerForNewTaskRunner(const std::string& label);
 
-  std::map<std::string, RunnerMap> runner_groups_;
+  std::map<std::string, TaskRunnerMap> runner_groups_;
   std::unique_ptr<TaskDispatcher> dispatcher_;
 
   DISAALOW_COPY_AND_ASSIGN(TaskManager)

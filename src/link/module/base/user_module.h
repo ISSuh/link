@@ -25,9 +25,11 @@ class UserModule : public UserModuleBase {
   virtual ~UserModule();
 
   void Initialize(
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner,
     const base::Json& arguments) override;
+
   void Process() override;
+
   void Terminate() override;
 
   template<typename T>
@@ -40,7 +42,7 @@ class UserModule : public UserModuleBase {
   virtual void Run() = 0;
   virtual void Shutdown() = 0;
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_weak_;
   std::shared_ptr<base::Logger> logger_;
 
   base::Json arguments_;

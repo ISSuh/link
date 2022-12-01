@@ -37,7 +37,7 @@ TEST(Timer, timer_test) {
     = std::make_shared<base::TaskManager>();
   base::LoggerManager::Instance()->SetTaskManager(task_manager);
 
-  base::TaskRunner* task_runner =
+  std::weak_ptr<base::TaskRunner> task_runner =
     task_manager->CreateTaskRunner(
       "test", "test", base::TaskRunner::Type::SEQUENCE);
 

@@ -13,7 +13,7 @@
 
 #include "link/base/macro.h"
 #include "link/base/buffer.h"
-#include "link/base/callback/callback.h"
+#include "link/base/callback.h"
 #include "link/base/task/task_runner.h"
 #include "link/base/event/event_dispatcher.h"
 #include "link/io/base/ip_endpoint.h"
