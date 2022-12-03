@@ -30,7 +30,7 @@ class LoggerManager {
 
   void SetTaskManager(std::shared_ptr<base::TaskManager>);
 
-  std::shared_ptr<Logger> CreateLogger(const std::string name);
+  std::shared_ptr<Logger> CreateLogger(const std::string name, LogLevel level);
   std::shared_ptr<Logger> FineLoggerFromThreadId(uint64_t thread_id);
 
  private:

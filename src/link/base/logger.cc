@@ -6,14 +6,12 @@
 
 #include "link/base/logger.h"
 
-
+#include <iostream>
 #include <string>
+#include <thread>
 
 #include "link/base/time.h"
 #include "link/base/thread.h"
-#include "link/third_party/spdlog/spdlog.h"
-#include "link/third_party/spdlog/sinks/stdout_color_sinks.h"
-#include "link/third_party/spdlog/sinks/basic_file_sink.h"
 
 namespace nlink {
 namespace base {
@@ -21,44 +19,83 @@ namespace base {
 std::atomic<LoggerManager*> LoggerManager::instance_{nullptr};
 std::mutex LoggerManager::mutex_;
 
+enum LogColorCode {
+  RED      = 31,
+  GREEN    = 32,
+  YELLOW   = 33,
+  BLUE     = 34,
+  BLACK    = 39,
+};
+
+inline std::string LogLevelToStr(const LogLevel level) {
+  switch (level) {
+    case LogLevel::ERROR:
+      return "ERROR";
+    case LogLevel::WARNING:
+      return "WARNING";
+    case LogLevel::INFO:
+      return "INFO";
+    case LogLevel::DEBUG:
+      return "DEBUG";
+    case LogLevel::TRACE:
+      return "TRACE";
+    }
+  return "";
+}
+
+LogColorCode SelectLogColor(LogLevel level) {
+  LogColorCode color;
+  switch (level) {
+    case LogLevel::ERROR:
+      color = LogColorCode::RED;
+      break;
+    case LogLevel::WARNING:
+      color = LogColorCode::YELLOW;
+      break;
+    case LogLevel::INFO:
+      color = LogColorCode::GREEN;
+      break;
+    case LogLevel::DEBUG:
+      color = LogColorCode::BLUE;
+      break;
+    case LogLevel::TRACE:
+      color = LogColorCode::BLACK;
+      break;
+  }
+  return color;
+}
 class LoggerImpl : public Logger {
  public:
-  explicit LoggerImpl(const std::string& name);
+  LoggerImpl(const std::string& name, LogLevel level);
   virtual ~LoggerImpl();
 
   void PrintLog(LogLevel level, const std::string& log) override;
 
  private:
   std::string name_;
-
-  std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink_;
-  std::shared_ptr<spdlog::sinks::basic_file_sink_mt> file_sink_;
+  LogLevel log_level_;
 };
 
-LoggerImpl::LoggerImpl(const std::string& name)
-  : name_(name) {
+LoggerImpl::LoggerImpl(const std::string& name, LogLevel level)
+  : name_(name), log_level_(level) {
 }
 
 LoggerImpl::~LoggerImpl() = default;
 
 void LoggerImpl::PrintLog(LogLevel level, const std::string& log) {
-  switch (level) {
-    case LogLevel::ERROR:
-      SPDLOG_ERROR("<{}> {}", name_, log);
-      break;
-    case LogLevel::WARNING:
-      SPDLOG_WARN("<{}> {}", name_, log);
-      break;
-    case LogLevel::INFO:
-      SPDLOG_INFO("<{}> {}", name_, log);
-      break;
-    case LogLevel::DEBUG:
-      SPDLOG_DEBUG("<{}> {}", name_, log);
-      break;
-    case LogLevel::TRACE:
-      SPDLOG_TRACE("<{}> {}", name_, log);
-      break;
+  if (log_level_ < level) {
+    return;
   }
+
+  std::stringstream ss;
+  ss << "\033[" << SelectLogColor(level) << "m";
+  ss << "[" << Time::CurrentTimeToDateStr() << "]";
+  ss << "[" << std::this_thread::get_id() <<  "]";
+  ss << "[" << LogLevelToStr(level) << "]";
+  ss << "<" << name_ << "> ";
+  ss <<  log;
+
+  std::cout << ss.str() << std::endl;
 }
 
 LoggerManager* LoggerManager::Instance() {
@@ -72,8 +109,7 @@ LoggerManager* LoggerManager::Instance() {
 }
 
 LoggerManager::LoggerManager()
-  : default_logger_(std::make_shared<LoggerImpl>("main")) {
-  spdlog::set_pattern("[%H:%M:%S:%e:%f][%P:%t][%^%L%$] %v");
+  : default_logger_(std::make_shared<LoggerImpl>("main", LogLevel::INFO)) {
 }
 
 LoggerManager::~LoggerManager() {
@@ -84,8 +120,9 @@ void LoggerManager::SetTaskManager(
   task_manager_ = task_manager;
 }
 
-std::shared_ptr<Logger> LoggerManager::CreateLogger(const std::string name) {
-  std::shared_ptr<Logger> logger = std::make_shared<LoggerImpl>(name);
+std::shared_ptr<Logger> LoggerManager::CreateLogger(
+  const std::string name, LogLevel level) {
+  std::shared_ptr<Logger> logger = std::make_shared<LoggerImpl>(name, level);
 
   TaskManager::TaskThreadIdByLabel id_by_label = task_manager_->TaskThreadIds();
   for (const auto& item : id_by_label) {
@@ -113,7 +150,8 @@ void LoggerManager::UpdateThreadId() {
     const std::string name = item.first;
     const uint64_t id = item.second;
 
-    std::shared_ptr<Logger> logger = std::make_shared<LoggerImpl>(name);
+    std::shared_ptr<Logger> logger =
+      std::make_shared<LoggerImpl>(name, LogLevel::INFO);
     logger_map_[id] = logger;
   }
 }

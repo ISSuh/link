@@ -6,8 +6,9 @@
 
 #include "link/net/base/uri.h"
 
+#include <algorithm>
+
 #include "link/base/logging.h"
-#include "link/third_party/network/uri.hpp"
 
 namespace nlink {
 namespace net {

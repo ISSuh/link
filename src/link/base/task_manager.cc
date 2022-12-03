@@ -257,7 +257,7 @@ TaskRunner* TaskManager::GetTaskRunner(
 }
 
 void TaskManager::CreateLoggerForNewTaskRunner(const std::string& label) {
-  base::LoggerManager::Instance()->CreateLogger(label);
+  base::LoggerManager::Instance()->CreateLogger(label, LogLevel::INFO);
 }
 
 }  // namespace base

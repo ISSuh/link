@@ -38,7 +38,8 @@ base::TaskRunner* UserModule::GetTaskRunner() const {
 void UserModule::Initialize(
   std::weak_ptr<base::TaskRunner> task_runner_weak,
   const base::Json& arguments) {
-  logger_ = base::LoggerManager::Instance()->CreateLogger(module_name_);
+  logger_ =
+    base::LoggerManager::Instance()->CreateLogger(module_name_, LogLevel::INFO);
   task_runner_weak_ = task_runner_weak;
 
   arguments_ = arguments;
