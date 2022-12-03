@@ -63,9 +63,16 @@ Request::Request(
   : request_line_(request_line),
     header_(header),
     body_(body) {
+  header_.Set("host", request_line_.uri.Host());
+
   if (!body.empty() && !content_type.empty()) {
     header_.Set("content-type", content_type);
     header_.Set("content-length", body.size());
+  }
+
+  const std::string accept = header_.Find("accept");
+  if (accept.empty()) {
+    header_.Set("accept", "*/*");
   }
 }
 

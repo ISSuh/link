@@ -238,6 +238,8 @@ void HttpClientComponent::DoFetch(
     return;
   }
 
+  LOG(WARNING) << "[HttpClientComponent::Get] requese - "
+            << request.Serialize();
   CreateIOClientAndConnet(request, handler);
 }
 
@@ -254,7 +256,8 @@ void HttpClientComponent::DoFetchWithBody(
     return;
   }
 
-  net::http::Request::RequestLine request_line = {method, uri};
+  net::http::Request::RequestLine request_line =
+    {method, uri, net::http::Version::HTTP_1_1};
   net::http::Request request(request_line, header, body, content_type);
   CreateIOClientAndConnet(request, handler);
 }
