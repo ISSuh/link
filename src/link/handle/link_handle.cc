@@ -15,16 +15,18 @@ namespace handle {
 
 LinkHandle::LinkHandle()
   : event_dispatcher_(nullptr),
-    channel_controller_(std::make_shared<base::ChannelController>()),
-    component_factory_(
-      std::make_shared<component::ComponentFctaory>(channel_controller_)) {
+    channel_controller_(std::make_shared<base::ChannelController>())
+    // component_factory_(
+    //   std::make_shared<component::ComponentFctaory>(channel_controller_))
+{
 }
 
 LinkHandle::LinkHandle(nlink::module::UserModule*)
   : event_dispatcher_(nullptr),
-    channel_controller_(std::make_shared<base::ChannelController>()),
-    component_factory_(
-      std::make_shared<component::ComponentFctaory>(channel_controller_)) {
+    channel_controller_(std::make_shared<base::ChannelController>())
+    // component_factory_(
+    //   std::make_shared<component::ComponentFctaory>(channel_controller_))
+{
 }
 
 LinkHandle::~LinkHandle() = default;
@@ -59,10 +61,10 @@ void LinkHandle::Shutdown() {
   channel_controller_->CloseAllChannels();
 }
 
-std::weak_ptr<component::ComponentFctaory>
-LinkHandle::ComponentFactory() const {
-  return component_factory_;
-}
+// std::weak_ptr<component::ComponentFctaory>
+// LinkHandle::ComponentFactory() const {
+//   return component_factory_;
+// }
 
 }  // namespace handle
 }  // namespace nlink

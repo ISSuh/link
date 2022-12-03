@@ -9,6 +9,9 @@
 #include <sys/unistd.h>
 #include <sys/ioctl.h>
 
+#include <unistd.h>
+#include <stdlib.h>
+
 #include <cstring>
 #include <utility>
 
@@ -203,7 +206,7 @@ void Socket::ConnectCompleted() {
 }
 
 int32_t Socket::Close() {
-  close(descriptor_);
+  ::close(descriptor_);
   descriptor_ = kInvalidSocket;
   return IOError::OK;
 }
@@ -217,7 +220,7 @@ void Socket::Read(
 // TODO(issuh) : must change read logic through unuse buffer copy
 int32_t Socket::DoRead(base::Buffer* buffer) {
   std::vector<uint8_t> temp(buffer->Size(), 0);
-  int32_t size = read(descriptor_, &temp[0], buffer->Size());
+  int32_t size = ::read(descriptor_, &temp[0], buffer->Size());
 
   if (-1 != size) {
     temp.resize(size);

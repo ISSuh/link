@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_
-#define LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_
+#ifndef LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_KQUEUE_H_
+#define LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_KQUEUE_H_
 
 #include <vector>
 #include <memory>
@@ -20,15 +20,15 @@
 namespace nlink {
 namespace base {
 
-class EventDispatcherEpoll : public EventDispatcher {
+class EventDispatcherKqueue : public EventDispatcher {
  public:
-  static EventDispatcherEpoll* CreateEventDispatcher();
+  static EventDispatcherKqueue* CreateEventDispatcher();
 
-  EventDispatcherEpoll(
-    int32_t kqueue_descriptor,
+  EventDispatcherKqueue(
+    int32_t epoll_descriptor,
     int32_t event_size,
     int32_t timeout);
-  virtual ~EventDispatcherEpoll();
+  virtual ~EventDispatcherKqueue();
 
   // nlink::base::EventDispatcher
   void RegistEventChannelContoller(
@@ -50,13 +50,13 @@ class EventDispatcherEpoll : public EventDispatcher {
   uint32_t event_size_;
   int32_t timeout_;
 
-  int32_t kqueue_descriptor;
+  int32_t epoll_descriptor_;
   std::shared_ptr<EventChannelController> event_channel_controller_;
 
-  DISAALOW_COPY_AND_ASSIGN(EventDispatcherEpoll);
+  DISAALOW_COPY_AND_ASSIGN(EventDispatcherKqueue);
 };
 
 }  // namespace base
 }  // namespace nlink
 
-#endif  // LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_EPOLL_H_
+#endif  // LINK_BASE_EVENT_PLATFORM_EVENT_DISPATCHER_KQUEUE_H_

@@ -6,6 +6,7 @@ message("Build Link node")
 # Set Configure
 #-------------------------------------------------------------------------------
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-DDEBUG -DLINKER_FLAGS")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-export_dynamic") 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR_LINK})
 #-------------------------------------------------------------------------------
@@ -32,6 +33,7 @@ add_dependencies(${LINK_NODE_NAME}
 #-------------------------------------------------------------------------------
 # Build node launcher
 #-------------------------------------------------------------------------------
+
 set(node_launcher
   ${LINK_NODE_PATH}/node_launcher.cc
 )

@@ -53,7 +53,8 @@ void ModuleRegister::CreateModuleFactory(const std::string& class_name,
                                         const std::string& base_class_name) {
   LOG(INFO) << __func__ << " - "
               << "class_name : " << class_name
-              << ", base_class_name : " << base_class_name;
+              << ", base_class_name : " << base_class_name
+              << ", this : " << this;
 
   if (factories_.find(class_name) != factories_.end()) {
     ++factories_[class_name].ref_count;
@@ -73,6 +74,10 @@ void ModuleRegister::CreateModuleFactory(const std::string& class_name,
 template <typename UserModule>
 AbstractModlueFactory<UserModule>*
   ModuleRegister::GetModuleFactory(const std::string& class_name) {
+LOG(INFO) << __func__ << " - "
+            << "class_name : " << class_name
+            << ", this : " << this;
+
   if (factories_.find(class_name) == factories_.end()) {
     return nullptr;
   }

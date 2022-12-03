@@ -18,7 +18,8 @@ namespace base {
 class EventDispatcherFactory {
  public:
   static EventDispatcher* CreateEventDispatcher() {
-    return EventDispatcherEpoll::CreateEventDispatcher();
+    // return EventDispatcherEpoll::CreateEventDispatcher();
+    return nullptr;
   }
 };
 

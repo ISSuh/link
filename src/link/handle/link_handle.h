@@ -13,8 +13,8 @@
 #include "link/base/event/event_dispatcher.h"
 #include "link/base/event/channel_controller.h"
 #include "link/module/base/user_module.h"
-#include "link/component/base/component.h"
-#include "link/component/base/component_factory.h"
+// #include "link/component/base/component.h"
+// #include "link/component/base/component_factory.h"
 
 namespace nlink {
 namespace handle {
@@ -30,12 +30,12 @@ class LinkHandle {
   void RunOnce();
   void Shutdown();
 
-  std::weak_ptr<component::ComponentFctaory> ComponentFactory() const;
+  // std::weak_ptr<component::ComponentFctaory> ComponentFactory() const;
 
  private:
   std::unique_ptr<base::EventDispatcher> event_dispatcher_;
   std::shared_ptr<base::ChannelController> channel_controller_;
-  std::shared_ptr<component::ComponentFctaory> component_factory_;
+  // std::shared_ptr<component::ComponentFctaory> component_factory_;
 };
 
 }  // namespace handle

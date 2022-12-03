@@ -2,12 +2,24 @@ cmake_minimum_required(VERSION 3.5)
 project(link)
 
 #-------------------------------------------------------------------------------
-# Set Compiler
+# Set Environment
 #-------------------------------------------------------------------------------
 option(LINK_DEBUG "Debug Build" ON)
-option(LINK_WITH_ASIO "Use ASIO" OFF)
+
+option(LINK_USE_ASIO "Use ASIO" OFF)
 option(LINK_WITH_OPENSSL "Use Openssl" OFF)
 option(LINK_WITH_TEST "build test" OFF)
+
+set(LINK_USE_EPOLL OFF)
+set(LINK_USE_KQUEUE OFF)
+
+if(UNIX AND NOT APPLE)
+  set(LINK_USE_EPOLL ON)
+elseif(APPLE)
+  set(LINK_USE_KQUEUE ON)
+  else()
+  message("unsupport platform")
+endif()
 
 #-------------------------------------------------------------------------------
 # Set Compiler
@@ -16,9 +28,16 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(LINK_DEBUG)
-  set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -ldl -pg")
+  set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -pg")
 else()
-  set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC -rdynamic -ldl")
+  set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC -rdynamic")
+endif()
+
+if(UNIX AND NOT APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ldl")
+elseif(APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-export_dynamic") 
+else()
 endif()
 
 #-------------------------------------------------------------------------------
@@ -96,19 +115,19 @@ include_directories(
 add_subdirectory(${LINK_BASE_PATH})
 add_subdirectory(${LINK_MODULE_PATH})
 add_subdirectory(${LINK_NODE_PATH})
-add_subdirectory(${LINK_IO_PATH})
-add_subdirectory(${LINK_NET_PATH})
+# add_subdirectory(${LINK_IO_PATH})
+# add_subdirectory(${LINK_NET_PATH})
 add_subdirectory(${LINK_HANDLE_PATH})
-add_subdirectory(${LINK_COMPONENT_PATH})
+# add_subdirectory(${LINK_COMPONENT_PATH})
 
 add_library(${LINK_LIBRARY_NAME}
  SHARED
   $<TARGET_OBJECTS:link_base> 
   $<TARGET_OBJECTS:link_module>
   $<TARGET_OBJECTS:link_node>
-  $<TARGET_OBJECTS:link_io>
-  $<TARGET_OBJECTS:link_net>
-  $<TARGET_OBJECTS:link_component>
+  # $<TARGET_OBJECTS:link_io>
+  # $<TARGET_OBJECTS:link_net>
+  # $<TARGET_OBJECTS:link_component>
   $<TARGET_OBJECTS:link_handle>
 )
 
@@ -117,9 +136,9 @@ target_link_libraries(${LINK_LIBRARY_NAME}
   ${LINK_BASE_NAME}
   ${LINK_MODULE_NAME}
   ${LINK_NODE_NAME}
-  ${LINK_IO_NAME}
-  ${LINK_NET_NAME}
-  ${LINK_COMPONENT_NAME}
+  # ${LINK_IO_NAME}
+  # ${LINK_NET_NAME}
+  # ${LINK_COMPONENT_NAME}
   ${LINK_HANDLE_NAME}
 )
 

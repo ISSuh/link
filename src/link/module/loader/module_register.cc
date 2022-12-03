@@ -6,6 +6,8 @@
 
 #include "link/module/loader/module_register.h"
 
+#include "link/base/logging.h"
+
 namespace nlink {
 namespace module {
 
@@ -19,6 +21,8 @@ ModuleRegister* ModuleRegister::GetInstance() {
       instance_ = new ModuleRegister();
     }
   }
+
+  LOG(INFO) << __func__ << " - instance_ : " << instance_;
   return instance_;
 }
 
@@ -27,6 +31,7 @@ void ModuleRegister::ReleaseModuleFactory(const std::string& class_name) {
     return;
   }
 
+  LOG(INFO) << __func__ << " - this : " << this;
 
   // TODO(issuh) : should change release factory logic
   --factories_[class_name].ref_count;

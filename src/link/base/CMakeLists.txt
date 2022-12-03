@@ -6,10 +6,14 @@ FILE(GLOB base ${LINK_BASE_PATH}/*.cc)
 FILE(GLOB base_task ${LINK_BASE_PATH}/task/*.cc)
 FILE(GLOB base_event ${LINK_BASE_PATH}/event/*.cc)
 
-if(LINK_WITH_ASIO)
+if(LINK_USE_ASIO)
   FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/platform/asio/*.cc)
-else()
+elseif(LINK_USE_EPOLL)
   FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/platform/epoll/*.cc)
+elseif(LINK_USE_KQUEUE)
+  # FILE(GLOB base_event_platform ${LINK_BASE_PATH}/event/platform/kqueue/*.cc)
+else()
+  message("need setting event platform")
 endif()
 
 add_library(${LINK_BASE_NAME}

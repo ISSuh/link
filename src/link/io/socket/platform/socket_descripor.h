@@ -13,10 +13,10 @@
 namespace nlink {
 namespace io {
 
-#if defined(__linux__)
+// #if defined(__linux__)
 typedef int32_t SocketDescriptor;
 #define NLINK_ERRNO errno
-#endif
+// #endif
 
 extern const SocketDescriptor kInvalidSocket;
 

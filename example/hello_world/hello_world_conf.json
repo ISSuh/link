@@ -4,7 +4,7 @@
   "modules": [
     {
       "module_name": "Sample_0",
-      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/hello_world/libhello_world.so",
+      "module_path": "/Users/inseocksuh/workspace/my_project/link/build/link/example/hello_world/libhello_world.so",
       "module": {
         "class_name": "SampleModule",
         "arguments": {

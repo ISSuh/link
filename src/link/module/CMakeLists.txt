@@ -2,7 +2,6 @@ project(link_module)
 
 message("Build Link module")
 
-
 FILE(GLOB module_base ${LINK_MODULE_PATH}/base/*.cc)
 FILE(GLOB module_loader ${LINK_MODULE_PATH}/loader/*.cc)
 FILE(GLOB module_controller ${LINK_MODULE_PATH}/controller/*.cc)
