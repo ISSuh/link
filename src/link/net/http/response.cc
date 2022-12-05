@@ -36,8 +36,8 @@ Response::Response(StatusLine status_line)
 }
 
 Response::Response(
-  StatusLine status_line, const HttpHeader&)
-  : Response(status_line, HttpHeader(), "", "") {
+  StatusLine status_line, const HttpHeader& header)
+  : Response(status_line, header, "", "") {
 }
 
 Response::Response(
@@ -76,6 +76,10 @@ void Response::SetHeaderItem(const std::string& key, const std::string& value) {
 
 void Response::SetHeaderItem(const std::string& key, int32_t value) {
   header_.Set(key, value);
+}
+
+const std::string Response::FindHeaderItem(const std::string key) const {
+  return header_.Find(key);
 }
 
 const std::string Response::Body() const {
@@ -121,6 +125,21 @@ const std::string Response::Serialize() const {
   stream << kCRLF;
   stream << body_;
   return stream.str();
+}
+
+bool Response::IsChunk() const {
+  constexpr const char* kTransferEncodingKey = "Transfer-Encoding";
+  constexpr const char* kChunkValue = "chunked";
+  const std::string value = FindHeaderItem(kTransferEncodingKey);
+
+  if (value.empty()) {
+    return false;
+  }
+
+  if (0 != value.compare(kChunkValue)) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace http

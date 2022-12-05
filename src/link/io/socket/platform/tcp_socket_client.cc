@@ -164,6 +164,7 @@ void TcpSocketClient::InternalCloseHandler(std::shared_ptr<Session> session) {
 
 void TcpSocketClient::InternalReadHandler(
   const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
+
   if (!read_handler_) {
     return;
   }

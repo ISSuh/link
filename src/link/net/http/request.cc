@@ -74,6 +74,8 @@ Request::Request(
   if (accept.empty()) {
     header_.Set("accept", "*/*");
   }
+
+  header_.Set("connection", "keep-alive");
 }
 
 Request::~Request() = default;
@@ -177,6 +179,21 @@ bool Request::HasQuery() const {
 
 const std::string Request::FindQueryParam(const std::string key) const {
   return request_line_.uri.QueryParam(key);
+}
+
+bool Request::IsChunk() const {
+  constexpr const char* kTransferEncodingKey = "Transfer-Encoding";
+  constexpr const char* kChunkValue = "chunked";
+  const std::string value = FindHeaderItem(kTransferEncodingKey);
+
+  if (value.empty()) {
+    return false;
+  }
+
+  if (0 != value.compare(kChunkValue)) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace http

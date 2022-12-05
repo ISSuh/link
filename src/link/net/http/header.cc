@@ -72,8 +72,7 @@ bool HttpHeader::Set(const std::string& header_str) {
   const std::string value =
     header_str.substr(value_pos, header_str.size());
 
-  std::string lower_key = ToLowerKey(key);
-  Set(lower_key, value);
+  Set(key, value);
   return true;
 }
 

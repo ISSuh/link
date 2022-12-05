@@ -51,6 +51,7 @@ class Response {
   HttpHeader Header() const;
   void SetHeaderItem(const std::string& key, const std::string& value);
   void SetHeaderItem(const std::string& key, int32_t value);
+  const std::string FindHeaderItem(const std::string key) const;
 
   const std::string Body() const;
   void SetBody(const std::string& content, const std::string& content_type);
@@ -60,6 +61,8 @@ class Response {
   const std::string ContentType() const;
 
   const std::string Serialize() const;
+
+  bool IsChunk() const;
 
  private:
   StatusLine status_line_;

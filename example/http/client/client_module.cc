@@ -28,16 +28,16 @@ void ExampleHttpClientModule::Run() {
   handle_.Initialize();
   http_client_.CreateAndRegistComponent(GetTaskRunner(), &handle_);
 
-  // http_client_.Get(path_for_get);
+  http_client_.Get(path_for_get);
 
-  base::Json json = {
-    {"Id", 12345},
-    {"Customer", "John Smith"},
-    {"Quantity", 1},
-    {"Price", 10.0}};
+  // base::Json json = {
+  //   {"Id", 12345},
+  //   {"Customer", "John Smith"},
+  //   {"Quantity", 1},
+  //   {"Price", 10.0}};
 
-  std::string body(json.dump(4));
-  http_client_.Post(path_for_post, "application/json", body);
+  // std::string body(json.dump(4));
+  // http_client_.Post(path_for_post, "application/json", body);
   WaitingForResponse();
 
   handle_.Shutdown();

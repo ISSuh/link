@@ -23,7 +23,7 @@ TEST(Url, parse_uri_string_succes) {
   EXPECT_TRUE(uri.HasHost());
   EXPECT_STRCASEEQ("http", uri.Scheme().c_str());
   EXPECT_STRCASEEQ("www.google.com", uri.Host().c_str());
-  EXPECT_STRCASEEQ(uri_str.c_str(), uri.Serialize().c_str());
+  EXPECT_STRCASEEQ((uri_str + "/").c_str(), uri.Serialize().c_str());
 
   uri_str = "https://localhost:12345";
   uri = net::Uri::Parse(uri_str);
@@ -33,7 +33,7 @@ TEST(Url, parse_uri_string_succes) {
   EXPECT_STRCASEEQ("https", uri.Scheme().c_str());
   EXPECT_STRCASEEQ("localhost", uri.Host().c_str());
   EXPECT_EQ(12345, uri.Port());
-  EXPECT_STRCASEEQ(uri_str.c_str(), uri.Serialize().c_str());
+  EXPECT_STRCASEEQ((uri_str + "/").c_str(), uri.Serialize().c_str());
 
   uri_str = "https://user@localhost";
   uri = net::Uri::Parse(uri_str);
@@ -43,7 +43,7 @@ TEST(Url, parse_uri_string_succes) {
   EXPECT_STRCASEEQ("https", uri.Scheme().c_str());
   EXPECT_STRCASEEQ("user", uri.UserName().c_str());
   EXPECT_STRCASEEQ("localhost", uri.Host().c_str());
-  EXPECT_STRCASEEQ(uri_str.c_str(), uri.Serialize().c_str());
+  EXPECT_STRCASEEQ((uri_str + "/").c_str(), uri.Serialize().c_str());
 
   uri_str = "http://user:password@localhost:12345";
   uri = net::Uri::Parse(uri_str);
@@ -57,7 +57,7 @@ TEST(Url, parse_uri_string_succes) {
   EXPECT_STRCASEEQ("password", uri.Password().c_str());
   EXPECT_STRCASEEQ("localhost", uri.Host().c_str());
   EXPECT_EQ(12345, uri.Port());
-  EXPECT_STRCASEEQ(uri_str.c_str(), uri.Serialize().c_str());
+  EXPECT_STRCASEEQ((uri_str + "/").c_str(), uri.Serialize().c_str());
 
   uri_str = "http://localhost:80/test";
   uri = net::Uri::Parse(uri_str);

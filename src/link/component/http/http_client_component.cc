@@ -238,8 +238,6 @@ void HttpClientComponent::DoFetch(
     return;
   }
 
-  LOG(WARNING) << "[HttpClientComponent::Get] requese - "
-            << request.Serialize();
   CreateIOClientAndConnet(request, handler);
 }
 
@@ -298,8 +296,6 @@ void HttpClientComponent::InternalConnectHandler(
 
   std::shared_ptr<base::Buffer> buffer =
     std::make_shared<base::Buffer>(request.Serialize());
-
-  LOG(INFO) << __func__ << " - request : \n" << request.Serialize();
 
   client->Write(buffer);
 

@@ -11,6 +11,7 @@
 #include <sstream>
 #include <list>
 #include <set>
+#include <cstdlib>
 
 #include "link/base/logging.h"
 #include "link/net/http/constant.h"
@@ -43,6 +44,7 @@ Method ParseMethod(
 
   *current_pos = pos + kSpaceSize;
   *state = Parser::ParseState::PARSE_REQUEST_URI;
+
   return method;
 }
 
@@ -64,6 +66,7 @@ const std::string ParseRequestPath(
 
   *current_pos = pos + kSpaceSize;
   *state = Parser::ParseState::PARSE_HTTP_VERSION;
+
   return path;
 }
 
@@ -87,6 +90,7 @@ HttpStatusCode ParseStatusCode(
 
   *current_pos = pos + kCRorLFSize;
   *state = Parser::ParseState::PARSE_STATUS_REASON;
+
   return static_cast<HttpStatusCode>(status_code);
 }
 
@@ -108,6 +112,7 @@ const std::string ParseStatusReason(
 
   *current_pos = pos + kCRLFSize;
   *state = Parser::ParseState::PARSE_HEADER;
+
   return reason;
 }
 
@@ -133,6 +138,7 @@ Version ParseRequestHttpVersion(
 
   *current_pos = pos + kCRLFSize;
   *state = Parser::ParseState::PARSE_HEADER;
+
   return version;
 }
 
@@ -158,6 +164,7 @@ Version ParseResponseHttpVersion(
 
   *current_pos = pos + kSpaceSize;
   *state = Parser::ParseState::PARSE_STATUS_CODE;
+
   return version;
 }
 
@@ -186,11 +193,14 @@ void ParseHeaders(
   std::string header_str("");
   size_t pos = *current_pos;
 
-  while (std::getline(stream, header_str, kCR)) {
+  while (std::getline(stream, header_str, kLF)) {
     pos += header_str.size() + kCRLFSize + kCRLFSize;
     if (header_str.size() == kCRorLFSize) {
       break;
     }
+
+    // remove CR on header line
+    header_str.pop_back();
 
     if (!headers->Set(header_str)) {
       *state = Parser::ParseState::PARSE_ERROR;
@@ -211,14 +221,50 @@ const std::string ParseBody(
   }
 
   std::string body = message.substr(*current_pos, remained_size);
+
   *current_pos += remained_size;
   *state = Parser::ParseState::PARSE_DONE;
+
   return body;
+}
+
+int32_t ParseChunkSize(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state) {
+  size_t pos = *current_pos;
+  while ((!CheckEndOfStringByIndex(message, pos + 1)) &&
+        !(message[pos] == kCR && message[pos + 1] == kLF)) {
+    ++pos;
+  }
+
+  size_t size = pos - *current_pos;
+  const std::string chunk_size_str = message.substr(*current_pos, size);
+  int32_t chunk_size = std::strtol(chunk_size_str.c_str(), nullptr, 16);
+
+  *current_pos = pos + kCRLFSize;
+  *state = Parser::ParseState::PARSE_CHUNK_BODY;
+
+  return chunk_size;
+}
+
+const std::string ParseChunkBody(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state) {
+  size_t pos = *current_pos;
+  while ((!CheckEndOfStringByIndex(message, pos + 1)) &&
+        !(message[pos] == kCR && message[pos + 1] == kLF)) {
+    ++pos;
+  }
+
+  size_t size = pos - *current_pos;
+  const std::string chunk_body_str = message.substr(*current_pos, size);
+
+  *current_pos = pos + kCRLFSize;
+  *state = Parser::ParseState::PARSE_DONE;
+
+  return chunk_body_str;
 }
 
 Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
   std::string request_str(buffer.ToString());
-  size_t request_size = request_str.size();
 
   Method method = Method::INVALID;
   std::string path("");
@@ -227,6 +273,7 @@ Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
   HttpHeader header;
   std::string body("");
 
+  bool parse_error = false;
   bool parsing = true;
   Parser::ParseState state = Parser::ParseState::PARSE_METHOD;
   size_t current_pos = 0;
@@ -260,6 +307,7 @@ Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
       case Parser::ParseState::PARSE_ERROR: {
         LOG(ERROR) << "[RequestParser::Parse] request parse error";
         parsing = false;
+        parse_error = true;
         break;
       }
       default: {
@@ -268,6 +316,10 @@ Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
         break;
       }
     }
+  }
+
+  if (parse_error) {
+    return Request();
   }
 
   const std::string host = header.Find("Host");
@@ -285,7 +337,6 @@ Request Parser::ParseRequest(const base::Buffer& buffer, bool is_https) {
 
 Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {
   std::string request_str(buffer.ToString());
-  size_t response_size = request_str.size();
 
   HttpStatusCode status = HttpStatusCode::NOT_FOUND;
   std::string reason("");
@@ -294,6 +345,7 @@ Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {
   HttpHeader header;
   std::string body("");
 
+  bool parse_error = false;
   bool parsing = true;
   Parser::ParseState state = Parser::ParseState::PARSE_HTTP_VERSION;
   size_t current_pos = 0;
@@ -327,6 +379,7 @@ Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {
       case Parser::ParseState::PARSE_ERROR: {
         LOG(ERROR) << "[ResponseParser::Parse] response parse error";
         parsing = false;
+        parse_error = true;
         break;
       }
       default: {
@@ -337,11 +390,65 @@ Response Parser::ParseResponse(const base::Buffer& buffer, bool is_https) {
     }
   }
 
+  if (parse_error) {
+    return Response();
+  }
+
   Response::StatusLine status_line(status, "", version);
   if (body.empty()) {
     return Response(status_line, header);
   }
   return Response(status_line, header, body);
+}
+
+Chunk Parser::ParseChunk(const base::Buffer& buffer) {
+  std::string chunk_str(buffer.ToString());
+
+  int32_t chunk_size = -1;
+  std::string chunk_body("");
+
+  bool parse_error = false;
+  bool parsing = true;
+  Parser::ParseState state = Parser::ParseState::PARSE_CHUNK_SIZE;
+  size_t current_pos = 0;
+  while (parsing) {
+    switch (state) {
+      case Parser::ParseState::PARSE_CHUNK_SIZE: {
+        chunk_size = ParseChunkSize(chunk_str, &current_pos, &state);
+        break;
+      }
+      case Parser::ParseState::PARSE_CHUNK_BODY: {
+        chunk_body = ParseChunkBody(chunk_str, &current_pos, &state);
+        break;
+      }
+      case Parser::ParseState::PARSE_DONE: {
+        parsing = false;
+        break;
+      }
+      case Parser::ParseState::PARSE_ERROR: {
+        LOG(ERROR) << "[RequestParser::Parse] request parse error";
+        parsing = false;
+        parse_error = true;
+        break;
+      }
+      default: {
+        LOG(ERROR) << "[ResponseParser::ParseChunk] invalid parse state";
+        parsing = false;
+        break;
+      }
+    }
+  }
+
+  if (parse_error) {
+    return Chunk();
+  }
+
+  if (chunk_size != chunk_body.size()) {
+    LOG(ERROR) << "[ResponseParser::ParseChunk] invalid size of chunk";
+    return Chunk();
+  }
+
+  return Chunk(chunk_body);
 }
 
 }  // namespace http

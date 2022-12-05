@@ -28,7 +28,7 @@ const size_t kFragmentDelimiterSize = 1;
 const char kColon = ':';
 const size_t kColonSize = 1;
 const char kSlash = '/';
-const size_t kkSlashSize = 1;
+const size_t kSlashSize = 1;
 
 std::pair<std::string, std::string> ParseUserInfo(
   const std::string& user_info_string) {
@@ -209,9 +209,9 @@ Uri Uri::Parse(const std::string& uri_string) {
     return Uri();
   }
 
-  pos = authority_pos + kkSlashSize;
+  pos = authority_pos + kSlashSize;
   if (pos >= splited_uri.size()) {
-    return Uri(scheme, authority);
+    return Uri(scheme, authority, "/");
   }
 
   // parse path

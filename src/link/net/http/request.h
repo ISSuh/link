@@ -59,9 +59,6 @@ class Request {
   const std::string UriOrigin() const;
   const std::string Path() const;
 
-  bool HasQuery() const;
-  const std::string FindQueryParam(const std::string key) const;
-
   const HttpHeader Header() const;
   void SetHeaderItem(const std::string& key, const std::string& value);
   void SetHeaderItem(const std::string& key, int32_t value);
@@ -73,6 +70,11 @@ class Request {
   bool HasBody() const;
   size_t ContentLength() const;
   const std::string ContentType() const;
+
+  bool HasQuery() const;
+  const std::string FindQueryParam(const std::string key) const;
+
+  bool IsChunk() const;
 
  private:
   RequestLine request_line_;

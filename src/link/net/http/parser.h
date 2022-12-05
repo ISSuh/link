@@ -16,6 +16,7 @@
 #include "link/net/http/header.h"
 #include "link/net/http/request.h"
 #include "link/net/http/response.h"
+#include "link/net/http/chunk.h"
 
 namespace nlink {
 namespace net {
@@ -38,6 +39,8 @@ class Parser {
     PARSE_HEADER_END,
     PARSE_BODY,
     PARSE_BODY_END,
+    PARSE_CHUNK_SIZE,
+    PARSE_CHUNK_BODY,
     PARSE_DONE,
     PARSE_ERROR,
   };
@@ -47,6 +50,8 @@ class Parser {
 
   static Response ParseResponse(
     const base::Buffer& buffer, bool is_https = false);
+
+  static Chunk ParseChunk(const base::Buffer& buffer);
 };
 
 Method ParseMethod(
@@ -74,6 +79,12 @@ void ParseHeaders(
   HttpHeader* headers);
 
 const std::string ParseBody(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state);
+
+int32_t ParseChunkSize(
+  const std::string& message, size_t* current_pos, Parser::ParseState* state);
+
+const std::string ParseChunkBody(
   const std::string& message, size_t* current_pos, Parser::ParseState* state);
 
 }  // namespace http

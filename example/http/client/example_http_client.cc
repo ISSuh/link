@@ -61,7 +61,7 @@ void ExampleHttpClient::GetHandler(const net::http::Response& response) {
   auto header = response.Header();
   std::string body = response.Body();
 
-  LOG(INFO) << "[ExampleHttpClient::PostHandler] \n"
+  LOG(INFO) << "[ExampleHttpClient::GetHandler] \n"
             << "header size : " << header.Serialize().size()
             << " / body size : " << body.size()
             << "\n" << response.Serialize();
