@@ -85,7 +85,8 @@ int32_t ParseChunkSize(
   const std::string& message, size_t* current_pos, Parser::ParseState* state);
 
 const std::string ParseChunkBody(
-  const std::string& message, size_t* current_pos, Parser::ParseState* state);
+  const std::string& message, size_t* current_pos,
+  Parser::ParseState* state, int32_t chunk_size);
 
 }  // namespace http
 }  // namespace net

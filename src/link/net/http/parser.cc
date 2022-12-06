@@ -247,12 +247,14 @@ int32_t ParseChunkSize(
 }
 
 const std::string ParseChunkBody(
-  const std::string& message, size_t* current_pos, Parser::ParseState* state) {
-  size_t pos = *current_pos;
-  while ((!CheckEndOfStringByIndex(message, pos + 1)) &&
-        !(message[pos] == kCR && message[pos + 1] == kLF)) {
-    ++pos;
-  }
+  const std::string& message, size_t* current_pos,
+  Parser::ParseState* state, int32_t chunk_size) {
+  size_t pos = *current_pos + chunk_size;
+
+  // while ((!CheckEndOfStringByIndex(message, pos + 1)) &&
+  //       !(message[pos] == kCR && message[pos + 1] == kLF)) {
+  //   ++pos;
+  // }
 
   size_t size = pos - *current_pos;
   const std::string chunk_body_str = message.substr(*current_pos, size);
@@ -418,7 +420,8 @@ Chunk Parser::ParseChunk(const base::Buffer& buffer) {
         break;
       }
       case Parser::ParseState::PARSE_CHUNK_BODY: {
-        chunk_body = ParseChunkBody(chunk_str, &current_pos, &state);
+        chunk_body =
+          ParseChunkBody(chunk_str, &current_pos, &state, chunk_size);
         break;
       }
       case Parser::ParseState::PARSE_DONE: {

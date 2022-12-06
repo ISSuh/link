@@ -29,13 +29,14 @@ HttpClientComponent::HttpClientComponent(
   base::ComponentChannelController* channel_controller,
   base::TaskRunner* task_runner)
   : HttpComponent(channel_controller),
-    task_runner_(task_runner) {
+    task_runner_(task_runner),
+    will_response_chunk_(false) {
 }
 
 HttpClientComponent::~HttpClientComponent() = default;
 
 void HttpClientComponent::Get(
-  const std::string& uri_string, RequestHanelder handler) {
+  const std::string& uri_string, RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
@@ -53,7 +54,7 @@ void HttpClientComponent::Get(
 void HttpClientComponent::Get(
   const std::string& uri_string,
   const net::http::HttpHeader& header,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (!uri.HasScheme() || !uri.HasHost()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
@@ -68,7 +69,7 @@ void HttpClientComponent::Post(
   const std::string& uri_string,
   const std::string& content_type,
   const std::string& body,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Post] invalid url. "
@@ -89,7 +90,7 @@ void HttpClientComponent::Post(
   const std::string& uri_string,
   const net::http::HttpHeader& header,
   const std::string& body,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Post] invalid url. "
@@ -123,7 +124,7 @@ void HttpClientComponent::Put(
   const std::string& uri_string,
   const std::string& content_type,
   const std::string& body,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Put] invalid url. "
@@ -144,7 +145,7 @@ void HttpClientComponent::Put(
   const std::string& uri_string,
   const net::http::HttpHeader& header,
   const std::string& body,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Put] invalid url. "
@@ -175,7 +176,7 @@ void HttpClientComponent::Put(
 }
 
 void HttpClientComponent::Delete(
-  const std::string& uri_string, RequestHanelder handler) {
+  const std::string& uri_string, RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
@@ -190,7 +191,7 @@ void HttpClientComponent::Delete(
 void HttpClientComponent::Delete(
   const std::string& uri_string,
   const net::http::HttpHeader& header,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::Uri uri = net::Uri::Parse(uri_string);
   if (uri.Empty()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid url. "
@@ -204,7 +205,7 @@ void HttpClientComponent::Delete(
 void HttpClientComponent::Fetch(
   net::http::Method method,
   const std::string& uri_string,
-  RequestHanelder handler,
+  RequestHandler handler,
   const net::http::HttpHeader& header,
   const std::string& content_type,
   const std::string& body) {
@@ -236,7 +237,7 @@ void HttpClientComponent::DoFetch(
   net::http::Method method,
   const net::Uri& uri,
   const net::http::HttpHeader& header,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   net::http::Request::RequestLine request_line =
     {method, uri, net::http::Version::HTTP_1_1};
   net::http::Request request(request_line, header);
@@ -255,7 +256,7 @@ void HttpClientComponent::DoFetchWithBody(
   const net::http::HttpHeader& header,
   const std::string& body,
   const std::string& content_type,
-  RequestHanelder handler) {
+  RequestHandler handler) {
   if (content_type.empty()) {
     LOG(ERROR) << "[HttpClientComponent::Get] invalid content_type. "
                << content_type;
@@ -269,7 +270,7 @@ void HttpClientComponent::DoFetchWithBody(
 }
 
 void HttpClientComponent::CreateIOClientAndConnet(
-  const net::http::Request& request, RequestHanelder handler) {
+  const net::http::Request& request, RequestHandler handler) {
   io::Client* client = io::SocketFactory::CreateTcpClient(task_runner_);
   LinkComponent::AttachChannelsToController(client);
 
@@ -326,18 +327,25 @@ void HttpClientComponent::InternalCloseHandler(
 }
 
 void HttpClientComponent::InternalReadHandler(
-  RequestHanelder request_handler,
+  RequestHandler request_handler,
   const base::Buffer& buffer,
   std::shared_ptr<io::Session>) {
   if (buffer.IsEmpty()) {
     return;
   }
 
-  net::http::Response response = net::http::Parser::ParseResponse(buffer);
-  if (!request_handler) {
-    return;
+  if (will_response_chunk_) {
+    net::http::Chunk chunk = net::http::Parser::ParseChunk(buffer);
+
+  } else {
+    net::http::Response response = net::http::Parser::ParseResponse(buffer);
+    if (!request_handler) {
+      return;
+    }
+    request_handler(response);
+
+    will_response_chunk_ = response.IsChunk();
   }
-  request_handler(response);
 }
 
 void HttpClientComponent::InternalWriteHandler(size_t) {
