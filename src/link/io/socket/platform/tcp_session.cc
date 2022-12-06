@@ -30,9 +30,9 @@ void TcpSocketSession::Open(
   handler::ReadHandler read_handler,
   handler::WriteHandler write_handler,
   handler::CloseHandler close_handler) {
-  read_handler_ = read_handler;
-  write_handler_ = write_handler;
-  close_handler_ = close_handler;
+  read_handler_ = std::move(read_handler);
+  write_handler_ = std::move(write_handler);
+  close_handler_ = std::move(close_handler);
 
   is_opend_ = true;
 }
@@ -179,8 +179,8 @@ void TcpSocketSession::InternalWriteHandler(
     }
 
     task_runner_->PostTask(
-      [this, write_handler = write_handler_, clumulative_trasmission_size]() {
-        write_handler(clumulative_trasmission_size);
+      [this, clumulative_trasmission_size]() {
+        this->InvokeWriteHandler(clumulative_trasmission_size);
       });
 
     DoNextProcess();
@@ -208,8 +208,8 @@ void TcpSocketSession::InternalReadHandler(
     }
 
     task_runner_->PostTask(
-      [this, read_handler = read_handler_, buffer]() {
-        read_handler(*buffer, shared_from_this());
+      [this, buffer]() {
+        this->InvokeReadHandler(*buffer);
       });
 
     DoNextProcess();
@@ -240,6 +240,17 @@ void TcpSocketSession::InternalReadHandler(
           session->DoRead(buffer);
         }
       });
+  }
+}
+
+void TcpSocketSession::InvokeWriteHandler(size_t writed_size) {
+  if (write_handler_) {
+    write_handler_(writed_size);
+  }
+}
+void TcpSocketSession::InvokeReadHandler(const base::Buffer& buffer) {
+  if (read_handler_) {
+    read_handler_(buffer, shared_from_this());
   }
 }
 

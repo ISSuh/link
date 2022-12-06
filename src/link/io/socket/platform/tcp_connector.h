@@ -31,8 +31,8 @@ class TcpConnector : public Connector {
  private:
   void DoConnect(handler::ConnectHandler handler);
   void PostConnectTask(handler::ConnectHandler handler);
-  void InternalConnectHnadler(handler::AcceptHandler handler, int32_t res);
-  void CreateAndRegistNewSession(handler::AcceptHandler handler);
+  void InternalConnectHnadler(handler::ConnectHandler handler, int32_t res);
+  void CreateAndRegistNewSession(handler::ConnectHandler handler);
 
   base::TaskRunner* task_runner_;
   SocketCreatedCallbak socket_create_callback_;

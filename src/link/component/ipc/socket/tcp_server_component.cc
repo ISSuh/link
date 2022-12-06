@@ -7,6 +7,7 @@
 #include "link/component/ipc/socket/tcp_server_component.h"
 
 #include <vector>
+#include <utility>
 
 #include "link/base/buffer.h"
 #include "link/base/logging.h"
@@ -21,10 +22,10 @@ TcpServerComponent::TcpServerComponent(
   SocketComponent::Handler handlers)
   : SocketComponent(channel_controller),
     server_(io::SocketFactory::CreateTcpServer(task_runner)),
-    accept_handler_(handlers.accept_handler),
-    close_handler_(handlers.close_handler),
-    read_handler_(handlers.read_handler),
-    write_handler_(handlers.write_handler) {
+    accept_handler_(std::move(handlers.accept_handler)),
+    close_handler_(std::move(handlers.close_handler)),
+    read_handler_(std::move(handlers.read_handler)),
+    write_handler_(std::move(handlers.write_handler)) {
   LinkComponent::AttachChannelsToController(server_.get());
 
   server_->RegistIOHandler(
@@ -91,7 +92,8 @@ TcpServerComponent* TcpServerComponent::CreateComponent(
   if (!channel_controller || !task_runner) {
     return nullptr;
   }
-  return new TcpServerComponent(channel_controller, task_runner, handlers);
+  return new TcpServerComponent(
+    channel_controller, task_runner, std::move(handlers));
 }
 
 }  // namespace component

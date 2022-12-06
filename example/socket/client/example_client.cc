@@ -14,24 +14,7 @@
 using namespace nlink;
 
 ExampleClient::ExampleClient()
-  : handlers_({
-      component::SocketComponent::Handler::AcceptHandler(),
-      [this](std::shared_ptr<nlink::io::Session> session) {
-        this->OnConnect(session);
-      },
-
-      [this](std::shared_ptr<nlink::io::Session> session) {
-        this->OnClose(session);
-      },
-      [this](
-        const nlink::base::Buffer& buffer,
-        std::shared_ptr<nlink::io::Session> session) {
-        this->OnRead(buffer, session);
-      },
-      [this](size_t length) {
-        this->OnWrite(length);
-      }}),
-    client_component_(nullptr),
+  : client_component_(nullptr),
     is_connected(false),
     finish_(false),
     write_size_(0) {}
@@ -44,8 +27,27 @@ void ExampleClient::CreateAndRegistComponent(
   auto component_factory_weak = handle->ComponentFactory();
   auto component_factory = component_factory_weak.lock();
 
+  nlink::component::SocketComponent::Handler handlers({
+        component::SocketComponent::Handler::AcceptHandler(),
+        [this](std::shared_ptr<nlink::io::Session> session) {
+          this->OnConnect(session);
+        },
+
+        [this](std::shared_ptr<nlink::io::Session> session) {
+          this->OnClose(session);
+        },
+        [this](
+          const nlink::base::Buffer& buffer,
+          std::shared_ptr<nlink::io::Session> session) {
+          this->OnRead(buffer, session);
+        },
+        [this](size_t length) {
+          this->OnWrite(length);
+        }});
+
   client_component_ =
-    component_factory->CreateTcpClientComponent(task_runner, handlers_);
+    component_factory->CreateTcpClientComponent(
+      task_runner, std::move(handlers));
 }
 
 void ExampleClient::Connect(const std::string& address, int32_t port) {

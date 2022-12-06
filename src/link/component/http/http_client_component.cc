@@ -47,7 +47,7 @@ void HttpClientComponent::Get(
   default_header.Set("host", uri.Host());
   default_header.Set("accept", "*/*");
   default_header.Set("user-agent", "nlink/0.0.1");
-  DoFetch(net::http::Method::GET, uri, default_header, handler);
+  DoFetch(net::http::Method::GET, uri, default_header, std::move(handler));
 }
 
 void HttpClientComponent::Get(
@@ -61,7 +61,7 @@ void HttpClientComponent::Get(
     return;
   }
 
-  DoFetch(net::http::Method::GET, uri, header, handler);
+  DoFetch(net::http::Method::GET, uri, header, std::move(handler));
 }
 
 void HttpClientComponent::Post(
@@ -80,7 +80,9 @@ void HttpClientComponent::Post(
   header.Set("content-type", content_type);
   header.Set("content-length", body.size());
   DoFetchWithBody(
-    net::http::Method::POST, uri, header, body, content_type, handler);
+    net::http::Method::POST, uri, header,
+    body, content_type,
+    std::move(handler));
 }
 
 void HttpClientComponent::Post(
@@ -112,7 +114,9 @@ void HttpClientComponent::Post(
   }
 
   DoFetchWithBody(
-    net::http::Method::POST, uri, header, body, content_type, handler);
+    net::http::Method::POST, uri, header,
+    body, content_type,
+    std::move(handler));
 }
 
 void HttpClientComponent::Put(
@@ -131,7 +135,9 @@ void HttpClientComponent::Put(
   header.Set("content-type", content_type);
   header.Set("content-length", body.size());
   DoFetchWithBody(
-    net::http::Method::PUT, uri, header, body, content_type, handler);
+    net::http::Method::PUT, uri, header,
+    body, content_type,
+    std::move(handler));
 }
 
 void HttpClientComponent::Put(
@@ -163,7 +169,9 @@ void HttpClientComponent::Put(
   }
 
   DoFetchWithBody(
-    net::http::Method::PUT, uri, header, body, content_type, handler);
+    net::http::Method::PUT, uri, header,
+    body, content_type,
+    std::move(handler));
 }
 
 void HttpClientComponent::Delete(
@@ -176,7 +184,7 @@ void HttpClientComponent::Delete(
   }
 
   net::http::HttpHeader default_header;
-  DoFetch(net::http::Method::DELETE, uri, default_header, handler);
+  DoFetch(net::http::Method::DELETE, uri, default_header, std::move(handler));
 }
 
 void HttpClientComponent::Delete(
@@ -190,7 +198,7 @@ void HttpClientComponent::Delete(
     return;
   }
 
-  DoFetch(net::http::Method::DELETE, uri, header, handler);
+  DoFetch(net::http::Method::DELETE, uri, header, std::move(handler));
 }
 
 void HttpClientComponent::Fetch(
@@ -210,12 +218,12 @@ void HttpClientComponent::Fetch(
   switch (method) {
     case net::http::Method::GET:
     case net::http::Method::DELETE:
-      DoFetch(method, uri, header, handler);
+      DoFetch(method, uri, header, std::move(handler));
       break;
     case net::http::Method::POST:
     case net::http::Method::PUT:
       DoFetchWithBody(
-        method, uri, header, body, content_type, handler);
+        method, uri, header, body, content_type, std::move(handler));
       break;
     default:
       LOG(WARNING) << "[HttpClientComponent::Fetch] unsupport method. "
@@ -238,7 +246,7 @@ void HttpClientComponent::DoFetch(
     return;
   }
 
-  CreateIOClientAndConnet(request, handler);
+  CreateIOClientAndConnet(request, std::move(handler));
 }
 
 void HttpClientComponent::DoFetchWithBody(
@@ -257,7 +265,7 @@ void HttpClientComponent::DoFetchWithBody(
   net::http::Request::RequestLine request_line =
     {method, uri, net::http::Version::HTTP_1_1};
   net::http::Request request(request_line, header, body, content_type);
-  CreateIOClientAndConnet(request, handler);
+  CreateIOClientAndConnet(request, std::move(handler));
 }
 
 void HttpClientComponent::CreateIOClientAndConnet(
@@ -265,14 +273,20 @@ void HttpClientComponent::CreateIOClientAndConnet(
   io::Client* client = io::SocketFactory::CreateTcpClient(task_runner_);
   LinkComponent::AttachChannelsToController(client);
 
-  client->RegistIOHandler(
-    [this, handler](
-      const base::Buffer& buffer, std::shared_ptr<io::Session> session) {
-      this->InternalReadHandler(handler, buffer, session);
-    },
+  io::handler::ReadHandler socket_read_handler =
+    [this, request_handler = std::move(handler)](
+      const base::Buffer& buffer,
+      std::shared_ptr<io::Session> session) mutable {
+        this->InternalReadHandler(std::move(request_handler), buffer, session);
+      };
+
+  io::handler::WriteHandler socket_write_handler =
     [this](size_t length) {
       this->InternalWriteHandler(length);
-    });
+    };
+
+  client->RegistIOHandler(
+    std::move(socket_read_handler), std::move(socket_write_handler));
 
   auto uri = request.RequestUri();
   client->Connect(

@@ -7,13 +7,24 @@
 #include "example_server.h"
 
 #include <vector>
+#include <utility>
 
 #include "link/base/logging.h"
 
 using namespace nlink;
 
 ExampleServer::ExampleServer()
-  : handlers_({
+  : server_component_(nullptr) {}
+
+ExampleServer::~ExampleServer() = default;
+
+void ExampleServer::CreateAndRegistComponent(
+  nlink::base::TaskRunner* task_runner,
+  nlink::handle::LinkHandle* handle) {
+  auto component_factory_weak = handle->ComponentFactory();
+  auto component_factory = component_factory_weak.lock();
+
+  nlink::component::SocketComponent::Handler handlers = {
       [this](std::shared_ptr<nlink::io::Session> session) {
         this->OnAccept(session);
       },
@@ -28,19 +39,11 @@ ExampleServer::ExampleServer()
       },
       [this](size_t length) {
         this->OnWrite(length);
-      }}),
-    server_component_(nullptr) {}
-
-ExampleServer::~ExampleServer() = default;
-
-void ExampleServer::CreateAndRegistComponent(
-  nlink::base::TaskRunner* task_runner,
-  nlink::handle::LinkHandle* handle) {
-  auto component_factory_weak = handle->ComponentFactory();
-  auto component_factory = component_factory_weak.lock();
+      }};
 
   server_component_ =
-    component_factory->CreateTcpServerComponent(task_runner, handlers_);
+    component_factory->CreateTcpServerComponent(
+      task_runner, std::move(handlers));
 }
 
 void ExampleServer::ServerOpen(const std::string& address, int32_t port) {

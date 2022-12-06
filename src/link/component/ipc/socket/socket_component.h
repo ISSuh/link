@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "link/base/macro.h"
+#include "link/base/callback.h"
 #include "link/component/base/component.h"
 #include "link/io/socket/session.h"
 
@@ -22,12 +23,12 @@ class SocketComponent : public LinkComponent {
  public:
   class Handler {
    public:
-    using AcceptHandler = std::function<void(std::shared_ptr<io::Session>)>;
-    using ConnectHandler = std::function<void(std::shared_ptr<io::Session>)>;
-    using CloseHandler = std::function<void(std::shared_ptr<io::Session>)>;
+    using AcceptHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
+    using ConnectHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
+    using CloseHandler = base::Callback<void(std::shared_ptr<io::Session>)>;
     using ReadHandler =
-      std::function<void(const base::Buffer&, std::shared_ptr<io::Session>)>;
-    using WriteHandler = std::function<void(size_t)>;
+      base::Callback<void(const base::Buffer&, std::shared_ptr<io::Session>)>;
+    using WriteHandler = base::Callback<void(size_t)>;
 
     AcceptHandler accept_handler;
     ConnectHandler connect_handler;

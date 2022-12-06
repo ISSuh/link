@@ -20,7 +20,7 @@ namespace io {
 
 class TcpAcceptor : public Acceptor {
  public:
-  using SocketCreatedCallbak = std::function<void(SocketDescriptor, bool)>;
+  using SocketCreatedCallbak = base::Callback<void(SocketDescriptor, bool)>;
 
   TcpAcceptor(
     base::TaskRunner* task_runner,

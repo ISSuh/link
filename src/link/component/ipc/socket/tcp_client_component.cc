@@ -21,10 +21,10 @@ TcpClientComponent::TcpClientComponent(
   SocketComponent::Handler handlers)
   : SocketComponent(channel_controller),
     client_(io::SocketFactory::CreateTcpClient(task_runner)),
-    connect_handler_(handlers.connect_handler),
-    close_handler_(handlers.close_handler),
-    read_handler_(handlers.read_handler),
-    write_handler_(handlers.write_handler) {
+    connect_handler_(std::move(handlers.connect_handler)),
+    close_handler_(std::move(handlers.close_handler)),
+    read_handler_(std::move(handlers.read_handler)),
+    write_handler_(std::move(handlers.write_handler)) {
   LinkComponent::AttachChannelsToController(client_.get());
 
   client_->RegistIOHandler(
@@ -100,7 +100,8 @@ TcpClientComponent* TcpClientComponent::CreateComponent(
   if (!channel_controller || !task_runner) {
     return nullptr;
   }
-  return new TcpClientComponent(channel_controller, task_runner, handlers);
+  return new TcpClientComponent(
+    channel_controller, task_runner, std::move(handlers));
 }
 
 }  // namespace component

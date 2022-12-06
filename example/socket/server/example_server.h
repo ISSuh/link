@@ -33,7 +33,6 @@ class ExampleServer {
     const nlink::base::Buffer& buffer,
     std::shared_ptr<nlink::io::Session> session);
 
-  nlink::component::SocketComponent::Handler handlers_;
   nlink::component::TcpServerComponent* server_component_;
 };
 

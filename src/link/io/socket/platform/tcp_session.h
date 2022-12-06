@@ -59,6 +59,9 @@ class TcpSocketSession
     std::shared_ptr<base::Buffer> received_buffer,
     int32_t size);
 
+  void InvokeWriteHandler(size_t writed_size);
+  void InvokeReadHandler(const base::Buffer& buffer);
+
   base::TaskRunner* task_runner_;
   std::unique_ptr<TcpSocket> socket_;
 

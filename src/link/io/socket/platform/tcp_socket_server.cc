@@ -28,8 +28,8 @@ bool TcpSocketServer::Listen(
   const IpEndPoint& address,
   handler::AcceptHandler accept_handler,
   handler::CloseHandler close_handler) {
-  accept_handler_ = accept_handler;
-  close_handler_ = close_handler;
+  accept_handler_ = std::move(accept_handler);
+  close_handler_ = std::move(close_handler);
   return acceptor_->Listen(address);
 }
 
@@ -48,8 +48,8 @@ void TcpSocketServer::Close() {
 void TcpSocketServer::RegistIOHandler(
   handler::ReadHandler read_handler,
   handler::WriteHandler write_handler) {
-  read_handler_ = read_handler;
-  write_handler_ = write_handler;
+  read_handler_ = std::move(read_handler);
+  write_handler_ = std::move(write_handler);
 }
 
 void TcpSocketServer::OpenChannel(

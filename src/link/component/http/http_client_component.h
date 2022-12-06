@@ -29,7 +29,7 @@ class HttpComponent;
 
 class HttpClientComponent : public HttpComponent {
  public:
-  using RequestHanelder = std::function<void(const net::http::Response&)>;
+  using RequestHanelder = base::Callback<void(const net::http::Response&)>;
 
   static HttpClientComponent* CreateComponent(
     base::ComponentChannelController* channel_controller,

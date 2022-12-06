@@ -245,3 +245,24 @@ TEST(Callback, nested_callback) {
   EXPECT_CALL(callback_mock, Callback1());
   test();
 }
+
+// class TestClass {
+//  public:
+//   void TestMemberFunction(UserCallbacksMock* mock) {
+//     mock->Callback1();
+//   }
+// };
+
+// void TestNormalFunction(UserCallbacksMock* mock) {
+//   mock->Callback1();
+// }
+
+// TEST(Callback, bind_normal_funcion) {
+//   UserCallbacksMock callback_mock;
+
+//   base::Callback<void(UserCallbacksMock*)> test =
+//     base::Bind(&TestNormalFunction);
+
+//   EXPECT_CALL(callback_mock, Callback1());
+//   test(&callback_mock);
+// }

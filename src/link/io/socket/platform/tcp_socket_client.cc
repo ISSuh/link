@@ -27,8 +27,8 @@ void TcpSocketClient::Connect(
   IpEndPoint address,
   handler::ConnectHandler connect_handler,
   handler::CloseHandler close_handler) {
-  connect_handler_ = connect_handler;
-  close_handler_ = close_handler;
+  connect_handler_ = std::move(connect_handler);
+  close_handler_ = std::move(close_handler);
 
   if (nullptr != connector_) {
     connector_->Connect(address,
@@ -65,8 +65,8 @@ bool TcpSocketClient::IsConnected() const {
 void TcpSocketClient::RegistIOHandler(
   handler::ReadHandler read_handler,
   handler::WriteHandler write_handler) {
-  read_handler_ = read_handler;
-  write_handler_ = write_handler;
+  read_handler_ = std::move(read_handler);
+  write_handler_ = std::move(write_handler);
 }
 
 void TcpSocketClient::OpenChannel(

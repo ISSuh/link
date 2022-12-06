@@ -20,7 +20,7 @@ TcpAcceptor::TcpAcceptor(
   base::TaskRunner* task_runner,
   SocketCreatedCallbak socket_create_callback)
   : task_runner_(task_runner),
-    socket_create_callback_(socket_create_callback),
+    socket_create_callback_(std::move(socket_create_callback)),
     socket_(nullptr),
     is_connected_(false) {
 }
@@ -72,15 +72,17 @@ void TcpAcceptor::DoAccept(handler::AcceptHandler handler) {
   std::unique_ptr<TcpSocket> peer_socket = nullptr;
   IpEndPoint peer_address;
   socket_->Accept(&peer_socket, &peer_address,
-    [this, &peer_socket, handler](int32_t res) {
-      this->InternalAcceptHandler(std::move(peer_socket), handler, res);
+    [this, &peer_socket, accept_handler = std::move(handler)]
+    (int32_t res) mutable {
+      this->InternalAcceptHandler(
+        std::move(peer_socket), std::move(accept_handler), res);
     });
 }
 
 void TcpAcceptor::PostAcceptTask(handler::AcceptHandler handler) {
   task_runner_->PostTask(
-    [this, handler]() {
-      this->DoAccept(std::move(handler));
+    [this, accept_handler = std::move(handler)]() mutable {
+      this->DoAccept(std::move(accept_handler));
     });
 }
 
@@ -96,9 +98,10 @@ void TcpAcceptor::InternalAcceptHandler(
     case 11:
       break;
     default:
-      task_runner_->PostTask([this, handler]() {
-        this->DoAccept(handler);
-      });
+      task_runner_->PostTask(
+        [this, accept_handler = std::move(handler)]() mutable {
+          this->DoAccept(std::move(accept_handler));
+        });
       break;
   }
 }

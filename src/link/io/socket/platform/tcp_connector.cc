@@ -20,7 +20,7 @@ namespace io {
 TcpConnector::TcpConnector(
   base::TaskRunner* task_runner, SocketCreatedCallbak callback)
   : task_runner_(task_runner),
-    socket_create_callback_(callback),
+    socket_create_callback_(std::move(callback)),
     socket_(nullptr),
     try_connection_count_(0),
     is_connected_(false) {
@@ -52,8 +52,8 @@ void TcpConnector::DoConnect(handler::ConnectHandler handler) {
   ++try_connection_count_;
 
   base::CompletionCallback connect_callback =
-    [this, handler](int32_t err) {
-      this->InternalConnectHnadler(std::move(handler), err);
+    [this, connect_handler = std::move(handler)](int32_t err) mutable {
+      this->InternalConnectHnadler(std::move(connect_handler), err);
     };
 
   socket_->Connect(address_, std::move(connect_callback));
@@ -61,13 +61,13 @@ void TcpConnector::DoConnect(handler::ConnectHandler handler) {
 
 void TcpConnector::PostConnectTask(handler::ConnectHandler handler) {
   task_runner_->PostTask(
-    [this, handler]() {
-      this->DoConnect(std::move(handler));
+    [this, connect_handler = std::move(handler)]() mutable {
+      this->DoConnect(std::move(connect_handler));
     });
 }
 
 void TcpConnector::InternalConnectHnadler(
-  handler::AcceptHandler handler, int32_t res) {
+  handler::ConnectHandler handler, int32_t res) {
   switch (res) {
     case IOError::OK:
       CreateAndRegistNewSession(std::move(handler));
@@ -79,7 +79,7 @@ void TcpConnector::InternalConnectHnadler(
 }
 
 void TcpConnector::CreateAndRegistNewSession(
-  handler::AcceptHandler handler) {
+  handler::ConnectHandler handler) {
   is_connected_ = true;
 
   socket_create_callback_(socket_->Descriptor());
