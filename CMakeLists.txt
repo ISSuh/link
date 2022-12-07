@@ -16,9 +16,17 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(LINK_DEBUG)
-  set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -rdynamic -ldl -pg")
+  set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -fPIC -pg")
 else()
-  set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC -rdynamic -ldl")
+  set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra -fPIC")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # TODO
 endif()
 
 #-------------------------------------------------------------------------------

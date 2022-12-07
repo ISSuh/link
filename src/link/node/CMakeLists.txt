@@ -44,3 +44,8 @@ target_link_libraries(node_launcher
   ${LINK_MODULE_NAME}
   ${LINK_NODE_NAME}
 )
+
+set_target_properties(node_launcher
+ PROPERTIES 
+  LINK_FLAGS "-rdynamic -ldl"
+)
