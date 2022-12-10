@@ -23,7 +23,7 @@ class TcpAcceptor : public Acceptor {
   using SocketCreatedCallbak = base::Callback<void(SocketDescriptor, bool)>;
 
   TcpAcceptor(
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner,
     SocketCreatedCallbak socket_created_callback);
   virtual ~TcpAcceptor();
 
@@ -43,7 +43,7 @@ class TcpAcceptor : public Acceptor {
     std::unique_ptr<TcpSocket> peer_socket,
     handler::AcceptHandler handler);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   SocketCreatedCallbak socket_create_callback_;
 
   std::unique_ptr<TcpSocket> socket_;

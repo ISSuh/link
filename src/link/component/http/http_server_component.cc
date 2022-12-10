@@ -18,8 +18,8 @@ namespace component {
 
 HttpServerComponent* HttpServerComponent::CreateComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner) {
-  if (!channel_controller || !task_runner) {
+  std::weak_ptr<base::TaskRunner> task_runner) {
+  if (!channel_controller) {
     return nullptr;
   }
   return new HttpServerComponent(channel_controller, task_runner);
@@ -27,7 +27,7 @@ HttpServerComponent* HttpServerComponent::CreateComponent(
 
 HttpServerComponent::HttpServerComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner)
+  std::weak_ptr<base::TaskRunner> task_runner)
   : HttpComponent(channel_controller),
     task_runner_(task_runner),
     http_server_(std::make_unique<HttpServer>(task_runner)) {

@@ -21,7 +21,7 @@ namespace component {
 
 class HttpServer {
  public:
-  explicit HttpServer(base::TaskRunner* task_runner);
+  explicit HttpServer(std::weak_ptr<base::TaskRunner> task_runner);
   virtual ~HttpServer();
 
   io::Server* ServerContext() const;
@@ -40,7 +40,7 @@ class HttpServer {
     const base::Buffer& buffer, std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   std::unique_ptr<io::Server> io_server_;
 
   net::http::Routing routing_;

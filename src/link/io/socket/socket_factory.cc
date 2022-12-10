@@ -12,11 +12,13 @@
 namespace nlink {
 namespace io {
 
-Client* SocketFactory::CreateTcpClient(base::TaskRunner* task_runner) {
+Client* SocketFactory::CreateTcpClient(
+  std::weak_ptr<base::TaskRunner> task_runner) {
   return new TcpSocketClient(task_runner);
 }
 
-Server* SocketFactory::CreateTcpServer(base::TaskRunner* task_runner) {
+Server* SocketFactory::CreateTcpServer(
+  std::weak_ptr<base::TaskRunner> task_runner) {
   return new TcpSocketServer(task_runner);
 }
 

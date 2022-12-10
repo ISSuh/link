@@ -35,7 +35,7 @@ class UserModule : public UserModuleBase {
   template<typename T>
   void GetArgument(const std::string& key, T* dest);
 
-  base::TaskRunner* GetTaskRunner() const;
+  std::weak_ptr<base::TaskRunner> GetTaskRunner() const;
 
  protected:
   virtual void Init() = 0;

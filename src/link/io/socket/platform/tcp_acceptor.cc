@@ -17,7 +17,7 @@ namespace nlink {
 namespace io {
 
 TcpAcceptor::TcpAcceptor(
-  base::TaskRunner* task_runner,
+  std::weak_ptr<base::TaskRunner> task_runner,
   SocketCreatedCallbak socket_create_callback)
   : task_runner_(task_runner),
     socket_create_callback_(std::move(socket_create_callback)),
@@ -80,25 +80,34 @@ void TcpAcceptor::DoAccept(handler::AcceptHandler handler) {
 }
 
 void TcpAcceptor::PostAcceptTask(handler::AcceptHandler handler) {
-  task_runner_->PostTask(
-    [this, accept_handler = std::move(handler)]() mutable {
-      this->DoAccept(std::move(accept_handler));
-    });
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (task_runner) {
+    task_runner->PostTask(
+      [this, accept_handler = std::move(handler)]() mutable {
+        this->DoAccept(std::move(accept_handler));
+      });
+  }
 }
 
 void TcpAcceptor::InternalAcceptHandler(
   std::unique_ptr<TcpSocket> peer_socket,
   handler::AcceptHandler handler,
   int32_t res) {
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (!task_runner) {
+    return;
+  }
+
   switch (res) {
     case IOError::OK:
       CreateNewSessionAndRegist(
         std::move(peer_socket), std::move(handler));
       break;
+    // TODO(issuh): temp code
     case 11:
       break;
     default:
-      task_runner_->PostTask(
+      task_runner->PostTask(
         [this, accept_handler = std::move(handler)]() mutable {
           this->DoAccept(std::move(accept_handler));
         });

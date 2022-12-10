@@ -16,7 +16,7 @@
 namespace nlink {
 namespace component {
 
-HttpServer::HttpServer(base::TaskRunner* task_runner)
+HttpServer::HttpServer(std::weak_ptr<base::TaskRunner> task_runner)
   : task_runner_(task_runner),
     io_server_(io::SocketFactory::CreateTcpServer(task_runner)) {
 }

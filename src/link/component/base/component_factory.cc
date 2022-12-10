@@ -20,13 +20,15 @@ ComponentFctaory::ComponentFctaory(
 ComponentFctaory::~ComponentFctaory() = default;
 
 TcpClientComponent* ComponentFctaory::CreateTcpClientComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
+  std::weak_ptr<base::TaskRunner> task_runner,
+  SocketComponent::Handler handlers) {
   return TcpClientComponent::CreateComponent(
     channel_controller_.get(), task_runner, std::move(handlers));
 }
 
 TcpServerComponent* ComponentFctaory::CreateTcpServerComponent(
-  base::TaskRunner* task_runner, SocketComponent::Handler handlers) {
+  std::weak_ptr<base::TaskRunner> task_runner,
+  SocketComponent::Handler handlers) {
   return TcpServerComponent::CreateComponent(
     channel_controller_.get(), task_runner, std::move(handlers));
 }

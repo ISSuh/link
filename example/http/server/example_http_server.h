@@ -29,7 +29,7 @@ class TestHandler {
 class ExampleHttpServer {
  public:
   ExampleHttpServer(
-    nlink::base::TaskRunner* task_runner,
+    std::weak_ptr<nlink::base::TaskRunner> task_runner,
     nlink::handle::LinkHandle* handle);
   ~ExampleHttpServer();
 

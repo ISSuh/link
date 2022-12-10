@@ -21,7 +21,7 @@ ExampleHttpClient::ExampleHttpClient()
 ExampleHttpClient::~ExampleHttpClient() = default;
 
 void ExampleHttpClient::CreateAndRegistComponent(
-  nlink::base::TaskRunner* task_runner,
+  std::weak_ptr<nlink::base::TaskRunner> task_runner,
   nlink::handle::LinkHandle* handle) {
   auto component_factory_weak = handle->ComponentFactory();
   auto component_factory = component_factory_weak.lock();

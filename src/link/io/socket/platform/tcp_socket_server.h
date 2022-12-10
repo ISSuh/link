@@ -30,7 +30,7 @@ class TcpSocketServer : public Server {
  public:
   using EventTaskQueue = std::queue<std::function<void()>>;
 
-  explicit TcpSocketServer(base::TaskRunner* task_runner);
+  explicit TcpSocketServer(std::weak_ptr<base::TaskRunner> task_runner);
   virtual ~TcpSocketServer();
 
   // Server
@@ -67,7 +67,7 @@ class TcpSocketServer : public Server {
   void CloseSession(SocketDescriptor descriptor);
   void CloseAllSessions();
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   base::EventChannel::EventChannelDelegate* event_channel_delegate_;
 
   std::unique_ptr<Acceptor> acceptor_;

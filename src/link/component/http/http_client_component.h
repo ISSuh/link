@@ -34,7 +34,7 @@ class HttpClientComponent : public HttpComponent {
 
   static HttpClientComponent* CreateComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner);
+    std::weak_ptr<base::TaskRunner> task_runner);
 
   void Get(const std::string& path, RequestHandler handler);
   void Get(
@@ -81,7 +81,7 @@ class HttpClientComponent : public HttpComponent {
  private:
   HttpClientComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner);
+    std::weak_ptr<base::TaskRunner> task_runner);
   virtual ~HttpClientComponent();
 
   void DoFetch(
@@ -112,7 +112,7 @@ class HttpClientComponent : public HttpComponent {
     std::shared_ptr<io::Session> session);
   void InternalWriteHandler(size_t length);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   std::set<std::unique_ptr<io::Client>> clients_;
 
   bool will_response_chunk_;

@@ -16,7 +16,8 @@ namespace io {
 constexpr const size_t kDefaultBufferSize = 4096;
 
 TcpSocketSession::TcpSocketSession(
-  base::TaskRunner* task_runner, std::unique_ptr<TcpSocket> socket)
+  std::weak_ptr<base::TaskRunner> task_runner,
+  std::unique_ptr<TcpSocket> socket)
   : task_runner_(task_runner),
     socket_(std::move(socket)),
     is_opend_(false) {
@@ -44,7 +45,10 @@ void TcpSocketSession::Close() {
 
   task_queue_.push(std::move(task));
   if (1 == task_queue_.size()) {
-    task_runner_->PostTask(std::move(task));
+    std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+    if (task_runner) {
+      task_runner->PostTask(std::move(task));
+    }
   }
 }
 
@@ -90,7 +94,10 @@ void TcpSocketSession::DoNextProcess() {
   auto task = std::move(task_queue_.front());
   task_queue_.pop();
 
-  task_runner_->PostTask(std::move(task));
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (task_runner) {
+    task_runner->PostTask(std::move(task));
+  }
 }
 
 void TcpSocketSession::DoClose() {
@@ -164,8 +171,13 @@ void TcpSocketSession::InternalWriteHandler(
             << " trasmission_size : " << clumulative_trasmission_size
             << ", writed_size : " << writed_size;
 
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (!task_runner) {
+    return;
+  }
+
   if (0 > writed_size) {
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [this, buffer, clumulative_trasmission_size]() {
         this->DoWrite(buffer, clumulative_trasmission_size);
       });
@@ -178,14 +190,14 @@ void TcpSocketSession::InternalWriteHandler(
       return;
     }
 
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [this, clumulative_trasmission_size]() {
         this->InvokeWriteHandler(clumulative_trasmission_size);
       });
 
     DoNextProcess();
   } else {
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [this, buffer, clumulative_trasmission_size]() {
         this->DoWrite(buffer, clumulative_trasmission_size);
       });
@@ -198,6 +210,11 @@ void TcpSocketSession::InternalReadHandler(
   int32_t size) {
   LOG(INFO) << __func__ << " - res : " << size;
 
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (!task_runner) {
+    return;
+  }
+
   std::weak_ptr<TcpSocketSession> session_weak =
     shared_from_this();
 
@@ -207,14 +224,14 @@ void TcpSocketSession::InternalReadHandler(
       return;
     }
 
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [this, buffer]() {
         this->InvokeReadHandler(*buffer);
       });
 
     DoNextProcess();
   } else if (-1 > size) {
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [session_weak]() {
         auto session = session_weak.lock();
         if (nullptr != session) {
@@ -222,7 +239,7 @@ void TcpSocketSession::InternalReadHandler(
         }
       });
   } else if (0 == size) {
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [session_weak]() {
         auto session = session_weak.lock();
         if (nullptr != session) {
@@ -233,7 +250,7 @@ void TcpSocketSession::InternalReadHandler(
     received_buffer->Resize(size);
     buffer->Append(*received_buffer);
 
-    task_runner_->PostTask(
+    task_runner->PostTask(
       [session_weak, buffer]() {
         auto session = session_weak.lock();
         if (nullptr != session) {

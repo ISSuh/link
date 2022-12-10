@@ -35,7 +35,7 @@ void TestHandler::User(
 }
 
 ExampleHttpServer::ExampleHttpServer(
-    nlink::base::TaskRunner* task_runner,
+    std::weak_ptr<nlink::base::TaskRunner> task_runner,
     nlink::handle::LinkHandle* handle)
   : server_component_(nullptr) {
   auto component_factory_weak = handle->ComponentFactory();

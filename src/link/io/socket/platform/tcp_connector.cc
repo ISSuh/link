@@ -18,7 +18,7 @@ namespace nlink {
 namespace io {
 
 TcpConnector::TcpConnector(
-  base::TaskRunner* task_runner, SocketCreatedCallbak callback)
+  std::weak_ptr<base::TaskRunner> task_runner, SocketCreatedCallbak callback)
   : task_runner_(task_runner),
     socket_create_callback_(std::move(callback)),
     socket_(nullptr),
@@ -60,10 +60,13 @@ void TcpConnector::DoConnect(handler::ConnectHandler handler) {
 }
 
 void TcpConnector::PostConnectTask(handler::ConnectHandler handler) {
-  task_runner_->PostTask(
-    [this, connect_handler = std::move(handler)]() mutable {
-      this->DoConnect(std::move(connect_handler));
-    });
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (task_runner) {
+    task_runner->PostTask(
+      [this, connect_handler = std::move(handler)]() mutable {
+        this->DoConnect(std::move(connect_handler));
+      });
+  }
 }
 
 void TcpConnector::InternalConnectHnadler(

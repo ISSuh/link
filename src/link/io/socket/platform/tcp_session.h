@@ -25,7 +25,8 @@ class TcpSocketSession
     public std::enable_shared_from_this<TcpSocketSession> {
  public:
   TcpSocketSession(
-    base::TaskRunner* task_runner, std::unique_ptr<TcpSocket> socket);
+    std::weak_ptr<base::TaskRunner> task_runner,
+    std::unique_ptr<TcpSocket> socket);
   ~TcpSocketSession();
 
   // Session
@@ -62,7 +63,7 @@ class TcpSocketSession
   void InvokeWriteHandler(size_t writed_size);
   void InvokeReadHandler(const base::Buffer& buffer);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   std::unique_ptr<TcpSocket> socket_;
 
   handler::ReadHandler read_handler_;

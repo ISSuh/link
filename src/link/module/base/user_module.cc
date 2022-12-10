@@ -27,12 +27,8 @@ UserModule::UserModule(
 UserModule::~UserModule() {
 }
 
-base::TaskRunner* UserModule::GetTaskRunner() const {
-  std::shared_ptr<base::TaskRunner> task_runner = task_runner_weak_.lock();
-  if (nullptr == task_runner) {
-    return nullptr;
-  }
-  return task_runner.get();
+std::weak_ptr<base::TaskRunner> UserModule::GetTaskRunner() const {
+  return task_runner_weak_;
 }
 
 void UserModule::Initialize(

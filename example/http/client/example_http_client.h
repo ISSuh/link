@@ -21,7 +21,7 @@ class ExampleHttpClient {
   ~ExampleHttpClient();
 
   void CreateAndRegistComponent(
-    nlink::base::TaskRunner* task_runner,
+    std::weak_ptr<nlink::base::TaskRunner> task_runner,
     nlink::handle::LinkHandle* handle);
 
   bool IsReceivedResponse() const;

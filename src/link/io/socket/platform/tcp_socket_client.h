@@ -29,7 +29,7 @@ class TcpSocketClient : public Client {
  public:
   using EventTaskQueue = std::queue<base::TaskCallback>;
 
-  explicit TcpSocketClient(base::TaskRunner* task_runner);
+  explicit TcpSocketClient(std::weak_ptr<base::TaskRunner> task_runner);
   virtual ~TcpSocketClient();
 
   // Client
@@ -62,7 +62,7 @@ class TcpSocketClient : public Client {
 
   void RegistChannel(SocketDescriptor descriptor);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   base::EventChannel::EventChannelDelegate* channel_delegate_;
 
   std::unique_ptr<Connector> connector_;

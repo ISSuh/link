@@ -15,7 +15,7 @@
 namespace nlink {
 namespace io {
 
-TcpSocketClient::TcpSocketClient(base::TaskRunner* task_runner)
+TcpSocketClient::TcpSocketClient(std::weak_ptr<base::TaskRunner> task_runner)
   : task_runner_(task_runner),
     channel_delegate_(nullptr),
     session_(nullptr) {
@@ -130,7 +130,10 @@ void TcpSocketClient::HandlerWriteEvent() {
   base::TaskCallback callback = std::move(wrtie_task_queue_.front());
   wrtie_task_queue_.pop();
 
-  task_runner_->PostTask(std::move(callback));
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (task_runner) {
+    task_runner->PostTask(std::move(callback));
+  }
 }
 
 void TcpSocketClient::InternalConnectHandler(std::shared_ptr<Session> session) {

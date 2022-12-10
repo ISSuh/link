@@ -28,7 +28,7 @@ class HttpServerComponent : public HttpComponent {
  public:
   static HttpServerComponent* CreateComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner);
+    std::weak_ptr<base::TaskRunner> task_runner);
 
   void Open(const std::string& address, int32_t port);
   void Close();
@@ -40,10 +40,10 @@ class HttpServerComponent : public HttpComponent {
  private:
   explicit HttpServerComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner);
+    std::weak_ptr<base::TaskRunner> task_runner);
   virtual ~HttpServerComponent();
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   std::unique_ptr<HttpServer> http_server_;
 
   DISAALOW_COPY_AND_ASSIGN(HttpServerComponent);

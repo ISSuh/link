@@ -16,7 +16,7 @@
 namespace nlink {
 namespace io {
 
-TcpSocketServer::TcpSocketServer(base::TaskRunner* task_runner)
+TcpSocketServer::TcpSocketServer(std::weak_ptr<base::TaskRunner> task_runner)
   : task_runner_(task_runner),
     acceptor_(nullptr),
     accept_descriptor_(kInvalidSocket) {
@@ -131,11 +131,15 @@ void TcpSocketServer::HandleCloseEvent(SocketDescriptor descriptor) {
     return;
   }
 
-  std::shared_ptr<Session> session = sessions_.at(descriptor);
-  task_runner_->PostTask(
-    [this, session]() {
-      session->Close();
-    });
+  std::shared_ptr<base::TaskRunner> task_runner = task_runner_.lock();
+  if (task_runner) {
+    std::shared_ptr<Session> session = sessions_.at(descriptor);
+
+    task_runner->PostTask(
+      [this, session]() {
+        session->Close();
+      });
+  }
 }
 
 void TcpSocketServer::RegistAcceptedClient(std::shared_ptr<Client>) {

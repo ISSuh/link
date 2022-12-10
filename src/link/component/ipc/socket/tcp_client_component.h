@@ -26,7 +26,7 @@ class TcpClientComponent : public SocketComponent {
  public:
   static TcpClientComponent* CreateComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner,
     SocketComponent::Handler handlers);
 
   void Connect(const std::string& address, int32_t port);
@@ -39,7 +39,7 @@ class TcpClientComponent : public SocketComponent {
  private:
   TcpClientComponent(
     base::ComponentChannelController* channel_controller,
-    base::TaskRunner* task_runner,
+    std::weak_ptr<base::TaskRunner> task_runner,
     SocketComponent::Handler handlers);
   virtual ~TcpClientComponent();
 

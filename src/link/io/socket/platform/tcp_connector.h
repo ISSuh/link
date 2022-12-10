@@ -10,6 +10,7 @@
 #include <memory>
 #include <functional>
 
+#include "link/base/timer.h"
 #include "link/base/task/task_runner.h"
 #include "link//io/socket/connector.h"
 #include "link/io/socket/platform/tcp_socket.h"
@@ -22,7 +23,7 @@ class TcpConnector : public Connector {
   using SocketCreatedCallbak = std::function<void(SocketDescriptor)>;
 
   TcpConnector(
-    base::TaskRunner* task_runner, SocketCreatedCallbak callback);
+    std::weak_ptr<base::TaskRunner> task_runner, SocketCreatedCallbak callback);
   virtual ~TcpConnector();
 
   void Connect(
@@ -34,7 +35,7 @@ class TcpConnector : public Connector {
   void InternalConnectHnadler(handler::ConnectHandler handler, int32_t res);
   void CreateAndRegistNewSession(handler::ConnectHandler handler);
 
-  base::TaskRunner* task_runner_;
+  std::weak_ptr<base::TaskRunner> task_runner_;
   SocketCreatedCallbak socket_create_callback_;
 
   std::unique_ptr<TcpSocket> socket_;

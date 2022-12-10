@@ -42,7 +42,7 @@ Implement module based micro service framework.
   - ~~Process pending write, read on socket~~
   - ~~Implement non copy callback, buffer on socket~~
   - ~~Restruct access using domain name~~
-  - Implement openssl
+  - Implement TLS
   - Implement shared memory
   - Implement pipe, named pipe
 

@@ -18,8 +18,8 @@ namespace component {
 
 HttpClientComponent* HttpClientComponent::CreateComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner) {
-  if (!channel_controller || !task_runner) {
+  std::weak_ptr<base::TaskRunner> task_runner) {
+  if (!channel_controller) {
     return nullptr;
   }
   return new HttpClientComponent(channel_controller, task_runner);
@@ -27,7 +27,7 @@ HttpClientComponent* HttpClientComponent::CreateComponent(
 
 HttpClientComponent::HttpClientComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner)
+  std::weak_ptr<base::TaskRunner> task_runner)
   : HttpComponent(channel_controller),
     task_runner_(task_runner),
     will_response_chunk_(false) {

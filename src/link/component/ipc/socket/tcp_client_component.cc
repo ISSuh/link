@@ -17,7 +17,7 @@ namespace component {
 
 TcpClientComponent::TcpClientComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner,
+  std::weak_ptr<base::TaskRunner> task_runner,
   SocketComponent::Handler handlers)
   : SocketComponent(channel_controller),
     client_(io::SocketFactory::CreateTcpClient(task_runner)),
@@ -95,9 +95,9 @@ void TcpClientComponent::InternalWriteHandler(size_t length) {
 
 TcpClientComponent* TcpClientComponent::CreateComponent(
   base::ComponentChannelController* channel_controller,
-  base::TaskRunner* task_runner,
+  std::weak_ptr<base::TaskRunner> task_runner,
   SocketComponent::Handler handlers) {
-  if (!channel_controller || !task_runner) {
+  if (!channel_controller) {
     return nullptr;
   }
   return new TcpClientComponent(

@@ -27,13 +27,16 @@ class ComponentFctaory {
   virtual ~ComponentFctaory();
 
   TcpClientComponent* CreateTcpClientComponent(
-    base::TaskRunner* task_runner, SocketComponent::Handler handlers);
+    std::weak_ptr<base::TaskRunner> task_runner,
+    SocketComponent::Handler handlers);
 
   TcpServerComponent* CreateTcpServerComponent(
-    base::TaskRunner* task_runner, SocketComponent::Handler handlers);
+    std::weak_ptr<base::TaskRunner> task_runner,
+    SocketComponent::Handler handlers);
 
   template <typename ComponentType>
-  ComponentType* CreateHttpComponent(base::TaskRunner* task_runner);
+  ComponentType* CreateHttpComponent(
+    std::weak_ptr<base::TaskRunner> task_runner);
 
  private:
   std::shared_ptr<base::ComponentChannelController> channel_controller_;
@@ -41,7 +44,7 @@ class ComponentFctaory {
 
 template <typename ComponentType>
 ComponentType* ComponentFctaory::CreateHttpComponent(
-  base::TaskRunner* task_runner) {
+  std::weak_ptr<base::TaskRunner> task_runner) {
   return ComponentType::CreateComponent(channel_controller_.get(), task_runner);
 }
 
