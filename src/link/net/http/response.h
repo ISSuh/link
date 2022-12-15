@@ -9,6 +9,8 @@
 
 #include <string>
 
+#include "link/base/buffer.h"
+#include "link/base/callback.h"
 #include "link/net/base/uri.h"
 #include "link/net/http/method.h"
 #include "link/net/http/status_code.h"

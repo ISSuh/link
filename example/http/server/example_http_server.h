@@ -7,6 +7,7 @@
 #ifndef EXAMPLE_HTTP_SERVER_EXAMPLE_HTTP_SERVER_H_
 #define EXAMPLE_HTTP_SERVER_EXAMPLE_HTTP_SERVER_H_
 
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -18,12 +19,20 @@
 
 class TestHandler {
  public:
+  TestHandler();
+
   void HelloWorld(
     const nlink::net::http::Request&, nlink::net::http::Response*);
   void User(const nlink::net::http::Request&, nlink::net::http::Response*);
+  void Chunk(const nlink::net::http::Request&, nlink::net::http::Response*);
 
  private:
+  void MockFileRead();
+
   uint64_t user_id_;
+
+  std::vector<uint8_t> mock_file_;
+  uint32_t read_index_;
 };
 
 class ExampleHttpServer {
