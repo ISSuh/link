@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+project(@THIRD_PARTY_NAME@-fetch NONE)
+
+include(ExternalProject)
+
+ExternalProject_Add(@THIRD_PARTY_NAME@
+  GIT_REPOSITORY  https://github.com/ReneNyffenegger/cpp-base64
+
+  SOURCE_DIR    @THIRD_PARTY_DOWNLOAD_SRC_DIR@
+  BINARY_DIR    @THIRD_PARTY_DOWNLOAD_BUILD_DIR@
+
+  INSTALL_INCLUDE_DIR @THIRD_PARTY_DOWNLOAD_INSTALL_DIR@/include
+  INSTALL_LIB_DIR @THIRD_PARTY_DOWNLOAD_INSTALL_DIR@/lib
+
+  CONFIGURE_COMMAND
+    cd @THIRD_PARTY_DOWNLOAD_SRC_DIR@
+
+  BUILD_COMMAND
+    cd @THIRD_PARTY_DOWNLOAD_SRC_DIR@ &&
+	  g++ -std=c++14 -c base64.cpp -o base64.o &&
+    ar rvs lib@THIRD_PARTY_NAME@.a base64.o
+
+  INSTALL_COMMAND
+    cd @THIRD_PARTY_DOWNLOAD_SRC_DIR@ &&
+    scp base64.h @THIRD_PARTY_DOWNLOAD_INSTALL_DIR@/include &&
+    scp lib@THIRD_PARTY_NAME@.a @THIRD_PARTY_DOWNLOAD_INSTALL_DIR@/lib
+)

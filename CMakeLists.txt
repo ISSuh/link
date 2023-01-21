@@ -71,6 +71,7 @@ set(LINK_THIRDPATRY_PATH ${PROJECT_LINK_SRC_DIR}/third_party)
 
 set(LINK_THIRD_PARTY_LIST
   json
+  cpp-base64
 )
 
 if(LINK_WITH_ASIO)
@@ -92,6 +93,7 @@ foreach(third_party ${LINK_THIRD_PARTY_LIST})
 endforeach()
 
 set(LINK_THIRDPARTY_LIBS
+  cpp-base64
 )
 
 #-------------------------------------------------------------------------------
