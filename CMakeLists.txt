@@ -64,6 +64,9 @@ set(LINK_HANDLE_PATH ${PROJECT_LINK_SRC_DIR}/handle)
 set(LINK_COMPONENT_NAME ${LINK_LIBRARY_NAME}_component)
 set(LINK_COMPONENT_PATH ${PROJECT_LINK_SRC_DIR}/component)
 
+set(LINK_STORAGE_NAME ${LINK_LIBRARY_NAME}_storage)
+set(LINK_STORAGE_PATH ${PROJECT_LINK_SRC_DIR}/storage)
+
 #-------------------------------------------------------------------------------
 # Install thidparty
 #-------------------------------------------------------------------------------
@@ -110,6 +113,7 @@ add_subdirectory(${LINK_IO_PATH})
 add_subdirectory(${LINK_NET_PATH})
 add_subdirectory(${LINK_HANDLE_PATH})
 add_subdirectory(${LINK_COMPONENT_PATH})
+add_subdirectory(${LINK_STORAGE_PATH})
 
 add_library(${LINK_LIBRARY_NAME}
  SHARED
@@ -119,6 +123,7 @@ add_library(${LINK_LIBRARY_NAME}
   $<TARGET_OBJECTS:link_io>
   $<TARGET_OBJECTS:link_net>
   $<TARGET_OBJECTS:link_component>
+  $<TARGET_OBJECTS:link_storage>
   $<TARGET_OBJECTS:link_handle>
 )
 
@@ -130,6 +135,7 @@ target_link_libraries(${LINK_LIBRARY_NAME}
   ${LINK_IO_NAME}
   ${LINK_NET_NAME}
   ${LINK_COMPONENT_NAME}
+  ${LINK_STORAGE_NAME}
   ${LINK_HANDLE_NAME}
 )
 
@@ -145,7 +151,7 @@ set_target_properties(${LINK_LIBRARY_NAME}
 add_subdirectory(example)
 
 #-------------------------------------------------------------------------------
-# Set gTest
+# build unittest
 #-------------------------------------------------------------------------------
 set(TEST_DIR ${PROJECT_DIR}/test)
 
