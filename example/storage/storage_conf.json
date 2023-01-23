@@ -1,0 +1,18 @@
+{
+  "node_name": "storage",
+  "log_level": "debug",
+  "modules": [
+    {
+      "module_name": "SameplStorage",
+      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/hello_world/libhello_world.so",
+      "module": {
+        "class_name": "SampleStorageModule",
+        "arguments": {
+        },
+        "configure": {
+          "threading": false
+        }
+      }
+    }
+  ]
+}

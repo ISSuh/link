@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ADAPTOR_H_
-#define LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ADAPTOR_H_
+#ifndef LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ODBC_ADAPTOR_H_
+#define LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ODBC_ADAPTOR_H_
 
 #include <sql.h>
 #include <sqlext.h>
@@ -22,9 +22,11 @@ class ODBCAdaptor : public Adaptor {
   bool Connect(const std::string& path) override;
   bool Excute(const std::string& sql) override;
   bool Close() override;
+
+ private:
 };
 
 }  // namespace storage
 }  // namespace nlink
 
-#endif  // #define LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ADAPTOR_H_
+#endif  // #define LINK_STORAGE_DATABASE_ADAPTOR_ODBC_ODBC_ADAPTOR_H_

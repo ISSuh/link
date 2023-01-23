@@ -14,7 +14,9 @@ namespace storage {
 
 class Adaptor {
  public:
-  virtual bool Connect(const std::string& path) = 0;
+  virtual ~Adaptor() = default;
+
+  virtual bool Open(const std::string& path) = 0;
   virtual bool Excute(const std::string& sql) = 0;
   virtual bool Close() = 0;
 };

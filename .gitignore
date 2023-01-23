@@ -37,6 +37,7 @@
 build/*
 
 .vscode*
+*.db
 
 # Third Party
 src/link/third_party/*
