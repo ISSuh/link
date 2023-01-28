@@ -17,17 +17,30 @@
 namespace nlink {
 namespace storage {
 
-class Sqlite3Adaptor : public Adaptor {
+
+class People {
  public:
-  Sqlite3Adaptor();
-  virtual ~Sqlite3Adaptor();
+ private:
+  PK<uint32_t> id;
+  
+
+  int32_t id;
+  std::string name;
+}
+
+class Sqlite3 : public Adaptor {
+ public:
+  Sqlite3();
+  virtual ~Sqlite3();
 
   bool Open(const std::string& path) override;
   bool Excute(const std::string& sql) override;
-  bool Close() override;
+  void Close() override;
 
  private:
-  std::shared_ptr<sqlite3> db_handle_;
+  std::string ErrorMessage();
+
+  sqlite3* db_handle_;
 };
 
 }  // namespace storage

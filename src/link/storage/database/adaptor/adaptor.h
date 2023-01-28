@@ -18,7 +18,7 @@ class Adaptor {
 
   virtual bool Open(const std::string& path) = 0;
   virtual bool Excute(const std::string& sql) = 0;
-  virtual bool Close() = 0;
+  virtual void Close() = 0;
 };
 
 }  // namespace storage

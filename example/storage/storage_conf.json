@@ -4,10 +4,11 @@
   "modules": [
     {
       "module_name": "SameplStorage",
-      "module_path": "/home/issuh/workspace/my_project/link/build/link/example/hello_world/libhello_world.so",
+      "module_path": "/root/workspace/link/build/link/example/storage/libstorage_sample.so",
       "module": {
         "class_name": "SampleStorageModule",
         "arguments": {
+          "storage": "/root/workspace/link/example/storage/test.db"
         },
         "configure": {
           "threading": false

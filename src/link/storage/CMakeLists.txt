@@ -8,19 +8,24 @@ file(GLOB storage_base
 
 file(GLOB storage_database
   ${LINK_STORAGE_PATH}/database/*.cc
-  ${LINK_STORAGE_PATH}/adaptor/*.cc
+)
+
+file(GLOB storage_database_adaptor
+  ${LINK_STORAGE_PATH}/database/adaptor/sqlite3/*.cc
 )
 
 add_library(${LINK_STORAGE_NAME}
  OBJECT
   ${storage_base}
   ${storage_database}
+  ${storage_database_adaptor}
 )
 
 target_link_libraries(${LINK_STORAGE_NAME}
  PRIVATE
   ${LINK_BASE_NAME}
 
+  sqlite3
   odbc
 )
 
