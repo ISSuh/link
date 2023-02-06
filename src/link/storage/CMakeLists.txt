@@ -26,7 +26,6 @@ target_link_libraries(${LINK_STORAGE_NAME}
   ${LINK_BASE_NAME}
 
   sqlite3
-  odbc
 )
 
 add_dependencies(${LINK_STORAGE_NAME}

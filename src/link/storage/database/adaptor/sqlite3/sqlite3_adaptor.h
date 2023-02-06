@@ -17,17 +17,6 @@
 namespace nlink {
 namespace storage {
 
-
-class People {
- public:
- private:
-  PK<uint32_t> id;
-  
-
-  int32_t id;
-  std::string name;
-}
-
 class Sqlite3 : public Adaptor {
  public:
   Sqlite3();

@@ -65,7 +65,6 @@ bool Sqlite3::Excute(const std::string& sql) {
   }
 
   if(ret_code != SQLITE_DONE) {
-      //this error handling could be done better, but it works
       printf("ret_code = %d\n", ret_code);
   }
 

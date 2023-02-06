@@ -18,7 +18,7 @@ ExternalProject_Add(@THIRD_PARTY_NAME@
 
   BUILD_COMMAND
     cd @THIRD_PARTY_DOWNLOAD_SRC_DIR@ &&
-	  g++ -std=c++14 -c base64.cpp -o base64.o &&
+	  g++ -std=c++14 -c base64.cpp -o base64.o -fPIC &&
     ar rvs lib@THIRD_PARTY_NAME@.a base64.o
 
   INSTALL_COMMAND
